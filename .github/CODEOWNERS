@@ -1,0 +1,6 @@
+# Canonical CODEOWNERS for callmepewk/ontabs
+# Sovereign Human Authority
+* @callmepewk
+
+# Critical workflows, security and governance
+/.github/ @callmepewk
