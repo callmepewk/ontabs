@@ -54,7 +54,6 @@ export class GameEngine {
   private stats: GameStats;
   private rafId: number | null = null;
   private running = false;
-  private sustainHeld = new Map<string, boolean>();
 
   constructor(chart: GameChart, audio: AudioEngine, callbacks: EngineCallbacks = {}) {
     this.chart = chart;
