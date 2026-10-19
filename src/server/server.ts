@@ -35,3 +35,4 @@ export function startServer(port = PORT, host = HOST): Promise<http.Server> {
 if (process.argv[1]?.includes('server.ts') || process.argv[1]?.includes('server.js')) {
   startServer();
 }
+

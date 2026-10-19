@@ -129,3 +129,4 @@ export function transposeMidi(midi: number, semitones: number): number {
   }
   return next;
 }
+

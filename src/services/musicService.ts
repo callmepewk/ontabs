@@ -91,12 +91,25 @@ class SovereignMusicService implements MusicService {
   }
 
   async submitYoutubeUrl(url: string, instrument = 'guitar'): Promise<Song> {
+    const resolveRes = await fetch('/api/connectors/resolve', {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ url }),
+    });
+
+    if (!resolveRes.ok) {
+      const err = await resolveRes.json();
+      throw new Error(err.error || 'Falha ao validar URL externa.');
+    }
+
+    const resolved = await resolveRes.json();
+
     const res = await fetch('/api/music/convert', {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({
-        title: `Música (${url.substring(0, 25)}...)`,
-        artist: 'YouTube Import',
+        title: resolved.title,
+        artist: `${resolved.provider.toUpperCase()} Import`,
         instrument,
         durationSeconds: 60,
         bpm: 120,

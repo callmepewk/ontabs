@@ -8,3 +8,5 @@ export * from './keyDetection';
 export * from './fretOptimization';
 export * from './tabValidation';
 export * from './audioAnalysis';
+export * from './connectors';
+

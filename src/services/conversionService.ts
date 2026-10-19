@@ -4,7 +4,7 @@
 
 import { Instrument } from '@/types/domain';
 import { authService } from './authService';
-import { computeEnvelopeAndFlux, estimateBpmFromFlux } from '../engine/audioAnalysis';
+import { computeEnvelopeAndFlux, estimateBpmFromFlux, estimatePitchAutocorrelation } from '../engine';
 
 export type ConversionStage =
   | 'queued'
@@ -45,13 +45,14 @@ class SovereignConversionService implements ConversionService {
     const jobId = `job_${Date.now()}`;
     const title = typeof fileOrTitle === 'string' ? fileOrTitle : fileOrTitle.name.replace(/\.[^/.]+$/, '');
 
-    const update = (stage: ConversionStage, progress: number) => {
+    const update = (stage: ConversionStage, progress: number, errorMsg?: string) => {
       const job: ConversionJob = {
         id: jobId,
         songId: '',
         instrument,
         stage,
         progress,
+        error: errorMsg,
       };
       this.jobs.set(jobId, job);
       onProgress?.(stage, progress);
@@ -61,38 +62,99 @@ class SovereignConversionService implements ConversionService {
 
     let detectedBpm = 120;
     let durationSeconds = 60;
+    let songKey = 'C';
     const detectedNotes: any[] = [];
 
+    // Validação estrita de arquivos de áudio
+    if (typeof fileOrTitle !== 'string') {
+      const file = fileOrTitle;
+      const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
+      if (file.size > MAX_FILE_SIZE) {
+        const msg = `O arquivo selecionado (${(file.size / (1024 * 1024)).toFixed(1)}MB) excede o limite máximo permitido de 30MB.`;
+        update('error', 100, msg);
+        throw new Error(msg);
+      }
+      if (file.size === 0) {
+        const msg = 'O arquivo selecionado está vazio ou corrompido (0 bytes).';
+        update('error', 100, msg);
+        throw new Error(msg);
+      }
+    }
+
     // Se for arquivo de áudio real, processa via Web Audio API no navegador
-    if (typeof fileOrTitle !== 'string' && typeof window !== 'undefined' && window.AudioContext) {
+    if (typeof fileOrTitle !== 'string' && typeof window !== 'undefined' && (window.AudioContext || (window as any).webkitAudioContext)) {
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      const audioCtx = new AudioCtxClass();
+
       try {
         update('processing_audio', 30);
-        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const arrayBuffer = await fileOrTitle.arrayBuffer();
-        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        let audioBuffer: AudioBuffer;
+
+        try {
+          audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        } catch {
+          throw new Error(
+            'Falha na decodificação do áudio. Se for um vídeo MP4, certifique-se de que ele contém uma faixa de áudio compatível (AAC/MP3/PCM).'
+          );
+        }
+
         durationSeconds = Math.round(audioBuffer.duration);
+        if (durationSeconds > 600) {
+          throw new Error('A duração do áudio ultrapassa o limite máximo permitido de 10 minutos (600 segundos).');
+        }
 
         update('analyzing_music', 50);
-        // Downmix para mono
+        // Canal mono
         const channelData = audioBuffer.getChannelData(0);
-        const { flux, fps } = computeEnvelopeAndFlux(channelData, audioBuffer.sampleRate, 512);
+        const sampleRate = audioBuffer.sampleRate;
+        const { flux, fps } = computeEnvelopeAndFlux(channelData, sampleRate, 512);
 
         update('detecting_notes', 70);
         const bpmResult = estimateBpmFromFlux(flux, fps);
         detectedBpm = bpmResult.bpm || 120;
 
-        // Amostragem de transientes melódicos
+        // Amostragem de transientes melódicos e F0 com autocorrelação real
         const beatInterval = 60 / detectedBpm;
-        for (let t = 0; t < Math.min(durationSeconds, 60); t += beatInterval) {
-          detectedNotes.push({
-            timestamp: Number(t.toFixed(2)),
-            midi: 60 + ((Math.round(t) * 2) % 16), // melodia derivada
-            duration: Number((beatInterval * 0.8).toFixed(2)),
-          });
+        const windowSize = 2048;
+        const pitchClassCounts = new Array(12).fill(0);
+
+        for (let t = 0; t < Math.min(durationSeconds, 120); t += beatInterval / 2) {
+          const sampleIndex = Math.floor(t * sampleRate);
+          if (sampleIndex + windowSize <= channelData.length) {
+            const pitch = estimatePitchAutocorrelation(channelData, sampleRate, sampleIndex, windowSize);
+            if (pitch && pitch.clarity >= 0.35 && pitch.midi >= 28 && pitch.midi <= 88) {
+              detectedNotes.push({
+                timestamp: Number(t.toFixed(2)),
+                midi: pitch.midi,
+                frequency: pitch.frequency,
+                cents: pitch.cents,
+                clarity: pitch.clarity,
+                duration: Number((beatInterval * 0.45).toFixed(2)),
+              });
+              pitchClassCounts[pitch.midi % 12]++;
+            }
+          }
         }
+
+        // Determinação da Tonalidade pela nota mais preponderante
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        let maxCount = 0;
+        let bestRootIdx = 0;
+        for (let i = 0; i < 12; i++) {
+          if (pitchClassCounts[i] > maxCount) {
+            maxCount = pitchClassCounts[i];
+            bestRootIdx = i;
+          }
+        }
+        if (maxCount > 0) {
+          songKey = noteNames[bestRootIdx];
+        }
+      } catch (err: any) {
+        update('error', 100, err?.message);
+        throw err;
+      } finally {
         await audioCtx.close();
-      } catch (err) {
-        console.warn('Processamento de áudio local falhou ou codec não suportado. Usando fallback harmônico.', err);
       }
     } else {
       update('analyzing_music', 50);
@@ -119,7 +181,7 @@ class SovereignConversionService implements ConversionService {
         instrument,
         durationSeconds,
         bpm: detectedBpm,
-        songKey: 'C',
+        songKey,
         notes: detectedNotes,
       }),
     });

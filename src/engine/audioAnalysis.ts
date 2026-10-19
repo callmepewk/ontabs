@@ -183,3 +183,107 @@ export function extractWindowChroma(
 
   return chroma;
 }
+
+export interface PitchDetectionResult {
+  frequency: number;
+  midi: number;
+  cents: number;
+  clarity: number; // 0..1
+}
+
+/**
+ * Estimador de Frequência Fundamental (Pitch) por Autocorrelação de Domínio de Tempo.
+ * Rastreia a frequência fundamental F0 de sinais monofônicos (voz, corda individual, solo).
+ */
+export function estimatePitchAutocorrelation(
+  samples: Float32Array,
+  sampleRate: number,
+  start = 0,
+  length = samples.length,
+  minFreq = 70,  // ~C#2 (baixo/guitarra grave)
+  maxFreq = 1000, // ~B5 (guitarra aguda)
+  clarityThreshold = 0.35
+): PitchDetectionResult | null {
+  const actualLen = Math.min(length, samples.length - start);
+  if (actualLen < 256) return null;
+
+  // 1. Calcula energia RMS da janela para rejeitar silêncio
+  let sumSq = 0;
+  for (let i = 0; i < actualLen; i++) {
+    const val = samples[start + i];
+    sumSq += val * val;
+  }
+  const rms = Math.sqrt(sumSq / actualLen);
+  if (rms < 0.005) return null; // silêncio acústico
+
+  // 2. Limites de lag de autocorrelação
+  const minLag = Math.floor(sampleRate / maxFreq);
+  const maxLag = Math.ceil(sampleRate / minFreq);
+
+  if (maxLag >= actualLen) return null;
+
+  // R(0) - autocorrelação no lag zero
+  let r0 = 0;
+  for (let i = 0; i < actualLen - maxLag; i++) {
+    const v = samples[start + i];
+    r0 += v * v;
+  }
+  if (r0 <= 1e-9) return null;
+
+  let bestLag = -1;
+  let maxCorr = -Infinity;
+
+  // Busca o pico de autocorrelação no intervalo [minLag, maxLag]
+  for (let lag = minLag; lag <= maxLag; lag++) {
+    let corr = 0;
+    const count = actualLen - lag;
+    for (let i = 0; i < count; i++) {
+      corr += samples[start + i] * samples[start + i + lag];
+    }
+    const normCorr = corr / r0;
+
+    if (normCorr > maxCorr) {
+      maxCorr = normCorr;
+      bestLag = lag;
+    }
+  }
+
+  if (bestLag <= 0 || maxCorr < clarityThreshold) {
+    return null; // Sinal aperiódico ou ruído
+  }
+
+  // 3. Interpolação parabólica para refinar o lag fracionário
+  let exactLag = bestLag;
+  if (bestLag > minLag && bestLag < maxLag) {
+    let prev = 0;
+    let next = 0;
+    for (let i = 0; i < actualLen - (bestLag + 1); i++) {
+      prev += samples[start + i] * samples[start + i + bestLag - 1];
+      next += samples[start + i] * samples[start + i + bestLag + 1];
+    }
+    prev /= r0;
+    next /= r0;
+
+    const delta = (next - prev) / (2 * (2 * maxCorr - prev - next) + 1e-9);
+    if (Math.abs(delta) < 1) {
+      exactLag = bestLag + delta;
+    }
+  }
+
+  const frequency = sampleRate / exactLag;
+  if (frequency < minFreq * 0.9 || frequency > maxFreq * 1.1) {
+    return null;
+  }
+
+  const exactMidi = 69 + 12 * Math.log2(frequency / 440);
+  const midi = Math.round(exactMidi);
+  const cents = Math.round((exactMidi - midi) * 100);
+
+  return {
+    frequency: Number(frequency.toFixed(2)),
+    midi,
+    cents,
+    clarity: Number(Math.min(1.0, Math.max(0.0, maxCorr)).toFixed(2)),
+  };
+}
+

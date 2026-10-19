@@ -29,6 +29,7 @@ import {
 import {
   computeEnvelopeAndFlux,
   estimateBpmFromFlux,
+  estimatePitchAutocorrelation,
 } from '../audioAnalysis';
 
 describe('Music Engine - Teoria e Notas', () => {
@@ -210,5 +211,46 @@ describe('Music Engine - DSP e Detecção de BPM', () => {
     const bpmResult = estimateBpmFromFlux(flux, fps, 100, 140);
     expect(Math.abs(bpmResult.bpm - 120)).toBeLessThanOrEqual(1);
     expect(bpmResult.confidence).toBeGreaterThan(0.3);
+  });
+
+  it('detecta tom de afinação A4 (440 Hz) com exatidão e alta clareza', () => {
+    const sampleRate = 44100;
+    const duration = 0.5;
+    const samples = new Float32Array(Math.floor(sampleRate * duration));
+    for (let i = 0; i < samples.length; i++) {
+      samples[i] = Math.sin((2 * Math.PI * 440 * i) / sampleRate);
+    }
+
+    const result = estimatePitchAutocorrelation(samples, sampleRate);
+    expect(result).not.toBeNull();
+    expect(result!.midi).toBe(69); // A4
+    expect(Math.abs(result!.frequency - 440)).toBeLessThan(1.5);
+    expect(result!.clarity).toBeGreaterThan(0.7);
+  });
+
+  it('detecta corda A2 de violão (110 Hz)', () => {
+    const sampleRate = 44100;
+    const duration = 0.5;
+    const samples = new Float32Array(Math.floor(sampleRate * duration));
+    for (let i = 0; i < samples.length; i++) {
+      samples[i] = Math.sin((2 * Math.PI * 110 * i) / sampleRate);
+    }
+
+    const result = estimatePitchAutocorrelation(samples, sampleRate);
+    expect(result).not.toBeNull();
+    expect(result!.midi).toBe(45); // A2
+    expect(Math.abs(result!.frequency - 110)).toBeLessThan(1.0);
+  });
+
+  it('retorna null para silêncio e rejeita ruído aleatório', () => {
+    const sampleRate = 44100;
+    const silence = new Float32Array(2048);
+    expect(estimatePitchAutocorrelation(silence, sampleRate)).toBeNull();
+
+    const noise = new Float32Array(2048);
+    for (let i = 0; i < noise.length; i++) {
+      noise[i] = (Math.random() - 0.5) * 0.1;
+    }
+    expect(estimatePitchAutocorrelation(noise, sampleRate)).toBeNull();
   });
 });

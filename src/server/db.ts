@@ -177,11 +177,41 @@ export class Database {
     this.data.tablatures.push(demoTab);
   }
 
+  private writeQueue: Promise<void> = Promise.resolve();
+
   public save(): void {
-    const tmpPath = `${this.filePath}.tmp`;
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const tmpPath = `${this.filePath}.${process.pid}.${Date.now()}.${randomSuffix}.tmp`;
     const payload = JSON.stringify(this.data, null, 2);
-    fs.writeFileSync(tmpPath, payload, 'utf8');
-    fs.renameSync(tmpPath, this.filePath);
+    try {
+      fs.writeFileSync(tmpPath, payload, 'utf8');
+      fs.renameSync(tmpPath, this.filePath);
+    } catch (err) {
+      if (fs.existsSync(tmpPath)) {
+        try { fs.unlinkSync(tmpPath); } catch { /* ignore cleanup error */ }
+      }
+      throw err;
+    }
+  }
+
+  public async saveAsync(): Promise<void> {
+    const saveOperation = async () => {
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const tmpPath = `${this.filePath}.${process.pid}.${Date.now()}.${randomSuffix}.tmp`;
+      const payload = JSON.stringify(this.data, null, 2);
+      try {
+        await fs.promises.writeFile(tmpPath, payload, 'utf8');
+        await fs.promises.rename(tmpPath, this.filePath);
+      } catch (err) {
+        if (fs.existsSync(tmpPath)) {
+          try { await fs.promises.unlink(tmpPath); } catch { /* ignore cleanup error */ }
+        }
+        throw err;
+      }
+    };
+
+    this.writeQueue = this.writeQueue.then(saveOperation, saveOperation);
+    return this.writeQueue;
   }
 
   // --- Usuários & Sessões ---

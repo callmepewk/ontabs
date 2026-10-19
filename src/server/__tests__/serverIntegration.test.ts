@@ -220,4 +220,64 @@ describe('Ontabs Independent Server - End-to-End API Integration', () => {
     const getRes = await fetch(`${BASE_URL}/api/songs/${songAId}`);
     expect(getRes.status).toBe(200);
   });
+
+  it('POST /api/connectors/resolve valida links externos e bloqueia SSRF', async () => {
+    // Caso válido YouTube
+    const ytRes = await fetch(`${BASE_URL}/api/connectors/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }),
+    });
+    expect(ytRes.status).toBe(200);
+    const ytBody = await ytRes.json();
+    expect(ytBody.provider).toBe('youtube');
+    expect(ytBody.id).toBe('dQw4w9WgXcQ');
+
+    // Tentativa de SSRF
+    const ssrfRes = await fetch(`${BASE_URL}/api/connectors/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'http://169.254.169.254/latest/meta-data' }),
+    });
+    expect(ssrfRes.status).toBe(400);
+    const ssrfBody = await ssrfRes.json();
+    expect(ssrfBody.error).toMatch(/endereços locais ou de rede privada/i);
+  });
+
+  it('POST /api/plans/select rejeita ativação de plano pago sem gateway real (402)', async () => {
+    const regRes = await fetch(`${BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: `billing_test_${Date.now()}@ontabs.app`, password: 'password123' }),
+    });
+    const { token } = await regRes.json();
+
+    // Tenta selecionar plano pro sem gateway de pagamento
+    const selectProRes = await fetch(`${BASE_URL}/api/plans/select`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ planCode: 'pro' }),
+    });
+
+    expect(selectProRes.status).toBe(402);
+    const body = await selectProRes.json();
+    expect(body.code).toBe('PAYMENT_GATEWAY_NOT_CONFIGURED');
+
+    // Selecionar plano free é permitido (200)
+    const selectFreeRes = await fetch(`${BASE_URL}/api/plans/select`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ planCode: 'free' }),
+    });
+
+    expect(selectFreeRes.status).toBe(200);
+    const freeBody = await selectFreeRes.json();
+    expect(freeBody.user.planCode).toBe('free');
+  });
 });

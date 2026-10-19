@@ -21,11 +21,36 @@ export function ConverterPage() {
   const [currentStage, setCurrentStage] = useState<ConversionStage | null>(null);
   const [progress, setProgress] = useState(0);
   const [converting, setConverting] = useState(false);
+  const [externalUrl, setExternalUrl] = useState('');
+  const [externalMeta, setExternalMeta] = useState<any | null>(null);
+  const [resolvingUrl, setResolvingUrl] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     authService.getEntitlementStatus().then(setEntitlement).catch(() => null);
   }, []);
+
+  async function handleResolveUrl() {
+    if (!externalUrl.trim()) return;
+    setError(null);
+    setResolvingUrl(true);
+    setExternalMeta(null);
+
+    try {
+      const res = await fetch('/api/connectors/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: externalUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Falha ao validar link.');
+      setExternalMeta(data);
+    } catch (err: any) {
+      setError(err?.message || 'Link inválido.');
+    } finally {
+      setResolvingUrl(false);
+    }
+  }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -172,6 +197,44 @@ export function ConverterPage() {
           >
             Gerar Tab de Demonstração
           </button>
+        </div>
+
+        <div className="card" style={{ gridColumn: 'span 2' }}>
+          <strong>Importar por Link (YouTube / Spotify)</strong>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '8px 0' }}>
+            Valide links públicos para associar metadados oficiais e estruturar a transcrição com segurança técnica.
+          </p>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <input
+              type="text"
+              placeholder="https://www.youtube.com/watch?v=... ou https://open.spotify.com/track/..."
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+              disabled={resolvingUrl}
+              style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-elevated)', color: 'inherit' }}
+            />
+            <button
+              className="btn secondary"
+              disabled={resolvingUrl || !externalUrl.trim()}
+              onClick={handleResolveUrl}
+            >
+              {resolvingUrl ? 'Validando...' : 'Validar Link'}
+            </button>
+          </div>
+
+          {externalMeta && (
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              borderRadius: 6,
+              padding: 10,
+              marginTop: 10,
+              fontSize: 13,
+            }}>
+              <div><strong>{externalMeta.title}</strong> ({externalMeta.provider.toUpperCase()})</div>
+              <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{externalMeta.message}</div>
+            </div>
+          )}
         </div>
       </div>
 

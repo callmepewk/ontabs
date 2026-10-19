@@ -51,3 +51,4 @@ export function getSessionFromToken(db: Database, token: string): { user: UserRe
   if (!user) return null;
   return { user, session };
 }
+

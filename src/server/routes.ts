@@ -14,6 +14,7 @@ import {
 } from './accessStateMachine';
 import { Instrument } from '@/types/domain';
 import { optimizeFretSequence } from '../engine/fretOptimization';
+import { resolveExternalConnectorUrl } from '../engine/connectors';
 
 export interface RequestContext {
   req: http.IncomingMessage;
@@ -249,20 +250,42 @@ export async function dispatchApiRequest(
       return sendJson(res, 400, { error: 'Plano inválido.' });
     }
 
+    if (planCode !== 'free') {
+      return sendJson(res, 402, {
+        error:
+          'Ambiente de pagamento em homologação (Stripe/Pix não configurado para cobrança real). Utilize o período de Trial Pro de 7 dias para testar todas as funcionalidades do OnTabs.',
+        code: 'PAYMENT_GATEWAY_NOT_CONFIGURED',
+      });
+    }
+
     const updated = db.updateUser(user.id, {
-      planCode,
-      subscriptionStatus: planCode === 'free' ? 'none' : 'active',
+      planCode: 'free',
+      subscriptionStatus: 'none',
     });
 
     return sendJson(res, 200, {
       success: true,
-      message: `Plano atualizado para ${PLAN_CATALOG[planCode].name}.`,
+      message: `Plano alterado para Gratuito.`,
       user: {
         id: updated?.id,
         planCode: updated?.planCode,
         subscriptionStatus: updated?.subscriptionStatus,
       },
     });
+  }
+
+  // --- CONECTORES DE MÍDIA EXTERNA (YOUTUBE / SPOTIFY) ---
+  if (pathname === '/api/connectors/resolve' && method === 'POST') {
+    const { url: mediaUrl } = body as { url?: string };
+    if (!mediaUrl) {
+      return sendJson(res, 400, { error: 'O parâmetro "url" é obrigatório.' });
+    }
+    try {
+      const resolved = resolveExternalConnectorUrl(mediaUrl);
+      return sendJson(res, 200, resolved);
+    } catch (err: any) {
+      return sendJson(res, 400, { error: err.message || 'Falha ao validar conector externo.' });
+    }
   }
 
   // --- MÚSICAS & BIBLIOTECA (PAGINADA) ---
