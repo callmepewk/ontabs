@@ -78,6 +78,28 @@ export interface PracticeRecord {
   createdAt: string;
 }
 
+export interface SetlistRecord {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  items: {
+    id: string;
+    songId: string;
+    title: string;
+    artist: string;
+    targetInstrument: string;
+    tuning: string;
+    bpm: number;
+    targetBpm: number;
+    key: string;
+    stageNotes?: string;
+    cueInSeconds?: number;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DatabaseSchema {
   version: number;
   users: UserRecord[];
@@ -86,6 +108,7 @@ export interface DatabaseSchema {
   songs: SongRecord[];
   tablatures: TabRecord[];
   practiceSessions: PracticeRecord[];
+  setlists?: SetlistRecord[];
 }
 
 const DEFAULT_DB_PATH = path.resolve(process.cwd(), 'data', 'ontabs-store.json');
@@ -367,6 +390,46 @@ export class Database {
 
   public listPractice(userId: string): PracticeRecord[] {
     return this.data.practiceSessions.filter((p) => p.userId === userId);
+  }
+
+  // --- Setlists & Ensaio de Banda ---
+  public listSetlists(userId: string): SetlistRecord[] {
+    const list = this.data.setlists || [];
+    return list.filter((s) => s.userId === userId || s.userId === 'system');
+  }
+
+  public getSetlist(id: string): SetlistRecord | null {
+    const list = this.data.setlists || [];
+    return list.find((s) => s.id === id) || null;
+  }
+
+  public createSetlist(setlist: SetlistRecord): SetlistRecord {
+    if (!this.data.setlists) this.data.setlists = [];
+    this.data.setlists.push(setlist);
+    this.save();
+    return setlist;
+  }
+
+  public updateSetlist(id: string, updates: Partial<SetlistRecord>, userId: string): SetlistRecord | null {
+    if (!this.data.setlists) return null;
+    const idx = this.data.setlists.findIndex((s) => s.id === id && (s.userId === userId || userId === 'admin'));
+    if (idx === -1) return null;
+    this.data.setlists[idx] = {
+      ...this.data.setlists[idx],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    this.save();
+    return this.data.setlists[idx];
+  }
+
+  public deleteSetlist(id: string, userId: string): boolean {
+    if (!this.data.setlists) return false;
+    const prev = this.data.setlists.length;
+    this.data.setlists = this.data.setlists.filter((s) => !(s.id === id && (s.userId === userId || userId === 'admin')));
+    const deleted = this.data.setlists.length < prev;
+    if (deleted) this.save();
+    return deleted;
   }
 }
 

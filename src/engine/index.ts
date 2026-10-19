@@ -13,4 +13,7 @@ export * from './intermediateRepresentation';
 export * from './collectiveArrangement';
 export * from './instrumentArrangement';
 export * from './activeListener';
+export * from './equalizer';
+export * from './stemsMixer';
+export * from './setlists';
 

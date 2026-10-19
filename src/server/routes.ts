@@ -462,6 +462,57 @@ export async function dispatchApiRequest(
     return sendJson(res, 200, history);
   }
 
+  // --- SETLISTS & REPERTÓRIO DE BANDA ---
+  if (pathname === '/api/setlists' && method === 'GET') {
+    const setlists = db.listSetlists(user?.id || 'visitor');
+    return sendJson(res, 200, setlists);
+  }
+
+  if (pathname.startsWith('/api/setlists/') && method === 'GET') {
+    const id = pathname.replace('/api/setlists/', '');
+    const setlist = db.getSetlist(id);
+    if (!setlist) {
+      return sendJson(res, 404, { error: 'Setlist não encontrado.' });
+    }
+    return sendJson(res, 200, setlist);
+  }
+
+  if (pathname === '/api/setlists' && method === 'POST') {
+    const { name, description, items } = body;
+    if (!name || typeof name !== 'string') {
+      return sendJson(res, 400, { error: 'O nome do setlist é obrigatório.' });
+    }
+    const now = new Date().toISOString();
+    const newSetlist = db.createSetlist({
+      id: `set_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      userId: user?.id || 'visitor',
+      name: name.trim(),
+      description,
+      items: items || [],
+      createdAt: now,
+      updatedAt: now,
+    });
+    return sendJson(res, 201, newSetlist);
+  }
+
+  if (pathname.startsWith('/api/setlists/') && method === 'PUT') {
+    const id = pathname.replace('/api/setlists/', '');
+    const updated = db.updateSetlist(id, body, user?.id || 'visitor');
+    if (!updated) {
+      return sendJson(res, 404, { error: 'Setlist não encontrado ou acesso não autorizado.' });
+    }
+    return sendJson(res, 200, updated);
+  }
+
+  if (pathname.startsWith('/api/setlists/') && method === 'DELETE') {
+    const id = pathname.replace('/api/setlists/', '');
+    const deleted = db.deleteSetlist(id, user?.id || 'visitor');
+    if (!deleted) {
+      return sendJson(res, 404, { error: 'Setlist não encontrado ou acesso não autorizado.' });
+    }
+    return sendJson(res, 200, { success: true });
+  }
+
   // Rota não encontrada
   return sendJson(res, 404, { error: 'Endpoint não encontrado.', path: pathname });
 }
