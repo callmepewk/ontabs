@@ -2,7 +2,7 @@
 // Validador de Tablaturas - Regras de Domínio Físico e Musical
 
 import { Instrument } from '@/types/domain';
-import { INSTRUMENT_CONFIGS } from './tunings';
+import { INSTRUMENT_CONFIGS, FrettedInstrument } from './tunings';
 
 export type TabValidationErrorType =
   | 'impossible_fret'
@@ -61,7 +61,7 @@ export function validateTabNotes(
 ): TabValidationResult {
   const errors: TabValidationError[] = [];
   const warnings: TabValidationError[] = [];
-  const config = INSTRUMENT_CONFIGS[instrument] || INSTRUMENT_CONFIGS.guitar;
+  const config = INSTRUMENT_CONFIGS[instrument as FrettedInstrument] ?? INSTRUMENT_CONFIGS.guitar;
   const maxFret = config.maxFret;
   const stringCount = config.stringsCount;
 

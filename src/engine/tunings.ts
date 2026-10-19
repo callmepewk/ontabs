@@ -13,10 +13,34 @@ export interface InstrumentConfig {
   defaultTuningMidi: number[];
 }
 
-export const INSTRUMENT_CONFIGS: Record<Instrument, InstrumentConfig> = {
+export type FrettedInstrument =
+  | 'guitar'
+  | 'rhythm_guitar'
+  | 'lead_guitar'
+  | 'acoustic_guitar'
+  | 'bass'
+  | 'ukulele';
+
+export const INSTRUMENT_CONFIGS: Record<FrettedInstrument, InstrumentConfig> & Record<string, InstrumentConfig | undefined> = {
   guitar: {
     instrument: 'guitar',
     name: 'Guitarra Elétrica',
+    stringsCount: 6,
+    maxFret: 24,
+    defaultTuningNotes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+    defaultTuningMidi: [40, 45, 50, 55, 59, 64],
+  },
+  rhythm_guitar: {
+    instrument: 'rhythm_guitar',
+    name: 'Guitarra Rítmica',
+    stringsCount: 6,
+    maxFret: 24,
+    defaultTuningNotes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],
+    defaultTuningMidi: [40, 45, 50, 55, 59, 64],
+  },
+  lead_guitar: {
+    instrument: 'lead_guitar',
+    name: 'Guitarra Solo / Riff',
     stringsCount: 6,
     maxFret: 24,
     defaultTuningNotes: ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'],

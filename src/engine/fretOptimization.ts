@@ -2,7 +2,7 @@
 // Otimizador de digitação (Fret Assignment Optimizer)
 // Mapeia notas musicais em posições de braço minimizando custos ergonômicos e mecânicos.
 
-import { FretboardPosition, findPositionsForMidi, INSTRUMENT_CONFIGS } from './tunings';
+import { FretboardPosition, findPositionsForMidi, INSTRUMENT_CONFIGS, FrettedInstrument } from './tunings';
 import { Instrument } from '@/types/domain';
 
 export interface NoteEventToMap {
@@ -93,7 +93,7 @@ export function optimizeFretSequence(
   _tuningNotes?: string[],
   weights: FretOptimizationWeights = DEFAULT_OPTIMIZATION_WEIGHTS
 ): OptimizedFretNote[] {
-  const config = INSTRUMENT_CONFIGS[instrument] || INSTRUMENT_CONFIGS.guitar;
+  const config = INSTRUMENT_CONFIGS[instrument as FrettedInstrument] ?? INSTRUMENT_CONFIGS.guitar;
   const tuningMidi = config.defaultTuningMidi;
   const maxFret = config.maxFret;
 

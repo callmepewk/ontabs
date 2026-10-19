@@ -8,6 +8,14 @@ import { musicService } from '@/services/musicService';
 import { tabService } from '@/services/tabService';
 import { Song } from '@/types/domain';
 
+function toPlayDifficulty(d?: string): 'easy' | 'medium' | 'hard' | 'expert' {
+  if (d === 'beginner' || d === 'easy') return 'easy';
+  if (d === 'intermediate' || d === 'medium') return 'medium';
+  if (d === 'advanced' || d === 'hard') return 'hard';
+  if (d === 'expert') return 'expert';
+  return 'medium';
+}
+
 export function PlayPage() {
   const { songId } = useParams();
   const navigate = useNavigate();
@@ -30,7 +38,7 @@ export function PlayPage() {
               artist: tab.artist,
               bpm: tab.bpm,
               laneCount: 5,
-              difficulty: tab.difficulty,
+              difficulty: toPlayDifficulty(tab.difficulty),
               durationSeconds: tab.durationSeconds,
             })
           );
