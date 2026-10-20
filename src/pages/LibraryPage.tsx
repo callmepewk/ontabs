@@ -1,5 +1,5 @@
 // src/pages/LibraryPage.tsx
-// Biblioteca Musical do OnTabs — Paginação Completa e Segmentação por Clique (FASE NAV)
+// Biblioteca Musical do OnTabs — Modernização Visual, Paginação e Catálogo Soberano
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ import {
   CatalogResponse,
 } from '@/services/musicService';
 import { Song } from '@/types/domain';
+import { Button, Card, Input, Skeleton } from '@/components/ui';
 
 // Acervo demonstrativo soberano para exploração pública antes do cadastro
 const PUBLIC_DEMO_SONGS: Song[] = [
@@ -111,31 +112,31 @@ function getRightsBadge(asset: VerifiedAsset) {
     return {
       text: '✓ DOMÍNIO PÚBLICO',
       bg: 'rgba(16, 185, 129, 0.15)',
-      color: '#10b981',
-      border: 'rgba(16, 185, 129, 0.4)',
+      color: 'var(--accent-neon)',
+      border: 'rgba(16, 185, 129, 0.35)',
     };
   }
   if (asset.licenseId === 'CC-BY-4.0') {
     return {
       text: 'CC BY 4.0 · CRÉDITO OBRIGATÓRIO',
       bg: 'rgba(59, 130, 246, 0.15)',
-      color: '#3b82f6',
-      border: 'rgba(59, 130, 246, 0.4)',
+      color: 'var(--accent-electric)',
+      border: 'rgba(59, 130, 246, 0.35)',
     };
   }
   if (asset.licenseId?.includes('NC') || asset.licenseId?.includes('NON-COMMERCIAL')) {
     return {
       text: 'CC BY-NC-SA · NÃO COMERCIAL',
       bg: 'rgba(168, 85, 247, 0.15)',
-      color: '#a855f7',
-      border: 'rgba(168, 85, 247, 0.4)',
+      color: '#c084fc',
+      border: 'rgba(168, 85, 247, 0.35)',
     };
   }
   return {
     text: 'RESTRITO · METADATA ONLY / DRM',
     bg: 'rgba(245, 158, 11, 0.15)',
-    color: '#f59e0b',
-    border: 'rgba(245, 158, 11, 0.4)',
+    color: 'var(--accent-amber)',
+    border: 'rgba(245, 158, 11, 0.35)',
   };
 }
 
@@ -186,8 +187,8 @@ export function LibraryPage() {
 
       const res = await musicService.listLibrary(page, limit, query || undefined, instrumentFilter);
 
-      // Se a biblioteca do servidor estiver vazia (usuário não autenticado ou novo usuário),
-      // disponibiliza o catálogo de demonstração pública navegável e segmentável
+      // Se a biblioteca pessoal estiver vazia (novo usuário ou visitante),
+      // disponibiliza o catálogo de demonstração pública navegável
       if (res.total === 0 && !query) {
         setIsDemoMode(true);
         let filteredDemo = [...PUBLIC_DEMO_SONGS];
@@ -212,7 +213,6 @@ export function LibraryPage() {
       }
     } catch (err) {
       console.error('Erro ao listar músicas da biblioteca:', err);
-      // Fallback seguro em caso de indisponibilidade de rede
       setIsDemoMode(true);
       setData({
         items: PUBLIC_DEMO_SONGS.slice(0, limit),
@@ -259,55 +259,63 @@ export function LibraryPage() {
   ];
 
   return (
-    <div className="page" style={{ maxWidth: 1040, margin: '0 auto' }}>
+    <div className="page" style={{ maxWidth: 1080, margin: '0 auto', paddingBottom: 80 }}>
       {/* Cabeçalho */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1 className="page-title" style={{ margin: 0 }}>Biblioteca & Repertório</h1>
-          <p className="page-subtitle" style={{ margin: '4px 0 0 0' }}>
+          <p className="page-subtitle" style={{ margin: '6px 0 0 0' }}>
             {data.total} {data.total === 1 ? 'música disponível' : 'músicas disponíveis'} para estudo, transcrição e gameplay.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Link to="/converter" className="btn" style={{ background: '#10b981', color: '#000', fontWeight: 600 }}>
-            + Nova Análise Musical
+        <div>
+          <Link to="/converter">
+            <Button variant="primary">
+              + Nova Análise Musical
+            </Button>
           </Link>
         </div>
       </div>
 
       {/* Abas Principais de Seção */}
-      <div style={{
-        display: 'flex',
-        gap: 12,
-        marginTop: 18,
-        borderBottom: '1px solid var(--border)',
-        paddingBottom: 2,
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          marginTop: 20,
+          borderBottom: '1px solid var(--border-subtle)',
+          paddingBottom: 2,
+        }}
+      >
         <button
           onClick={() => setActiveTab('library')}
           style={{
             padding: '10px 18px',
             fontSize: 14,
             fontWeight: activeTab === 'library' ? 700 : 500,
-            color: activeTab === 'library' ? '#10b981' : 'var(--text-muted)',
+            color: activeTab === 'library' ? 'var(--accent-neon)' : 'var(--text-secondary)',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'library' ? '2px solid #10b981' : '2px solid transparent',
+            borderBottom: activeTab === 'library' ? '2px solid var(--accent-neon)' : '2px solid transparent',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            transition: 'all var(--duration-fast) var(--ease-spring)',
           }}
         >
           <span>📁</span>
           <span>Meu Repertório & Análises</span>
-          <span style={{
-            fontSize: 11,
-            padding: '2px 6px',
-            borderRadius: 10,
-            background: activeTab === 'library' ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
-            color: activeTab === 'library' ? '#10b981' : 'var(--text-muted)',
-          }}>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-pill)',
+              background: activeTab === 'library' ? 'rgba(16, 185, 129, 0.18)' : 'var(--surface-overlay)',
+              color: activeTab === 'library' ? 'var(--accent-neon)' : 'var(--text-muted)',
+              fontWeight: 600,
+            }}
+          >
             {data.total}
           </span>
         </button>
@@ -318,25 +326,29 @@ export function LibraryPage() {
             padding: '10px 18px',
             fontSize: 14,
             fontWeight: activeTab === 'catalog' ? 700 : 500,
-            color: activeTab === 'catalog' ? '#10b981' : 'var(--text-muted)',
+            color: activeTab === 'catalog' ? 'var(--accent-neon)' : 'var(--text-secondary)',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'catalog' ? '2px solid #10b981' : '2px solid transparent',
+            borderBottom: activeTab === 'catalog' ? '2px solid var(--accent-neon)' : '2px solid transparent',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            transition: 'all var(--duration-fast) var(--ease-spring)',
           }}
         >
           <span>🛡️</span>
           <span>Catálogo Soberano Verificado (Direitos & Proveniência)</span>
-          <span style={{
-            fontSize: 11,
-            padding: '2px 6px',
-            borderRadius: 10,
-            background: activeTab === 'catalog' ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
-            color: activeTab === 'catalog' ? '#10b981' : 'var(--text-muted)',
-          }}>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-pill)',
+              background: activeTab === 'catalog' ? 'rgba(16, 185, 129, 0.18)' : 'var(--surface-overlay)',
+              color: activeTab === 'catalog' ? 'var(--accent-neon)' : 'var(--text-muted)',
+              fontWeight: 600,
+            }}
+          >
             9 Obras
           </span>
         </button>
@@ -344,406 +356,452 @@ export function LibraryPage() {
 
       {activeTab === 'library' ? (
         <>
-      {/* Banner de Demonstração Pública para Visitantes */}
-      {isDemoMode && (
-        <div style={{
-          background: 'rgba(61, 220, 151, 0.08)',
-          border: '1px solid rgba(61, 220, 151, 0.25)',
-          borderRadius: 8,
-          padding: '10px 16px',
-          marginTop: 16,
-          fontSize: 13,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 10,
-        }}>
-          <div>
-            <span style={{ color: '#10b981', fontWeight: 700 }}>👁️ Modo Demonstração Pública:</span>{' '}
-            Você está explorando o catálogo de referência do OnTabs. Navegue livremente por instrumentos, tablaturas e paginação antes de se cadastrar.
-          </div>
-          <Link to="/register" style={{ color: '#10b981', fontWeight: 600, textDecoration: 'underline' }}>
-            Criar conta para salvar seu próprio acervo →
-          </Link>
-        </div>
-      )}
-
-      {/* Segmentação por Clique (Botões de Categoria de Instrumento) */}
-      <div style={{
-        display: 'flex',
-        gap: 6,
-        overflowX: 'auto',
-        padding: '14px 0 4px',
-        borderBottom: '1px solid var(--border)',
-        marginBottom: 16,
-      }}>
-        {segments.map((seg) => {
-          const isActive = activeSegment === seg.id;
-          return (
-            <button
-              key={seg.id}
-              onClick={() => handleSegmentClick(seg.id)}
+          {/* Banner de Demonstração Pública para Visitantes */}
+          {isDemoMode && (
+            <Card
+              elevation={1}
               style={{
+                marginTop: 20,
+                background: 'rgba(16, 185, 129, 0.05)',
+                borderColor: 'rgba(16, 185, 129, 0.25)',
                 display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '8px 14px',
-                borderRadius: 8,
-                fontSize: 13,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                border: isActive ? '1px solid #10b981' : '1px solid var(--border)',
-                background: isActive ? 'rgba(16, 185, 129, 0.18)' : 'var(--bg-elevated)',
-                color: isActive ? '#10b981' : 'var(--text-muted)',
-                fontWeight: isActive ? 700 : 400,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span>{seg.icon}</span>
-              <span>{seg.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Barra de Ferramentas: Pesquisa, Seletor de Modo de Exibição e Tamanho de Página */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 12,
-        marginBottom: 20,
-      }}>
-        {/* Formulário de Busca */}
-        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 8, flex: 1, minWidth: 260 }}>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por título, artista ou tonalidade..."
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 6,
-              border: '1px solid var(--border)',
-              background: '#09090b',
-              color: 'var(--text)',
-              fontSize: 13,
-            }}
-          />
-          <button type="submit" className="btn secondary" style={{ fontSize: 13 }}>
-            Buscar
-          </button>
-        </form>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* Seletor de Itens por Página */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-            <span>Exibir:</span>
-            {[6, 12, 24].map((size) => (
-              <button
-                key={size}
-                onClick={() => setPageSize(size)}
-                style={{
-                  padding: '3px 8px',
-                  borderRadius: 4,
-                  fontSize: 11,
-                  border: pageSize === size ? '1px solid #10b981' : '1px solid var(--border)',
-                  background: pageSize === size ? '#10b981' : 'transparent',
-                  color: pageSize === size ? '#000' : 'var(--text-muted)',
-                  fontWeight: pageSize === size ? 700 : 400,
-                  cursor: 'pointer',
-                }}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-
-          {/* Toggle de Modo Grade / Lista */}
-          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
-            <button
-              onClick={() => setViewMode('grid')}
-              style={{
-                padding: '6px 10px',
-                fontSize: 12,
-                cursor: 'pointer',
-                border: 'none',
-                background: viewMode === 'grid' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                color: viewMode === 'grid' ? '#10b981' : 'var(--text-muted)',
-                fontWeight: viewMode === 'grid' ? 700 : 400,
-              }}
-              title="Visualização em Grade"
-            >
-              ▦ Grade
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              style={{
-                padding: '6px 10px',
-                fontSize: 12,
-                cursor: 'pointer',
-                border: 'none',
-                background: viewMode === 'list' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-                color: viewMode === 'list' ? '#10b981' : 'var(--text-muted)',
-                fontWeight: viewMode === 'list' ? 700 : 400,
-              }}
-              title="Visualização em Lista"
-            >
-              ☰ Lista
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Conteúdo: Lista ou Grade */}
-      {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-          Carregando repertório...
-        </div>
-      ) : data.items.length === 0 ? (
-        <div className="empty-state card" style={{ textAlign: 'center', padding: 40 }}>
-          <p style={{ fontSize: 16 }}>Nenhuma música encontrada para os critérios selecionados.</p>
-          <button
-            className="btn"
-            onClick={() => {
-              setActiveSegment('all');
-              setSearch('');
-            }}
-            style={{ marginTop: 12 }}
-          >
-            Limpar Filtros de Pesquisa
-          </button>
-        </div>
-      ) : viewMode === 'grid' ? (
-        /* Visualização em Grade (Cards) */
-        <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-          {data.items.map((s) => (
-            <div
-              key={s.id}
-              className="card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
                 justifyContent: 'space-between',
-                padding: 16,
-                background: '#0e0f17',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 12,
+                padding: '14px 18px',
               }}
             >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{
-                    fontSize: 10,
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    padding: '2px 8px',
-                    borderRadius: 4,
-                    textTransform: 'uppercase',
-                    color: '#3ddc97',
-                    fontWeight: 600,
-                  }}>
-                    {s.instrument || 'guitar'}
-                  </span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                    {s.bpm ? `${s.bpm} BPM` : ''} {s.key ? `· Tom: ${s.key}` : ''}
-                  </span>
-                </div>
-                <h3 style={{ margin: '10px 0 4px', fontSize: 15 }}>{s.title}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: 12, margin: 0 }}>{s.artist}</p>
+              <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+                <span style={{ color: 'var(--accent-neon)', fontWeight: 700 }}>👁️ Modo Demonstração Pública:</span>{' '}
+                Você está explorando o catálogo de referência do OnTabs. Navegue livremente por instrumentos, tablaturas e paginação antes de se cadastrar.
+              </div>
+              <Link to="/register">
+                <Button variant="secondary" size="sm">
+                  Criar conta para salvar seu acervo →
+                </Button>
+              </Link>
+            </Card>
+          )}
+
+          {/* Segmentação por Clique (Botões de Categoria de Instrumento) */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              padding: '16px 0 8px',
+              borderBottom: '1px solid var(--border-subtle)',
+              marginBottom: 20,
+            }}
+          >
+            {segments.map((seg) => {
+              const isActive = activeSegment === seg.id;
+              return (
+                <button
+                  key={seg.id}
+                  onClick={() => handleSegmentClick(seg.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 14px',
+                    borderRadius: 'var(--radius-pill)',
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    border: isActive ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
+                    background: isActive ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-base)',
+                    color: isActive ? 'var(--accent-neon)' : 'var(--text-secondary)',
+                    fontWeight: isActive ? 700 : 500,
+                    transition: 'all var(--duration-fast) var(--ease-spring)',
+                  }}
+                >
+                  <span>{seg.icon}</span>
+                  <span>{seg.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Barra de Ferramentas: Pesquisa, Seletor de Modo de Exibição e Tamanho de Página */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 12,
+              marginBottom: 24,
+            }}
+          >
+            {/* Formulário de Busca */}
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 10, flex: 1, minWidth: 260 }}>
+              <div style={{ flex: 1 }}>
+                <Input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por título, artista ou tonalidade..."
+                  style={{ padding: '8px 14px', fontSize: 13 }}
+                />
+              </div>
+              <Button type="submit" variant="secondary" size="md">
+                Buscar
+              </Button>
+            </form>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              {/* Seletor de Itens por Página */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+                <span>Exibir:</span>
+                {[6, 12, 24].map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setPageSize(size)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 12,
+                      border: pageSize === size ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
+                      background: pageSize === size ? 'var(--accent-neon)' : 'var(--surface-base)',
+                      color: pageSize === size ? '#051a11' : 'var(--text-secondary)',
+                      fontWeight: pageSize === size ? 700 : 500,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {size}
+                  </button>
+                ))}
               </div>
 
-              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                <Link
-                  to={`/tab/${s.tabId || s.id}`}
-                  className="btn secondary"
-                  style={{ flex: 1, textAlign: 'center', fontSize: 12, padding: '6px 8px' }}
+              {/* Toggle de Modo Grade / Lista */}
+              <div
+                style={{
+                  display: 'flex',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  overflow: 'hidden',
+                  background: 'var(--surface-base)',
+                }}
+              >
+                <button
+                  onClick={() => setViewMode('grid')}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    border: 'none',
+                    background: viewMode === 'grid' ? 'var(--surface-overlay)' : 'transparent',
+                    color: viewMode === 'grid' ? 'var(--accent-neon)' : 'var(--text-secondary)',
+                    fontWeight: viewMode === 'grid' ? 700 : 500,
+                  }}
+                  title="Visualização em Grade"
                 >
-                  Ver Tab & Arranjo
-                </Link>
-                <Link
-                  to={`/play/${s.id}`}
-                  className="btn"
-                  style={{ flex: 1, textAlign: 'center', fontSize: 12, background: '#10b981', color: '#000', padding: '6px 8px', fontWeight: 600 }}
+                  ▦ Grade
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    border: 'none',
+                    background: viewMode === 'list' ? 'var(--surface-overlay)' : 'transparent',
+                    color: viewMode === 'list' ? 'var(--accent-neon)' : 'var(--text-secondary)',
+                    fontWeight: viewMode === 'list' ? 700 : 500,
+                  }}
+                  title="Visualização em Lista"
                 >
-                  🎮 Praticar
-                </Link>
+                  ☰ Lista
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        /* Visualização em Lista Detalhada (Tabela) */
-        <div className="card" style={{ padding: 0, overflowX: 'auto', background: '#0e0f17' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>
-                <th style={{ padding: '12px 16px' }}>Título & Artista</th>
-                <th style={{ padding: '12px 16px' }}>Instrumento</th>
-                <th style={{ padding: '12px 16px' }}>BPM</th>
-                <th style={{ padding: '12px 16px' }}>Tonalidade</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right' }}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.items.map((s) => (
-                <tr key={s.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                  <td style={{ padding: '12px 16px' }}>
-                    <div style={{ fontWeight: 600 }}>{s.title}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.artist}</div>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <span style={{ fontSize: 11, background: 'rgba(255, 255, 255, 0.08)', padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize' }}>
-                      {s.instrument || 'Guitarra'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>
-                    {s.bpm || '—'}
-                  </td>
-                  <td style={{ padding: '12px 16px', color: '#10b981', fontWeight: 600 }}>
-                    {s.key || '—'}
-                  </td>
-                  <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: 6 }}>
-                      <Link
-                        to={`/tab/${s.tabId || s.id}`}
-                        className="btn secondary"
-                        style={{ fontSize: 11, padding: '4px 8px' }}
-                      >
-                        Tablatura
-                      </Link>
-                      <Link
-                        to={`/play/${s.id}`}
-                        className="btn"
-                        style={{ fontSize: 11, padding: '4px 8px', background: '#10b981', color: '#000', fontWeight: 600 }}
-                      >
-                        Praticar
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Controles de Paginação Acessíveis e Determinísticos */}
-      {data.totalPages > 1 && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginTop: 28,
-          paddingTop: 16,
-          borderTop: '1px solid var(--border)',
-        }}>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            Exibindo {Math.min(data.total, (currentPage - 1) * pageSize + 1)}–
-            {Math.min(data.total, currentPage * pageSize)} de {data.total} músicas
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* Primeira Página */}
-            <button
-              className="btn secondary"
-              disabled={currentPage <= 1}
-              onClick={() => handlePageChange(1)}
-              style={{ padding: '4px 8px', fontSize: 12 }}
-              title="Primeira página"
-            >
-              «
-            </button>
-
-            {/* Página Anterior */}
-            <button
-              className="btn secondary"
-              disabled={currentPage <= 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-              style={{ padding: '4px 10px', fontSize: 12 }}
-            >
-              ← Anterior
-            </button>
-
-            {/* Números das Páginas */}
-            {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => handlePageChange(p)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 4,
-                  fontSize: 12,
-                  cursor: 'pointer',
-                  border: currentPage === p ? '1px solid #10b981' : '1px solid var(--border)',
-                  background: currentPage === p ? '#10b981' : 'transparent',
-                  color: currentPage === p ? '#000' : 'var(--text-muted)',
-                  fontWeight: currentPage === p ? 700 : 400,
+          {/* Conteúdo: Lista ou Grade */}
+          {loading ? (
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
+              {Array.from({ length: pageSize }).map((_, idx) => (
+                <Card key={idx} elevation={1} style={{ padding: 20 }}>
+                  <Skeleton width="40%" height="18px" style={{ marginBottom: 14 }} />
+                  <Skeleton width="80%" height="22px" style={{ marginBottom: 8 }} />
+                  <Skeleton width="55%" height="16px" style={{ marginBottom: 20 }} />
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <Skeleton width="50%" height="34px" radius="var(--radius-pill)" />
+                    <Skeleton width="50%" height="34px" radius="var(--radius-pill)" />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : data.items.length === 0 ? (
+            <Card elevation={1} style={{ textAlign: 'center', padding: 48 }}>
+              <p style={{ fontSize: 16, color: 'var(--text-secondary)', margin: '0 0 16px' }}>
+                Nenhuma música encontrada para os critérios selecionados.
+              </p>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setActiveSegment('all');
+                  setSearch('');
                 }}
               >
-                {p}
-              </button>
-            ))}
+                Limpar Filtros de Pesquisa
+              </Button>
+            </Card>
+          ) : viewMode === 'grid' ? (
+            /* Visualização em Grade (Cards) */
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
+              {data.items.map((s) => (
+                <Card
+                  key={s.id}
+                  elevation={1}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: 20,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          background: 'rgba(16, 185, 129, 0.12)',
+                          color: 'var(--accent-neon)',
+                          border: '1px solid rgba(16, 185, 129, 0.25)',
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-pill)',
+                          textTransform: 'uppercase',
+                          fontWeight: 700,
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        {s.instrument || 'guitar'}
+                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        {s.bpm ? `${s.bpm} BPM` : ''} {s.key ? `· Tom: ${s.key}` : ''}
+                      </span>
+                    </div>
+                    <h3 style={{ margin: '14px 0 4px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {s.title}
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>{s.artist}</p>
+                  </div>
 
-            {/* Próxima Página */}
-            <button
-              className="btn secondary"
-              disabled={currentPage >= data.totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-              style={{ padding: '4px 10px', fontSize: 12 }}
-            >
-              Próxima →
-            </button>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+                    <Link to={`/tab/${s.tabId || s.id}`} style={{ flex: 1 }}>
+                      <Button variant="secondary" size="sm" style={{ width: '100%', fontSize: 12 }}>
+                        Ver Tablatura
+                      </Button>
+                    </Link>
+                    <Link to={`/play/${s.id}`} style={{ flex: 1 }}>
+                      <Button variant="primary" size="sm" style={{ width: '100%', fontSize: 12 }}>
+                        🎮 Praticar
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Visualização em Lista Detalhada (Tabela) */
+            <Card elevation={1} style={{ padding: 0, overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: '1px solid var(--border-subtle)',
+                      color: 'var(--text-muted)',
+                      fontSize: 11,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      background: 'var(--surface-elevated)',
+                    }}
+                  >
+                    <th style={{ padding: '14px 18px' }}>Título & Artista</th>
+                    <th style={{ padding: '14px 18px' }}>Instrumento</th>
+                    <th style={{ padding: '14px 18px' }}>BPM</th>
+                    <th style={{ padding: '14px 18px' }}>Tonalidade</th>
+                    <th style={{ padding: '14px 18px', textAlign: 'right' }}>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.items.map((s) => (
+                    <tr
+                      key={s.id}
+                      style={{
+                        borderBottom: '1px solid var(--border-subtle)',
+                        transition: 'background var(--duration-fast) var(--ease-spring)',
+                      }}
+                    >
+                      <td style={{ padding: '14px 18px' }}>
+                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{s.title}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{s.artist}</div>
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            background: 'var(--surface-overlay)',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-subtle)',
+                            padding: '3px 8px',
+                            borderRadius: 'var(--radius-pill)',
+                            textTransform: 'capitalize',
+                          }}
+                        >
+                          {s.instrument || 'Guitarra'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>
+                        {s.bpm || '—'}
+                      </td>
+                      <td style={{ padding: '14px 18px', color: 'var(--accent-neon)', fontWeight: 600 }}>
+                        {s.key || '—'}
+                      </td>
+                      <td style={{ padding: '14px 18px', textAlign: 'right' }}>
+                        <div style={{ display: 'inline-flex', gap: 8 }}>
+                          <Link to={`/tab/${s.tabId || s.id}`}>
+                            <Button variant="secondary" size="sm" style={{ fontSize: 12, padding: '4px 10px' }}>
+                              Tablatura
+                            </Button>
+                          </Link>
+                          <Link to={`/play/${s.id}`}>
+                            <Button variant="primary" size="sm" style={{ fontSize: 12, padding: '4px 10px' }}>
+                              Praticar
+                            </Button>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+          )}
 
-            {/* Última Página */}
-            <button
-              className="btn secondary"
-              disabled={currentPage >= data.totalPages}
-              onClick={() => handlePageChange(data.totalPages)}
-              style={{ padding: '4px 8px', fontSize: 12 }}
-              title="Última página"
+          {/* Controles de Paginação Acessíveis e Determinísticos */}
+          {data.totalPages > 1 && (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 12,
+                marginTop: 32,
+                paddingTop: 18,
+                borderTop: '1px solid var(--border-subtle)',
+              }}
             >
-              »
-            </button>
-          </div>
-        </div>
-      )}
+              <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                Exibindo {Math.min(data.total, (currentPage - 1) * pageSize + 1)}–
+                {Math.min(data.total, currentPage * pageSize)} de {data.total} músicas
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {/* Primeira Página */}
+                <button
+                  className="btn secondary"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(1)}
+                  style={{ padding: '6px 10px', fontSize: 12 }}
+                  title="Primeira página"
+                >
+                  «
+                </button>
+
+                {/* Página Anterior */}
+                <button
+                  className="btn secondary"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  style={{ padding: '6px 12px', fontSize: 12 }}
+                >
+                  ← Anterior
+                </button>
+
+                {/* Números das Páginas */}
+                {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => handlePageChange(p)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 12,
+                      cursor: 'pointer',
+                      border: currentPage === p ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
+                      background: currentPage === p ? 'var(--accent-neon)' : 'var(--surface-base)',
+                      color: currentPage === p ? '#051a11' : 'var(--text-secondary)',
+                      fontWeight: currentPage === p ? 700 : 500,
+                    }}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+                {/* Próxima Página */}
+                <button
+                  className="btn secondary"
+                  disabled={currentPage >= data.totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  style={{ padding: '6px 12px', fontSize: 12 }}
+                >
+                  Próxima →
+                </button>
+
+                {/* Última Página */}
+                <button
+                  className="btn secondary"
+                  disabled={currentPage >= data.totalPages}
+                  onClick={() => handlePageChange(data.totalPages)}
+                  style={{ padding: '6px 10px', fontSize: 12 }}
+                  title="Última página"
+                >
+                  »
+                </button>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         /* Seção do Catálogo Verificado */
-        <div style={{ marginTop: 18 }}>
+        <div style={{ marginTop: 24 }}>
           {/* Header Explicativo de Direitos e Soberania */}
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.05)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            borderRadius: 8,
-            padding: 16,
-            marginBottom: 20,
-            fontSize: 13,
-            lineHeight: 1.6,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: 18 }}>🛡️</span>
-              <strong style={{ color: '#10b981', fontSize: 14 }}>
+          <Card
+            elevation={1}
+            style={{
+              background: 'rgba(16, 185, 129, 0.04)',
+              borderColor: 'rgba(16, 185, 129, 0.25)',
+              padding: 20,
+              marginBottom: 24,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <span style={{ fontSize: 20 }}>🛡️</span>
+              <strong style={{ color: 'var(--accent-neon)', fontSize: 15 }}>
                 Catálogo Auditado & Inteligência de Direitos Autorais
               </strong>
             </div>
-            <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
               Todas as 9 obras abaixo foram catalogadas com <strong>separação tripartite de direitos</strong> (Composição, Arranjo e Fonograma) segundo a Lei 9.610/98 e convenções internacionais. Apenas obras de domínio público integral e licenças Creative Commons estritas com atribuição são liberadas para processamento e execução. Áudios protegidos por DRM (ex: Spotify) são restritos a <em>METADATA_ONLY</em> sem extração de áudio.
             </p>
-          </div>
+          </Card>
 
           {/* Filtros de Coleção do Catálogo */}
-          <div style={{
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            paddingBottom: 12,
-            marginBottom: 16,
-            borderBottom: '1px solid var(--border)',
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              paddingBottom: 12,
+              marginBottom: 20,
+              borderBottom: '1px solid var(--border-subtle)',
+            }}
+          >
             {[
               { id: 'all', label: 'Todas as Obras (9)' },
               { id: 'public_demo', label: 'Domínio Público & Demo (5)' },
@@ -757,14 +815,15 @@ export function LibraryPage() {
                   onClick={() => setCatalogFilter(f.id as any)}
                   style={{
                     padding: '8px 14px',
-                    borderRadius: 6,
+                    borderRadius: 'var(--radius-pill)',
                     fontSize: 13,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    border: isSelected ? '1px solid #10b981' : '1px solid var(--border)',
-                    background: isSelected ? 'rgba(16, 185, 129, 0.18)' : 'var(--bg-elevated)',
-                    color: isSelected ? '#10b981' : 'var(--text-muted)',
-                    fontWeight: isSelected ? 700 : 400,
+                    border: isSelected ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
+                    background: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-base)',
+                    color: isSelected ? 'var(--accent-neon)' : 'var(--text-secondary)',
+                    fontWeight: isSelected ? 700 : 500,
+                    transition: 'all var(--duration-fast) var(--ease-spring)',
                   }}
                 >
                   {f.label}
@@ -775,11 +834,19 @@ export function LibraryPage() {
 
           {/* Listagem de Ativos do Catálogo */}
           {catalogLoading ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-              Carregando catálogo verificado de obras e metadados de direitos...
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
+              {[1, 2, 3].map((n) => (
+                <Card key={n} elevation={1} style={{ padding: 22, height: 320 }}>
+                  <Skeleton width="50%" height="20px" style={{ marginBottom: 12 }} />
+                  <Skeleton width="75%" height="24px" style={{ marginBottom: 8 }} />
+                  <Skeleton width="40%" height="16px" style={{ marginBottom: 18 }} />
+                  <Skeleton width="100%" height="80px" style={{ marginBottom: 20 }} />
+                  <Skeleton width="100%" height="36px" radius="var(--radius-pill)" />
+                </Card>
+              ))}
             </div>
           ) : (
-            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
               {(catalogData?.assets || [])
                 .filter((asset) => {
                   if (catalogFilter === 'all') return true;
@@ -788,16 +855,14 @@ export function LibraryPage() {
                 .map((asset) => {
                   const badge = getRightsBadge(asset);
                   return (
-                    <div
+                    <Card
                       key={asset.id}
-                      className="card"
+                      elevation={1}
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
-                        padding: 18,
-                        background: '#0e0f17',
-                        border: '1px solid var(--border)',
+                        padding: 22,
                       }}
                     >
                       <div>
@@ -807,72 +872,132 @@ export function LibraryPage() {
                               fontSize: 10,
                               fontWeight: 700,
                               padding: '3px 8px',
-                              borderRadius: 4,
+                              borderRadius: 'var(--radius-pill)',
                               background: badge.bg,
                               color: badge.color,
                               border: `1px solid ${badge.border}`,
-                              letterSpacing: 0.5,
+                              letterSpacing: '0.04em',
                             }}
                           >
                             {badge.text}
                           </span>
-                          <span style={{ fontSize: 11, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: 4 }}>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              color: 'var(--text-muted)',
+                              background: 'var(--surface-overlay)',
+                              border: '1px solid var(--border-subtle)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-pill)',
+                            }}
+                          >
                             {asset.genre} · {asset.releaseYear || 'Histórico'}
                           </span>
                         </div>
 
-                        <h3 style={{ margin: '12px 0 4px', fontSize: 15 }}>{asset.title}</h3>
-                        <p style={{ color: '#10b981', fontSize: 13, margin: '0 0 10px', fontWeight: 500 }}>{asset.artist}</p>
+                        <h3 style={{ margin: '14px 0 4px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                          {asset.title}
+                        </h3>
+                        <p style={{ color: 'var(--accent-neon)', fontSize: 13, margin: '0 0 12px', fontWeight: 600 }}>
+                          {asset.artist}
+                        </p>
 
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, background: 'rgba(0,0,0,0.25)', padding: 10, borderRadius: 6, marginBottom: 12 }}>
-                          <div><strong>Composição:</strong> {asset.rightsHolder?.compositionAuthor || 'N/A'} {asset.rightsHolder?.isCompositionPublicDomain ? '(Domínio Público)' : ''}</div>
-                          <div><strong>Fonograma:</strong> {asset.rightsHolder?.recordingPerformer || 'N/A'} {asset.rightsHolder?.isPhonogramPublicDomain ? '(Domínio Público)' : ''}</div>
-                          <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af' }}>
-                            <em>"{asset.attribution?.creditText}"</em>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.5,
+                            background: 'var(--surface-overlay)',
+                            border: '1px solid var(--border-subtle)',
+                            padding: 12,
+                            borderRadius: 'var(--radius-md)',
+                            marginBottom: 14,
+                          }}
+                        >
+                          <div>
+                            <strong style={{ color: 'var(--text-primary)' }}>Composição:</strong>{' '}
+                            {asset.rightsHolder?.compositionAuthor || 'N/A'}{' '}
+                            {asset.rightsHolder?.isCompositionPublicDomain ? '(Domínio Público)' : ''}
+                          </div>
+                          <div>
+                            <strong style={{ color: 'var(--text-primary)' }}>Fonograma:</strong>{' '}
+                            {asset.rightsHolder?.recordingPerformer || 'N/A'}{' '}
+                            {asset.rightsHolder?.isPhonogramPublicDomain ? '(Domínio Público)' : ''}
+                          </div>
+                          <div style={{ marginTop: 6, fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                            "{asset.attribution?.creditText}"
                           </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 11, marginBottom: 14 }}>
-                          <span style={{ padding: '2px 6px', borderRadius: 4, background: asset.hasStems ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', color: asset.hasStems ? '#10b981' : 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 11, marginBottom: 16 }}>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: 'var(--radius-pill)',
+                              background: asset.hasStems ? 'rgba(16, 185, 129, 0.12)' : 'var(--surface-overlay)',
+                              color: asset.hasStems ? 'var(--accent-neon)' : 'var(--text-muted)',
+                              border: '1px solid var(--border-subtle)',
+                              fontWeight: 500,
+                            }}
+                          >
                             {asset.hasStems ? '✓ Stems Isolados' : 'Mixdown Estéreo'}
                           </span>
-                          <span style={{ padding: '2px 6px', borderRadius: 4, background: asset.hasGroundTruthTab ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.05)', color: asset.hasGroundTruthTab ? '#3b82f6' : 'var(--text-muted)' }}>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: 'var(--radius-pill)',
+                              background: asset.hasGroundTruthTab ? 'rgba(59, 130, 246, 0.12)' : 'var(--surface-overlay)',
+                              color: asset.hasGroundTruthTab ? 'var(--accent-electric)' : 'var(--text-muted)',
+                              border: '1px solid var(--border-subtle)',
+                              fontWeight: 500,
+                            }}
+                          >
                             {asset.hasGroundTruthTab ? '✓ Tab de Referência' : 'Transcrição Estimada'}
                           </span>
-                          <span style={{ padding: '2px 6px', borderRadius: 4, background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                          <span
+                            style={{
+                              padding: '3px 8px',
+                              borderRadius: 'var(--radius-pill)',
+                              background: 'var(--surface-overlay)',
+                              color: 'var(--text-muted)',
+                              border: '1px solid var(--border-subtle)',
+                            }}
+                          >
                             {asset.durationSeconds}s
                           </span>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                        <Link
-                          to={`/tab/${asset.id}`}
-                          className="btn secondary"
-                          style={{ flex: 1, textAlign: 'center', fontSize: 12, padding: '8px 10px' }}
-                        >
-                          Ver Tablatura
+                      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                        <Link to={`/tab/${asset.id}`} style={{ flex: 1 }}>
+                          <Button variant="secondary" size="sm" style={{ width: '100%', fontSize: 12 }}>
+                            Ver Tablatura
+                          </Button>
                         </Link>
                         {asset.permissions?.publicPlayback === 'ALLOWED' ? (
-                          <Link
-                            to={`/play/${asset.id}`}
-                            className="btn"
-                            style={{ flex: 1, textAlign: 'center', fontSize: 12, background: '#10b981', color: '#000', padding: '8px 10px', fontWeight: 600 }}
-                          >
-                            🎮 Praticar (Play)
+                          <Link to={`/play/${asset.id}`} style={{ flex: 1 }}>
+                            <Button variant="primary" size="sm" style={{ width: '100%', fontSize: 12 }}>
+                              🎮 Praticar (Play)
+                            </Button>
                           </Link>
                         ) : (
                           <button
                             disabled
                             className="btn secondary"
-                            style={{ flex: 1, fontSize: 11, opacity: 0.5, cursor: 'not-allowed', padding: '8px 10px' }}
+                            style={{
+                              flex: 1,
+                              fontSize: 11,
+                              opacity: 0.5,
+                              cursor: 'not-allowed',
+                              padding: '8px 10px',
+                            }}
                             title="Reprodução de áudio restrita pelos termos do provedor (apenas metadados)."
                           >
                             DRM Restrito
                           </button>
                         )}
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
             </div>
