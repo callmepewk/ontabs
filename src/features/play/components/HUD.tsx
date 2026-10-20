@@ -7,9 +7,10 @@ interface HUDProps {
   difficulty: string;
   bpm: number;
   stats: GameStats;
+  provenance?: 'USER_EXTRACTED' | 'SYNTHETIC_DEMO';
 }
 
-export function HUD({ title, artist, difficulty, bpm, stats }: HUDProps) {
+export function HUD({ title, artist, difficulty, bpm, stats, provenance }: HUDProps) {
   return (
     <div className="otp-hud">
       <div className="otp-hud-song">
@@ -19,6 +20,15 @@ export function HUD({ title, artist, difficulty, bpm, stats }: HUDProps) {
       <div className="otp-hud-meta">
         <span className="otp-pill">{difficulty}</span>
         <span className="otp-pill">{bpm} BPM</span>
+        {provenance === 'SYNTHETIC_DEMO' ? (
+          <span className="otp-pill" style={{ background: 'rgba(255, 209, 102, 0.2)', color: '#ffd166', border: '1px solid #ffd166' }}>
+            Demo Sintética
+          </span>
+        ) : (
+          <span className="otp-pill" style={{ background: 'rgba(61, 220, 151, 0.2)', color: '#3ddc97', border: '1px solid #3ddc97' }}>
+            Áudio Real Extraído
+          </span>
+        )}
       </div>
       <div className="otp-hud-combo">
         <span className="otp-combo-number">{stats.combo}</span>

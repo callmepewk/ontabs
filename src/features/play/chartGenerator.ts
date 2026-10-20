@@ -13,6 +13,7 @@ interface GenerateOptions {
   laneCount: 5 | 6;
   difficulty: Difficulty;
   durationSeconds: number;
+  provenance?: 'USER_EXTRACTED' | 'SYNTHETIC_DEMO';
 }
 
 // Cada dificuldade define: densidade de notas mantidas, se aceita acordes,
@@ -59,6 +60,7 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
         timestamp: ev.timestamp,
         lane,
         type: 'note',
+        provenance: opts.provenance,
       });
     } else if (isChord) {
       const lanes = Array.from(new Set(ev.strings.map((s) => stringToLane(s, opts.laneCount))));
@@ -68,6 +70,7 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
         lane: lanes[0],
         lanes,
         type: 'chord',
+        provenance: opts.provenance,
       });
     } else if (ev.sustainMs && ev.sustainMs > 200 && rules.allowSustain) {
       notes.push({
@@ -76,6 +79,7 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
         lane: stringToLane(ev.strings[0], opts.laneCount),
         type: 'sustain',
         duration: ev.sustainMs,
+        provenance: opts.provenance,
       });
     } else {
       notes.push({
@@ -83,6 +87,7 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
         timestamp: ev.timestamp,
         lane: stringToLane(ev.strings[0], opts.laneCount),
         type: 'note',
+        provenance: opts.provenance,
       });
     }
 
@@ -98,5 +103,6 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
     difficulty: opts.difficulty,
     notes,
     durationSeconds: opts.durationSeconds,
+    provenance: opts.provenance,
   };
 }

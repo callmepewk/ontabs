@@ -88,6 +88,17 @@ export function PlayScreen({ chart, audioUrl, onDifficultyChange, onExit }: Play
         <div className="otp-pregame">
           <h1>OnTabs Play</h1>
           <h2>{chart.title} <span>· {chart.artist}</span></h2>
+          <div style={{ marginTop: 6, marginBottom: 12 }}>
+            {chart.provenance === 'SYNTHETIC_DEMO' ? (
+              <span className="otp-pill" style={{ background: 'rgba(255, 209, 102, 0.2)', color: '#ffd166', border: '1px solid #ffd166', fontSize: 12 }}>
+                ⚙️ Demonstração Sintética (Web Audio)
+              </span>
+            ) : (
+              <span className="otp-pill" style={{ background: 'rgba(61, 220, 151, 0.2)', color: '#3ddc97', border: '1px solid #3ddc97', fontSize: 12 }}>
+                🎵 Áudio Real Extraído ({chart.notes.length} notas na chart)
+              </span>
+            )}
+          </div>
 
           <DifficultySelector
             value={difficulty}
@@ -107,7 +118,14 @@ export function PlayScreen({ chart, audioUrl, onDifficultyChange, onExit }: Play
 
       {started && learnMode === 'game' && (
         <>
-          <HUD title={chart.title} artist={chart.artist} difficulty={difficulty} bpm={chart.bpm} stats={displayStats} />
+          <HUD
+            title={chart.title}
+            artist={chart.artist}
+            difficulty={difficulty}
+            bpm={chart.bpm}
+            stats={displayStats}
+            provenance={chart.provenance}
+          />
           <Highway engine={engine} laneCount={chart.laneCount} laneColors={LANE_COLORS} />
           {isTouch && input && (
             <TouchControls laneCount={chart.laneCount} laneColors={LANE_COLORS} input={input} />

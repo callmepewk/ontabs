@@ -284,7 +284,7 @@ export interface TrajectoryAnalysisResult {
 
 /**
  * Analisa uma trajetória temporal de F0 (Active Listener) para detectar vibrato, bends e slides.
- * Algoritmo puramente matemático e determinístico.
+ * Utiliza Schmitt Trigger com banda morta de histerese (±8 cents) e medição inter-cruzamento.
  */
 export function analyzePitchTrajectory(points: TrajectoryPoint[]): TrajectoryAnalysisResult {
   if (points.length < 3) {
@@ -322,14 +322,26 @@ export function analyzePitchTrajectory(points: TrajectoryPoint[]): TrajectoryAna
     else detected.push('slide_down');
   }
 
-  // 3. Detecção de Vibrato: análise de cruzes de média (zero-crossings da oscilação)
+  // 3. Detecção de Vibrato: análise com histerese (Schmitt trigger) imune a ruído de alta frequência
   const avgMidi = validPoints.reduce((acc, p) => acc + p.midi, 0) / validPoints.length;
   const deviations = validPoints.map((p) => p.midi - avgMidi);
 
-  let zeroCrossings = 0;
-  for (let i = 1; i < deviations.length; i++) {
-    if ((deviations[i - 1] < 0 && deviations[i] >= 0) || (deviations[i - 1] > 0 && deviations[i] <= 0)) {
-      zeroCrossings++;
+  // Banda morta de histerese: ±0.08 semitons (±8 cents) para rejeição de jitter
+  const HYSTERESIS = 0.08;
+  let hystState: 'below' | 'above' | 'neutral' = 'neutral';
+  const crossingTimes: number[] = [];
+
+  for (let i = 0; i < deviations.length; i++) {
+    const d = deviations[i];
+    if (hystState === 'neutral') {
+      if (d > HYSTERESIS) hystState = 'above';
+      else if (d < -HYSTERESIS) hystState = 'below';
+    } else if (hystState === 'below' && d > HYSTERESIS) {
+      hystState = 'above';
+      crossingTimes.push(validPoints[i].time);
+    } else if (hystState === 'above' && d < -HYSTERESIS) {
+      hystState = 'below';
+      crossingTimes.push(validPoints[i].time);
     }
   }
 
@@ -338,9 +350,13 @@ export function analyzePitchTrajectory(points: TrajectoryPoint[]): TrajectoryAna
   let vibratoRateHz: number | undefined;
   let vibratoDepthCents: number | undefined;
 
-  if (duration >= 0.25 && zeroCrossings >= 3) {
-    const estimatedFreq = (zeroCrossings / 2) / duration;
-    // Vibrato musical padrão entre 4.0 Hz e 8.0 Hz
+  if (duration >= 0.25 && crossingTimes.length >= 3) {
+    // Medição inter-cruzamento: tempo exato entre o primeiro e o último cruzamento detectado
+    const dtCrossings = crossingTimes[crossingTimes.length - 1] - crossingTimes[0];
+    const numHalfCycles = crossingTimes.length - 1;
+    const estimatedFreq = dtCrossings > 0 ? (numHalfCycles / 2) / dtCrossings : 0;
+
+    // Vibrato musical padrão entre 3.5 Hz e 8.5 Hz
     if (estimatedFreq >= 3.5 && estimatedFreq <= 8.5) {
       const maxDev = Math.max(...deviations.map((d) => Math.abs(d)));
       const cents = maxDev * 100;
