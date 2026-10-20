@@ -84,3 +84,4 @@ class SovereignSetlistService {
 }
 
 export const setlistService = new SovereignSetlistService();
+

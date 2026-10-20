@@ -246,6 +246,10 @@ export class Database {
     return this.data.users.find((u) => u.id === id) || null;
   }
 
+  public countUsers(): number {
+    return this.data.users.length;
+  }
+
   public createUser(user: UserRecord): UserRecord {
     this.data.users.push(user);
     this.save();

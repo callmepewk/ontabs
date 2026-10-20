@@ -103,3 +103,4 @@ export class StemsMixer {
     return calculateEffectiveChannelGains(this.getAllChannels());
   }
 }
+

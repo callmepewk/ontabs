@@ -171,3 +171,4 @@ export const MultiInstrumentAdapter: React.FC<MultiInstrumentAdapterProps> = ({
     </div>
   );
 };
+

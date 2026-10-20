@@ -40,7 +40,7 @@ export const DEFAULT_OPTIMIZATION_WEIGHTS: FretOptimizationWeights = {
 /**
  * Calcula o custo de escolher uma determinada posição candidata, dado o contexto da nota anterior.
  */
-function evaluatePositionCost(
+export function evaluatePositionCost(
   cand: FretboardPosition,
   previous: OptimizedFretNote | null,
   targetPositionAnchor: number, // posição base (ex: 5ª casa)
@@ -142,4 +142,165 @@ export function optimizeFretSequence(
   }
 
   return result;
+}
+
+/**
+ * Otimizador Global (Dijkstra / Trellis Viterbi) que garante custo matematicamente mínimo
+ * em toda a frase musical, ponderando transições de mão e posições no braço.
+ */
+export function optimizeFretSequenceGlobal(
+  notes: NoteEventToMap[],
+  instrument: Instrument = 'guitar',
+  _tuningNotes?: string[],
+  weights: FretOptimizationWeights = DEFAULT_OPTIMIZATION_WEIGHTS
+): { path: OptimizedFretNote[]; totalCost: number } {
+  if (notes.length === 0) return { path: [], totalCost: 0 };
+
+  const config = INSTRUMENT_CONFIGS[instrument as FrettedInstrument] ?? INSTRUMENT_CONFIGS.guitar;
+  const tuningMidi = config.defaultTuningMidi;
+  const maxFret = config.maxFret;
+
+  // 1. Gera candidatos por etapa temporal
+  const stages: { note: NoteEventToMap; candidates: FretboardPosition[] }[] = [];
+  for (const n of notes) {
+    const cands = findPositionsForMidi(n.midi, tuningMidi, maxFret);
+    if (cands.length > 0) {
+      stages.push({ note: n, candidates: cands });
+    }
+  }
+
+  if (stages.length === 0) return { path: [], totalCost: 0 };
+
+  // 2. Programação Dinâmica / Dijkstra sobre a Trellis
+  // dp[stageIndex][candIndex] = { minCost, prevCandIndex }
+  type DPNode = { cost: number; prevIdx: number };
+  const dp: DPNode[][] = [];
+
+  // Inicializa estágio 0
+  dp[0] = stages[0].candidates.map((cand) => {
+    const initialCost = evaluatePositionCost(cand, null, 5, weights);
+    return { cost: initialCost, prevIdx: -1 };
+  });
+
+  // Itera estágios subsequentes
+  for (let s = 1; s < stages.length; s++) {
+    const prevCands = stages[s - 1].candidates;
+    const curCands = stages[s].candidates;
+    dp[s] = [];
+
+    for (let c = 0; c < curCands.length; c++) {
+      const curCand = curCands[c];
+      let minTransitionCost = Infinity;
+      let bestPrevIdx = -1;
+
+      for (let p = 0; p < prevCands.length; p++) {
+        const prevNodeObj: OptimizedFretNote = {
+          timestamp: stages[s - 1].note.timestamp,
+          midi: stages[s - 1].note.midi,
+          stringNumber: prevCands[p].stringNumber,
+          fret: prevCands[p].fret,
+          finger: 1,
+        };
+        const stepCost = evaluatePositionCost(curCand, prevNodeObj, 5, weights);
+        const totalSoFar = dp[s - 1][p].cost + stepCost;
+
+        if (totalSoFar < minTransitionCost) {
+          minTransitionCost = totalSoFar;
+          bestPrevIdx = p;
+        }
+      }
+
+      dp[s][c] = { cost: minTransitionCost, prevIdx: bestPrevIdx };
+    }
+  }
+
+  // 3. Identifica o nó terminal com menor custo
+  const lastStage = dp[stages.length - 1];
+  let minFinalCost = Infinity;
+  let bestFinalIdx = -1;
+  for (let c = 0; c < lastStage.length; c++) {
+    if (lastStage[c].cost < minFinalCost) {
+      minFinalCost = lastStage[c].cost;
+      bestFinalIdx = c;
+    }
+  }
+
+  // 4. Backtracking do caminho ótimo
+  const path: OptimizedFretNote[] = new Array(stages.length);
+  let curIdx = bestFinalIdx;
+  for (let s = stages.length - 1; s >= 0; s--) {
+    const cand = stages[s].candidates[curIdx];
+    path[s] = {
+      timestamp: stages[s].note.timestamp,
+      midi: stages[s].note.midi,
+      stringNumber: cand.stringNumber,
+      fret: cand.fret,
+      finger: cand.fret > 0 ? Math.min(4, Math.max(1, cand.fret % 4 + 1)) : 0,
+      duration: stages[s].note.duration,
+    };
+    curIdx = dp[s][curIdx].prevIdx;
+  }
+
+  return { path, totalCost: Number(minFinalCost.toFixed(4)) };
+}
+
+/**
+ * Busca Exaustiva para pequenos grafos (oráculo independente para validar Dijkstra).
+ */
+export function exhaustiveSearchFretSequence(
+  notes: NoteEventToMap[],
+  instrument: Instrument = 'guitar',
+  weights: FretOptimizationWeights = DEFAULT_OPTIMIZATION_WEIGHTS
+): { path: OptimizedFretNote[]; totalCost: number } {
+  const config = INSTRUMENT_CONFIGS[instrument as FrettedInstrument] ?? INSTRUMENT_CONFIGS.guitar;
+  const tuningMidi = config.defaultTuningMidi;
+  const maxFret = config.maxFret;
+
+  const candidateLists = notes.map((n) => ({
+    note: n,
+    cands: findPositionsForMidi(n.midi, tuningMidi, maxFret),
+  }));
+
+  let bestCombination: FretboardPosition[] = [];
+  let minCost = Infinity;
+
+  function recurse(index: number, currentCombo: FretboardPosition[], currentCost: number) {
+    if (index === candidateLists.length) {
+      if (currentCost < minCost) {
+        minCost = currentCost;
+        bestCombination = [...currentCombo];
+      }
+      return;
+    }
+
+    const { cands } = candidateLists[index];
+    for (const cand of cands) {
+      const prevCand = index > 0 ? currentCombo[index - 1] : null;
+      const prevNote: OptimizedFretNote | null = prevCand
+        ? {
+            timestamp: candidateLists[index - 1].note.timestamp,
+            midi: candidateLists[index - 1].note.midi,
+            stringNumber: prevCand.stringNumber,
+            fret: prevCand.fret,
+            finger: 1,
+          }
+        : null;
+
+      const stepCost = evaluatePositionCost(cand, prevNote, 5, weights);
+      recurse(index + 1, [...currentCombo, cand], currentCost + stepCost);
+    }
+  }
+
+  recurse(0, [], 0);
+
+  const path = bestCombination.map((cand, idx) => ({
+    timestamp: candidateLists[idx].note.timestamp,
+    midi: candidateLists[idx].note.midi,
+    stringNumber: cand.stringNumber,
+    fret: cand.fret,
+    finger: cand.fret > 0 ? 1 : 0,
+    duration: candidateLists[idx].note.duration,
+  }));
+
+  return { path, totalCost: Number(minCost.toFixed(4)) };
 }

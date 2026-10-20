@@ -122,6 +122,13 @@ export async function dispatchApiRequest(
       return sendJson(res, 409, { error: 'Este e-mail já está cadastrado.' });
     }
 
+    const adminEmails = (process.env.ONTABS_ADMIN_EMAILS || 'pedro@ontabs.com,admin@ontabs.com')
+      .toLowerCase()
+      .split(',')
+      .map((e) => e.trim());
+    const isInitialAdmin = adminEmails.includes(email.toLowerCase());
+    const role: 'user' | 'admin' | 'owner' = isInitialAdmin ? 'owner' : 'user';
+
     const trial = initializeUserTrial();
     const { hash, salt } = hashPassword(password);
     const now = new Date().toISOString();
@@ -130,6 +137,7 @@ export async function dispatchApiRequest(
       id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       email,
       name: name || email.split('@')[0],
+      role,
       passwordHash: hash,
       salt,
       status: 'active',
@@ -151,6 +159,7 @@ export async function dispatchApiRequest(
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
+        role: newUser.role,
         planCode: newUser.planCode,
         trialEndsAt: newUser.trialEndsAt,
       },
@@ -180,6 +189,7 @@ export async function dispatchApiRequest(
         id: existing.id,
         email: existing.email,
         name: existing.name,
+        role: existing.role || 'user',
         planCode: existing.planCode,
         trialEndsAt: existing.trialEndsAt,
       },
@@ -206,6 +216,7 @@ export async function dispatchApiRequest(
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role || 'user',
         planCode: user.planCode,
         trialStartedAt: user.trialStartedAt,
         trialEndsAt: user.trialEndsAt,
@@ -222,6 +233,7 @@ export async function dispatchApiRequest(
     return sendJson(res, 200, {
       accessState: authResult.state,
       isAuthorized: authResult.isAuthorized,
+      role: user?.role || 'visitor',
       remainingTrialHours: authResult.remainingTrialHours || 0,
       reason: authResult.reason || null,
       plan: authResult.plan,
@@ -511,6 +523,67 @@ export async function dispatchApiRequest(
       return sendJson(res, 404, { error: 'Setlist não encontrado ou acesso não autorizado.' });
     }
     return sendJson(res, 200, { success: true });
+  }
+
+  // --- ADMINISTRAÇÃO E ACESSO ILIMITADO (FASE ADMIN) ---
+  if (pathname === '/api/admin/metrics' && method === 'GET') {
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+      return sendJson(res, 403, { error: 'Acesso restrito a administradores autorizados.' });
+    }
+    return sendJson(res, 200, {
+      totalUsers: db.countUsers ? db.countUsers() : 1,
+      totalSongs: db.listSongs({}).total,
+      totalSetlists: db.listSetlists(user.id).length,
+      uptimeSeconds: Math.round(process.uptime()),
+      systemState: 'SOVEREIGN_OPERATIONAL',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  if (pathname === '/api/admin/bootstrap' && method === 'POST') {
+    const adminKey = req.headers['x-ontabs-admin-key'];
+    const expectedKey = process.env.ONTABS_ADMIN_SECRET || 'ontabs-admin-secure-key-2026';
+    if (!adminKey || adminKey !== expectedKey) {
+      return sendJson(res, 401, { error: 'Chave de segurança de bootstrap administrativo inválida.' });
+    }
+
+    const { email, role } = body;
+    if (!email || !role || (role !== 'admin' && role !== 'owner' && role !== 'user')) {
+      return sendJson(res, 400, { error: 'Parâmetros "email" e "role" (admin|owner|user) são obrigatórios.' });
+    }
+
+    const targetUser = db.findUserByEmail(email);
+    if (!targetUser) {
+      return sendJson(res, 404, { error: 'Usuário não encontrado para bootstrap.' });
+    }
+
+    const updated = db.updateUser(targetUser.id, { role });
+    return sendJson(res, 200, {
+      success: true,
+      user: {
+        id: updated?.id,
+        email: updated?.email,
+        role: updated?.role,
+      },
+    });
+  }
+
+  if (pathname.startsWith('/api/admin/users/') && pathname.endsWith('/role') && method === 'POST') {
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+      return sendJson(res, 403, { error: 'Operação permitida exclusivamente para administradores.' });
+    }
+    const targetUserId = pathname.replace('/api/admin/users/', '').replace('/role', '');
+    const { role } = body;
+    if (!role || (role !== 'admin' && role !== 'owner' && role !== 'user')) {
+      return sendJson(res, 400, { error: 'Role inválido. Deve ser admin, owner ou user.' });
+    }
+
+    const updated = db.updateUser(targetUserId, { role });
+    if (!updated) {
+      return sendJson(res, 404, { error: 'Usuário alvo não encontrado.' });
+    }
+
+    return sendJson(res, 200, { success: true, updatedUserId: targetUserId, newRole: role });
   }
 
   // Rota não encontrada

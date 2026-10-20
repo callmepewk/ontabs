@@ -12,7 +12,8 @@ export type AccessState =
   | 'SUBSCRIPTION_ACTIVE'
   | 'SUBSCRIPTION_PAST_DUE'
   | 'SUBSCRIPTION_CANCELED'
-  | 'ACCOUNT_SUSPENDED';
+  | 'ACCOUNT_SUSPENDED'
+  | 'ADMIN_UNLIMITED';
 
 export type PlanCode = 'free' | 'pro' | 'premium';
 
@@ -76,6 +77,7 @@ export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 export interface UserAccessRecord {
   id: string;
   email: string;
+  role?: 'user' | 'admin' | 'owner';
   status: 'active' | 'suspended';
   trialStartedAt: string | null; // ISO UTC
   trialEndsAt: string | null;    // ISO UTC
@@ -104,6 +106,11 @@ export function evaluateAccessState(
 ): AccessState {
   if (!user) {
     return visitorConsumedFreeUse ? 'FREE_USE_CONSUMED' : 'FREE_USE_AVAILABLE';
+  }
+
+  // Administrador ou Proprietário tem acesso ilimitado soberano permanente
+  if (user.role === 'admin' || user.role === 'owner') {
+    return 'ADMIN_UNLIMITED';
   }
 
   if (user.status === 'suspended') {
@@ -172,6 +179,29 @@ export function authorizeProtectedOperation(
       isAuthorized: false,
       reason: 'Conta suspensa por violação dos termos de uso.',
       plan: PLAN_CATALOG.free,
+    };
+  }
+
+  // 2b. Administrador Ilimitado (Owner / Admin)
+  if (state === 'ADMIN_UNLIMITED') {
+    return {
+      state: 'ADMIN_UNLIMITED',
+      isAuthorized: true,
+      plan: {
+        code: 'premium',
+        name: 'Administrador (Acesso Ilimitado)',
+        priceMonthly: 0,
+        analysesPerMonth: 999999,
+        maxSongs: 999999,
+        maxInstruments: 4,
+        maxDifficulties: 4,
+        features: [
+          'Acesso Administrativo Vitalício',
+          'Sem expiração de trial',
+          'Sem cotas comerciais',
+          'Painel de telemetria e auditoria',
+        ],
+      },
     };
   }
 
