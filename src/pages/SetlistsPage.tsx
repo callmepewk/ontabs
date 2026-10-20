@@ -225,7 +225,7 @@ export function SetlistsPage() {
           transition: border-color var(--duration-fast) var(--ease-spring);
         }
         .select-dark:focus {
-          border-color: var(--accent-neon);
+          border-color: var(--accent-primary);
         }
       `}</style>
 
@@ -241,26 +241,9 @@ export function SetlistsPage() {
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h1 className="page-title" style={{ margin: 0 }}>
-              Repertórios & Ensaios ao Vivo
-            </h1>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: 'var(--radius-pill)',
-                background: 'rgba(16, 185, 129, 0.12)',
-                color: 'var(--accent-neon)',
-                border: '1px solid rgba(16, 185, 129, 0.25)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-              }}
-            >
-              Fase 11 • Ao Vivo
-            </span>
-          </div>
+          <h1 className="page-title" style={{ margin: 0 }}>
+            Repertórios & Ensaios ao Vivo
+          </h1>
           <p className="page-subtitle" style={{ margin: '6px 0 0 0' }}>
             Coordenação de setlists de banda, transições de afinação e anotações de palco em tempo real.
           </p>
@@ -347,8 +330,8 @@ export function SetlistsPage() {
           elevation={2}
           style={{
             marginBottom: 24,
-            border: '1px solid var(--accent-neon)',
-            boxShadow: 'var(--shadow-glow-neon)',
+            border: '1px solid var(--border-default)',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
           <h3 style={{ marginTop: 0, marginBottom: 16, fontSize: 18, color: 'var(--text-primary)' }}>
@@ -451,12 +434,12 @@ export function SetlistsPage() {
                   }}
                   style={{
                     padding: '14px 16px',
-                    borderColor: isActive ? 'var(--accent-neon)' : 'var(--border-subtle)',
-                    background: isActive ? 'rgba(16, 185, 129, 0.08)' : 'var(--surface-base)',
-                    boxShadow: isActive ? '0 0 12px rgba(16, 185, 129, 0.15)' : 'none',
+                    borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-subtle)',
+                    background: isActive ? 'var(--accent-subtle)' : 'var(--surface-base)',
+                    boxShadow: isActive ? 'var(--shadow-md)' : 'none',
                   }}
                 >
-                  <div style={{ fontWeight: 600, fontSize: 14, color: isActive ? 'var(--accent-neon)' : 'var(--text-primary)' }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: isActive ? 'var(--accent-primary)' : 'var(--text-primary)' }}>
                     {s.name}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -611,15 +594,15 @@ export function SetlistsPage() {
                             width: 28,
                             height: 28,
                             minWidth: 28,
-                            borderRadius: '50%',
+                            borderRadius: 'var(--radius-sm)',
                             background: 'var(--surface-overlay)',
-                            color: 'var(--accent-neon)',
+                            color: 'var(--accent-primary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: 12,
                             fontWeight: 700,
-                            border: '1px solid rgba(16, 185, 129, 0.25)',
+                            border: '1px solid var(--border-subtle)',
                           }}
                         >
                           {idx + 1}
@@ -657,11 +640,11 @@ export function SetlistsPage() {
                                 gap: 4,
                                 fontSize: 11,
                                 fontWeight: 500,
-                                color: 'var(--accent-neon)',
-                                background: 'rgba(16, 185, 129, 0.12)',
-                                border: '1px solid rgba(16, 185, 129, 0.25)',
+                                color: 'var(--accent-primary)',
+                                background: 'var(--accent-subtle)',
+                                border: '1px solid var(--border-subtle)',
                                 padding: '1px 8px',
-                                borderRadius: 'var(--radius-pill)',
+                                borderRadius: 'var(--radius-sm)',
                                 marginTop: 4,
                               }}
                             >

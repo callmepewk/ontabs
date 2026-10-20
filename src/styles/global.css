@@ -1,48 +1,50 @@
 /* src/styles/global.css — Ontabs Unified Design System & Shell Styling */
 
 :root {
-  /* --- Superfícies e Profundidade --- */
-  --bg-canvas: #07080c;
-  --surface-base: #0f1118;
-  --surface-elevated: #161824;
-  --surface-overlay: #1e2132;
-  --surface-hover: rgba(255, 255, 255, 0.05);
+  /* --- Superfícies e Profundidade (Paleta Dark Studio) --- */
+  --bg-canvas: #090a0f;
+  --surface-base: #11131c;
+  --surface-elevated: #171a26;
+  --surface-overlay: #1e2232;
+  --surface-hover: rgba(255, 255, 255, 0.04);
   --surface-active: rgba(255, 255, 255, 0.08);
 
-  /* --- Bordas e Contornos --- */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-default: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.22);
-  --border-focus: #3b82f6;
+  /* --- Bordas e Contornos Estruturais --- */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.24);
+  --border-focus: #6366f1;
 
   /* --- Tipografia e Contrastes --- */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --text-inverse: #07080c;
+  --text-inverse: #090a0f;
 
-  /* --- Acentos e Semântica Musical --- */
-  --accent-neon: #10b981;       /* Sucesso, afinação perfeita, Pro */
-  --accent-electric: #3b82f6;   /* Interações principais, tabs ativas */
-  --accent-amber: #f59e0b;      /* Atenção, afinação próxima, intermediário */
-  --accent-coral: #ef4444;      /* Erro, desafinado, crítico */
-  --accent-gradient: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #059669 0%, #2563eb 100%);
+  /* --- Acentos e Semântica Musical Refinada --- */
+  --accent-primary: #6366f1;        /* Identidade principal Studio Indigo */
+  --accent-primary-hover: #4f46e5;
+  --accent-neon: #10b981;           /* Sucesso, afinação precisa, nota correta */
+  --accent-electric: #6366f1;       /* Ações primárias, seleção ativa */
+  --accent-amber: #f59e0b;          /* Atenção, aviso de afinação, intermediário */
+  --accent-coral: #ef4444;          /* Erro, desafinado, exclusão */
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
 
-  /* --- Sombras --- */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-subtle);
-  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-subtle);
-  --shadow-glow-neon: 0 0 20px rgba(16, 185, 129, 0.25);
-  --shadow-glow-electric: 0 0 20px rgba(59, 130, 246, 0.25);
+  /* --- Sombras de Estúdio (Sem Glows Neon Excessivos) --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border-subtle);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border-subtle);
+  --shadow-glow-neon: 0 2px 10px rgba(16, 185, 129, 0.15);
+  --shadow-glow-electric: 0 2px 12px rgba(99, 102, 241, 0.2);
 
-  /* --- Raios de Borda --- */
+  /* --- Sistema Geométrico Coerente --- */
   --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-pill: 9999px;
+  --radius-sm: 6px;
+  --radius-md: 8px;                 /* Controles, botões, inputs */
+  --radius-lg: 12px;                /* Cards, painéis, modais */
+  --radius-xl: 16px;                /* Containers amplos */
+  --radius-pill: 9999px;            /* Badges e tags compactas */
 
   /* --- Animações e Transições --- */
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
@@ -159,9 +161,9 @@ a {
 }
 
 .app-nav-link.active {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--accent-neon);
-  box-shadow: inset 2px 0 0 var(--accent-neon);
+  background: var(--surface-overlay);
+  color: var(--text-primary);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
   font-weight: 600;
 }
 
@@ -251,23 +253,23 @@ a {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: var(--radius-pill);
-  border: none;
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  background: var(--accent-gradient);
-  color: #051a11;
+  background: var(--accent-primary);
+  color: #ffffff;
   transition: all var(--duration-fast) var(--ease-spring);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  box-shadow: var(--shadow-sm);
   user-select: none;
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--accent-gradient-hover);
+  background: var(--accent-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  box-shadow: var(--shadow-md);
 }
 
 .btn:active:not(:disabled) {

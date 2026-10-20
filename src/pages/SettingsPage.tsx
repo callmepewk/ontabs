@@ -181,14 +181,13 @@ export function SettingsPage() {
             <span
               style={{
                 fontSize: 11,
-                fontWeight: 700,
+                fontWeight: 600,
                 padding: '3px 8px',
-                borderRadius: 'var(--radius-pill)',
-                background: currentUser ? 'rgba(59, 130, 246, 0.15)' : 'rgba(16, 185, 129, 0.12)',
-                color: currentUser ? 'var(--accent-electric)' : 'var(--accent-neon)',
-                border: `1px solid ${currentUser ? 'rgba(59, 130, 246, 0.3)' : 'rgba(16, 185, 129, 0.25)'}`,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--surface-overlay)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-subtle)',
+                letterSpacing: '0.02em',
               }}
             >
               {isAuthResolving
@@ -312,13 +311,13 @@ export function SettingsPage() {
             </div>
             <span
               style={{
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: 700,
-                color: 'var(--accent-neon)',
-                background: 'rgba(16, 185, 129, 0.1)',
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-pill)',
-                border: '1px solid rgba(16, 185, 129, 0.2)',
+                color: 'var(--accent-primary)',
+                background: 'var(--accent-subtle)',
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-subtle)',
               }}
             >
               {Math.round(settings.audioVolume * 100)}%
@@ -346,7 +345,7 @@ export function SettingsPage() {
               onChange={(e) => handleVolumeChange(Number(e.target.value))}
               style={{
                 width: '100%',
-                accentColor: 'var(--accent-neon)',
+                accentColor: 'var(--accent-primary)',
                 cursor: 'pointer',
               }}
             />

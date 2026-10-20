@@ -24,20 +24,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    // Dimensões por tamanho
+    // Dimensões por tamanho com geometria consistente (raio moderado, não pílula por padrão)
     const sizeStyles: Record<'sm' | 'md' | 'lg', React.CSSProperties> = {
-      sm: { padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--radius-pill)' },
-      md: { padding: '10px 18px', fontSize: '14px', borderRadius: 'var(--radius-pill)' },
-      lg: { padding: '14px 26px', fontSize: '15px', borderRadius: 'var(--radius-pill)' },
+      sm: { padding: '6px 12px', fontSize: '12px', borderRadius: 'var(--radius-sm)' },
+      md: { padding: '9px 16px', fontSize: '14px', borderRadius: 'var(--radius-md)' },
+      lg: { padding: '12px 22px', fontSize: '15px', borderRadius: 'var(--radius-md)' },
     };
 
-    // Estilos visuais por variante
+    // Estilos visuais por variante (cores sólidas de estúdio, sem neon/cyberpunk)
     const variantStyles: Record<'primary' | 'secondary' | 'ghost' | 'danger', React.CSSProperties> = {
       primary: {
-        background: 'var(--accent-gradient)',
-        color: '#051a11',
-        border: 'none',
-        boxShadow: '0 2px 10px rgba(16, 185, 129, 0.25)',
+        background: 'var(--accent-primary)',
+        color: '#ffffff',
+        border: '1px solid transparent',
+        boxShadow: 'var(--shadow-sm)',
       },
       secondary: {
         background: 'var(--surface-overlay)',
@@ -52,9 +52,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         boxShadow: 'none',
       },
       danger: {
-        background: 'rgba(239, 68, 68, 0.15)',
+        background: 'rgba(239, 68, 68, 0.12)',
         color: 'var(--accent-coral)',
-        border: '1px solid rgba(239, 68, 68, 0.3)',
+        border: '1px solid rgba(239, 68, 68, 0.25)',
         boxShadow: 'none',
       },
     };

@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services/authService';
+import { Button, Card, Input } from '@/components/ui';
 
 export function RegisterPage() {
   const [name, setName] = useState('');
@@ -29,117 +30,98 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 440, margin: '40px auto' }}>
-      <div className="card">
-        <h1 className="page-title" style={{ fontSize: 22, textAlign: 'center' }}>Comece Grátis no OnTabs</h1>
-        <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: 16 }}>
+    <div className="page" style={{ maxWidth: 460, margin: '48px auto' }}>
+      <Card elevation={2} style={{ padding: 32 }}>
+        <h1 className="page-title" style={{ fontSize: 24, textAlign: 'center', marginBottom: 6 }}>
+          Comece Grátis no OnTabs
+        </h1>
+        <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: 20 }}>
           Crie sua conta e aproveite <strong>7 dias de Trial Pro completo</strong> sem compromisso.
         </p>
 
-        <div style={{
-          background: 'rgba(16, 185, 129, 0.1)',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
-          borderRadius: 8,
-          padding: 10,
-          marginBottom: 16,
-          fontSize: 12,
-          color: '#10b981',
-          lineHeight: 1.5,
-        }}>
+        <div
+          style={{
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            marginBottom: 20,
+            fontSize: 13,
+            color: 'var(--accent-neon)',
+            lineHeight: 1.5,
+          }}
+        >
           ✨ Acesso total ao OnTabs Play, detecção de notas, afinações alternativas e biblioteca estendida liberados no seu período de teste.
         </div>
 
         {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 6,
-            padding: 10,
-            marginBottom: 16,
-            fontSize: 13,
-            color: '#ef4444',
-          }}>
-            {error}
+          <div
+            role="alert"
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              marginBottom: 20,
+              fontSize: 13,
+              color: 'var(--accent-coral)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Nome ou Apelido</label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text)',
-              }}
-              placeholder="Seu nome"
-            />
-          </div>
+        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Input
+            label="Nome ou Apelido"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Seu nome"
+          />
 
-          <div>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>E-mail</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text)',
-              }}
-              placeholder="seu@email.com"
-            />
-          </div>
+          <Input
+            label="E-mail"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+          />
 
-          <div>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Senha (mínimo 6 dígitos)</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text)',
-              }}
-              placeholder="Crie sua senha"
-            />
-          </div>
+          <Input
+            label="Senha (mínimo 6 dígitos)"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Crie sua senha"
+          />
 
-          <button
+          <Button
             type="submit"
-            className="btn"
+            variant="primary"
             disabled={loading}
-            style={{ marginTop: 10, width: '100%', background: '#10b981', color: '#000', fontWeight: 600 }}
+            isLoading={loading}
+            style={{ marginTop: 8, width: '100%' }}
           >
             {loading ? 'Criando conta...' : 'Ativar 7 Dias Grátis'}
-          </button>
+          </Button>
         </form>
 
-        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+        <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)' }}>
           Já possui conta?{' '}
-          <Link to="/login" style={{ color: '#10b981', fontWeight: 500 }}>
+          <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
             Fazer login
           </Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
-

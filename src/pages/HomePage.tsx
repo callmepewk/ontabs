@@ -1,8 +1,9 @@
 // src/pages/HomePage.tsx
-// OnTabs Commercial Landing Page — Engenharia Musical Soberana (FASE UI)
+// OnTabs Commercial Landing Page — Engenharia Musical Soberana
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button, Card } from '@/components/ui';
 
 export function HomePage() {
   const [activeInstrumentTab, setActiveInstrumentTab] = useState<'guitar' | 'bass' | 'drums' | 'sax'>('guitar');
@@ -49,25 +50,41 @@ export function HomePage() {
     guitar: {
       title: 'Guitarra Elétrica (Solo & Base)',
       desc: 'Classificação automática de papéis (Lead vs. Rhythm) e mapeamento polifônico para dedilhados ergonômicos no braço.',
-      specs: ['Afinação Standard, Drop D, DADGAD e afinações abertas', 'Otimização de casas via Dijkstra com tolerância biomecânica', 'Identificação de terças e oitavas paralelas entre guitarras'],
+      specs: [
+        'Afinação Standard, Drop D, DADGAD e afinações abertas',
+        'Otimização de casas via Dijkstra com tolerância biomecânica',
+        'Identificação de terças e oitavas paralelas entre guitarras',
+      ],
       icon: '🎸',
     },
     bass: {
       title: 'Contrabaixo (4 e 5 Cordas)',
       desc: 'Transposição inteligente de 1 oitava abaixo, mantendo clareza da fundamental e evitando posições fisicamente impossíveis.',
-      specs: ['Extensão E1 a G3 com filtragem de notas fantasmas', 'Foco na linha rítmica fundamental e notas de passagem', 'Equalizador de estudo com boost de 80Hz para isolamento'],
+      specs: [
+        'Extensão E1 a G3 com filtragem de notas fantasmas',
+        'Foco na linha rítmica fundamental e notas de passagem',
+        'Equalizador de estudo com boost de 80Hz para isolamento',
+      ],
       icon: '🎻',
     },
     drums: {
       title: 'Bateria & Percussão (Groove Grid)',
       desc: 'Tradução precisa de transientes e fluxo espectral para grade de 4 vias: Bumbo, Caixa, Chimbal e Pratos.',
-      specs: ['Detecção de onsets por derivada positiva de fluxo', 'Sincronização milimétrica de compassos e andamento (BPM)', 'Padrão visual pronto para treino rítmico'],
+      specs: [
+        'Detecção de onsets por derivada positiva de fluxo',
+        'Sincronização milimétrica de compassos e andamento (BPM)',
+        'Padrão visual pronto para treino rítmico',
+      ],
       icon: '🥁',
     },
     sax: {
       title: 'Saxofone & Instrumentos de Sopro',
       desc: 'Transposição automática para afinações em Eb (Alto/Barítono) e Bb (Tenor/Soprano) com respirações guiadas.',
-      specs: ['Transposição de tom automático (+9 ou +2 semitons)', 'Marcadores visuais de pausa para respiração a cada 4 compassos', 'Afinador cromático em cents para embocadura precisa'],
+      specs: [
+        'Transposição de tom automático (+9 ou +2 semitons)',
+        'Marcadores visuais de pausa para respiração a cada 4 compassos',
+        'Afinador cromático em cents para embocadura precisa',
+      ],
       icon: '🎷',
     },
   };
@@ -96,154 +113,170 @@ export function HomePage() {
   ];
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 20px 80px' }}>
-      {/* 1. Header Profissional */}
-      <header style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '16px 0 32px',
-        borderBottom: '1px solid var(--border)',
-        marginBottom: 40,
-      }}>
+    <div className="page" style={{ maxWidth: 1140, margin: '0 auto', paddingBottom: 80 }}>
+      {/* 1. Header Institucional */}
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '16px 0 28px',
+          borderBottom: '1px solid var(--border-subtle)',
+          marginBottom: 40,
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            fontSize: 22,
-            fontWeight: 800,
-            background: 'linear-gradient(90deg, #3ddc97, #4d8dff)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}>
-            ONTABS
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+            }}
+          >
+            ON<span style={{ color: 'var(--accent-primary)' }}>TABS</span>
           </div>
-          <span style={{
-            fontSize: 10,
-            background: 'rgba(16, 185, 129, 0.15)',
-            color: '#10b981',
-            padding: '2px 8px',
-            borderRadius: 12,
-            fontWeight: 700,
-          }}>
-            SOVEREIGN ENGINE
-          </span>
         </div>
 
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <a href="#recursos" style={{ fontSize: 13, color: 'var(--text-muted)' }}>Recursos</a>
-          <a href="#instrumentos" style={{ fontSize: 13, color: 'var(--text-muted)' }}>Instrumentos</a>
-          <a href="#como-funciona" style={{ fontSize: 13, color: 'var(--text-muted)' }}>Como Funciona</a>
-          <a href="#planos" style={{ fontSize: 13, color: 'var(--text-muted)' }}>Planos</a>
-          <a href="#faq" style={{ fontSize: 13, color: 'var(--text-muted)' }}>FAQ</a>
-          <Link to="/library" style={{ fontSize: 13, color: 'var(--text)', fontWeight: 600 }}>Biblioteca</Link>
-          <Link to="/login" className="btn secondary" style={{ fontSize: 12, padding: '6px 14px' }}>
-            Entrar
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+          <a href="#recursos" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            Recursos
+          </a>
+          <a href="#instrumentos" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            Instrumentos
+          </a>
+          <a href="#como-funciona" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            Como Funciona
+          </a>
+          <a href="#planos" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            Planos
+          </a>
+          <a href="#faq" style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+            FAQ
+          </a>
+          <Link to="/library" style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>
+            Biblioteca
           </Link>
-          <Link to="/register" className="btn" style={{ fontSize: 12, padding: '6px 14px', background: '#10b981', color: '#000', fontWeight: 700 }}>
-            Começar Grátis
+          <Link to="/login">
+            <Button variant="secondary" size="sm">
+              Entrar
+            </Button>
+          </Link>
+          <Link to="/register">
+            <Button variant="primary" size="sm">
+              Começar Grátis
+            </Button>
           </Link>
         </nav>
       </header>
 
       {/* 2. Hero Section */}
-      <section style={{ textAlign: 'center', padding: '40px 0 60px' }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          background: 'rgba(255, 255, 255, 0.05)',
-          padding: '6px 16px',
-          borderRadius: 20,
-          fontSize: 12,
-          color: '#3ddc97',
-          marginBottom: 20,
-          border: '1px solid rgba(61, 220, 151, 0.2)',
-        }}>
-          <span>⚡</span>
-          <span>Engenharia Musical Soberana · Multi-Instrumental · DSP Local</span>
-        </div>
-
-        <h1 style={{
-          fontSize: 'clamp(32px, 5vw, 54px)',
-          fontWeight: 800,
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
-          maxWidth: 860,
-          margin: '0 auto 20px',
-        }}>
-          Da gravação à tablatura perfeita, com <span style={{ color: '#10b981' }}>precisão matemática</span> e inteligência de banda.
+      <section style={{ textAlign: 'center', padding: '40px 0 56px' }}>
+        <h1
+          style={{
+            fontSize: 'clamp(32px, 5vw, 52px)',
+            fontWeight: 800,
+            lineHeight: 1.15,
+            letterSpacing: '-0.03em',
+            maxWidth: 880,
+            margin: '0 auto 20px',
+            color: 'var(--text-primary)',
+          }}
+        >
+          Da gravação à tablatura perfeita, com{' '}
+          <span style={{ color: 'var(--accent-primary)' }}>
+            precisão musical
+          </span>{' '}
+          e inteligência de banda.
         </h1>
 
-        <p style={{
-          fontSize: 'clamp(16px, 2vw, 19px)',
-          color: 'var(--text-muted)',
-          maxWidth: 720,
-          margin: '0 auto 32px',
-          lineHeight: 1.6,
-        }}>
+        <p
+          style={{
+            fontSize: 'clamp(16px, 2vw, 18px)',
+            color: 'var(--text-secondary)',
+            maxWidth: 720,
+            margin: '0 auto 32px',
+            lineHeight: 1.6,
+          }}
+        >
           Vá além de conversores automáticos rasos. Isole guitarras solo e base, adapte arranjos para contrabaixo e saxofone, refine sua execução com afinador em cents e coordene os ensaios do seu grupo.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-          <Link
-            to="/converter"
-            className="btn"
-            style={{
-              background: '#10b981',
-              color: '#000',
-              fontWeight: 700,
-              padding: '12px 28px',
-              fontSize: 15,
-              borderRadius: 8,
-            }}
-          >
-            Experimentar Análise Grátis →
+          <Link to="/converter">
+            <Button variant="primary" size="lg">
+              Experimentar Análise Grátis →
+            </Button>
           </Link>
-          <Link
-            to="/library"
-            className="btn secondary"
-            style={{ padding: '12px 24px', fontSize: 15, borderRadius: 8 }}
-          >
-            Explorar Catálogo Público
+          <Link to="/library">
+            <Button variant="secondary" size="lg">
+              Explorar Catálogo Público
+            </Button>
           </Link>
         </div>
 
         {/* Mockup Interativo do Hero */}
-        <div style={{
-          marginTop: 50,
-          background: '#0e0f17',
-          border: '1px solid var(--border)',
-          borderRadius: 12,
-          padding: 24,
-          boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-          textAlign: 'left',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffd166' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-              <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>
-                Canon Rock — JerryC (Otimização Ergonômica de Braço)
+        <Card
+          elevation={2}
+          style={{
+            marginTop: 48,
+            textAlign: 'left',
+            padding: 24,
+            border: '1px solid var(--border-default)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+              flexWrap: 'wrap',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--surface-overlay)',
+                  color: 'var(--accent-primary)',
+                  border: '1px solid var(--border-subtle)',
+                }}
+              >
+                Demonstração Interativa
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>
+                Canon Rock — JerryC
               </span>
             </div>
 
-            <button
+            <Button
+              variant={demoPlaying ? 'secondary' : 'primary'}
+              size="sm"
               onClick={playDemoSound}
-              className="btn"
-              style={{
-                fontSize: 12,
-                padding: '4px 12px',
-                background: demoPlaying ? '#ffd166' : '#10b981',
-                color: '#000',
-                fontWeight: 700,
-              }}
+              style={{ fontSize: 12 }}
             >
-              {demoPlaying ? '🔊 Reproduzindo...' : '▶ Tocar Arpejo Demo'}
-            </button>
+              {demoPlaying ? 'Reproduzindo...' : '▶ Tocar Arpejo Demo'}
+            </Button>
           </div>
 
           {/* Mini-Staff de Tablatura Interativa */}
-          <div style={{ background: '#09090b', borderRadius: 8, padding: 16, fontFamily: 'monospace', fontSize: 13 }}>
+          <div
+            style={{
+              background: 'var(--bg-canvas)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px 20px',
+              fontFamily: 'monospace',
+              fontSize: 13,
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
             {[
               { str: 'e|', note: '12', pos: 25 },
               { str: 'B|', note: '15', pos: 45 },
@@ -253,94 +286,141 @@ export function HomePage() {
               { str: 'E|', note: '—', pos: 0 },
             ].map((s, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', height: 22, position: 'relative' }}>
-                <span style={{ width: 30, color: '#10b981', fontWeight: 'bold' }}>{s.str}</span>
-                <div style={{ flex: 1, height: 1, background: '#27272a', position: 'relative' }}>
+                <span style={{ width: 30, color: 'var(--accent-neon)', fontWeight: 'bold' }}>{s.str}</span>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.1)', position: 'relative' }}>
                   {s.pos > 0 && (
-                    <span style={{
-                      position: 'absolute',
-                      left: `${s.pos}%`,
-                      top: -10,
-                      background: '#10b981',
-                      color: '#000',
-                      borderRadius: 4,
-                      padding: '0 4px',
-                      fontSize: 11,
-                      fontWeight: 'bold',
-                    }}>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        left: `${s.pos}%`,
+                        top: -10,
+                        background: 'var(--accent-neon)',
+                        color: '#051a11',
+                        borderRadius: 'var(--radius-xs)',
+                        padding: '1px 5px',
+                        fontSize: 11,
+                        fontWeight: 'bold',
+                      }}
+                    >
                       {s.note}
                     </span>
                   )}
                 </div>
-                <span style={{ color: '#27272a' }}>|</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</span>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginTop: 12 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              marginTop: 14,
+              flexWrap: 'wrap',
+              gap: 8,
+            }}
+          >
             <span>Tom: Ré Maior (D) · 130 BPM · Afinação: Drop D</span>
-            <span style={{ color: '#3ddc97' }}>✓ Custo de deslocamento biomecânico minimizado por Dijkstra</span>
+            <span style={{ color: 'var(--accent-primary)', fontWeight: 500 }}>
+              ✓ Custo de deslocamento biomecânico minimizado por Dijkstra
+            </span>
           </div>
-        </div>
+        </Card>
       </section>
 
       {/* 3. Diferenciação Editorial: Conversores Rasos vs. OnTabs */}
-      <section id="recursos" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+      <section id="recursos" style={{ padding: '60px 0', borderTop: '1px solid var(--border-subtle)' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px' }}>Por que o OnTabs é diferente?</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 15, maxWidth: 600, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)' }}>
+            Por que o OnTabs é diferente?
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 620, margin: '0 auto' }}>
             A maioria das ferramentas promete converter qualquer áudio com um clique, mas entrega partituras injogáveis e notas fantasmas.
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
-          <div className="card" style={{ padding: 24, background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-            <h3 style={{ color: '#ef4444', fontSize: 16, marginTop: 0 }}>❌ Conversores de Áudio Tradicionais</h3>
-            <ul style={{ fontSize: 13, color: 'var(--text-muted)', paddingLeft: 18, lineHeight: 1.8 }}>
+          <Card
+            elevation={1}
+            style={{
+              padding: 28,
+              background: 'rgba(239, 68, 68, 0.04)',
+              borderColor: 'rgba(239, 68, 68, 0.25)',
+            }}
+          >
+            <h3 style={{ color: 'var(--accent-coral)', fontSize: 16, marginTop: 0, fontWeight: 700 }}>
+              ❌ Conversores de Áudio Tradicionais
+            </h3>
+            <ul style={{ fontSize: 14, color: 'var(--text-secondary)', paddingLeft: 18, lineHeight: 1.8, margin: 0 }}>
               <li>Empilham notas aleatórias na mesma corda no mesmo milissegundo.</li>
               <li>Exigem digitações absurdas com aberturas de mais de 7 casas no braço.</li>
               <li>Não distinguem entre a Guitarra Solo e a Base de apoio rítmico.</li>
               <li>Ignoram a afinação física de instrumentos como baixo e saxofone.</li>
               <li>Promessas vazias de 100% de precisão para mixagens polifônicas densas.</li>
             </ul>
-          </div>
+          </Card>
 
-          <div className="card" style={{ padding: 24, background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-            <h3 style={{ color: '#10b981', fontSize: 16, marginTop: 0 }}>✓ Plataforma de Engenharia OnTabs</h3>
-            <ul style={{ fontSize: 13, color: 'var(--text)', paddingLeft: 18, lineHeight: 1.8 }}>
-              <li><strong>Otimização Ergonômica</strong>: Algoritmo de Dijkstra encontra a rota de menor custo biomecânico.</li>
-              <li><strong>Inteligência de Duas Guitarras</strong>: Identifica Lead vs. Rhythm e harmonizações a terças.</li>
-              <li><strong>Multi-Instrumental Real</strong>: Transposição de oitavas para baixo e intervalos de respiração para sax.</li>
-              <li><strong>Equalizador de Estudo</strong>: Filtros Biquad paramétricos para isolar a faixa de frequência desejada.</li>
-              <li><strong>Transparência Científica</strong>: Métricas e limites numéricos claros sem falsas alegações.</li>
+          <Card
+            elevation={1}
+            style={{
+              padding: 28,
+              background: 'rgba(99, 102, 241, 0.04)',
+              borderColor: 'rgba(99, 102, 241, 0.3)',
+            }}
+          >
+            <h3 style={{ color: 'var(--accent-primary)', fontSize: 16, marginTop: 0, fontWeight: 700 }}>
+              ✓ Plataforma de Engenharia OnTabs
+            </h3>
+            <ul style={{ fontSize: 14, color: 'var(--text-primary)', paddingLeft: 18, lineHeight: 1.8, margin: 0 }}>
+              <li>
+                <strong>Otimização Ergonômica</strong>: Algoritmo de Dijkstra encontra a rota de menor custo biomecânico.
+              </li>
+              <li>
+                <strong>Inteligência de Duas Guitarras</strong>: Identifica Lead vs. Rhythm e harmonizações a terças.
+              </li>
+              <li>
+                <strong>Multi-Instrumental Real</strong>: Transposição de oitavas para baixo e intervalos de respiração para sax.
+              </li>
+              <li>
+                <strong>Equalizador de Estudo</strong>: Filtros Biquad paramétricos para isolar a faixa de frequência desejada.
+              </li>
+              <li>
+                <strong>Transparência Científica</strong>: Métricas e limites numéricos claros sem falsas alegações.
+              </li>
             </ul>
-          </div>
+          </Card>
         </div>
       </section>
 
       {/* 4. Instrumentos Suportados ("Toque do Seu Jeito") */}
-      <section id="instrumentos" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+      <section id="instrumentos" style={{ padding: '60px 0', borderTop: '1px solid var(--border-subtle)' }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px' }}>Adaptação Multi-Instrumental</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)' }}>
+            Adaptação Multi-Instrumental
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
             Uma única gravação de referência desdobrada com fidelidade para a sua prática pessoal.
           </p>
         </div>
 
         {/* Abas de Instrumentos */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
           {(['guitar', 'bass', 'drums', 'sax'] as const).map((k) => (
             <button
               key={k}
               onClick={() => setActiveInstrumentTab(k)}
               style={{
-                padding: '10px 18px',
-                borderRadius: 8,
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-md)',
                 fontSize: 13,
                 cursor: 'pointer',
-                border: activeInstrumentTab === k ? '1px solid #10b981' : '1px solid var(--border)',
-                background: activeInstrumentTab === k ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
-                color: activeInstrumentTab === k ? '#10b981' : 'var(--text-muted)',
-                fontWeight: activeInstrumentTab === k ? 700 : 400,
+                border: activeInstrumentTab === k ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                background: activeInstrumentTab === k ? 'var(--surface-overlay)' : 'var(--surface-base)',
+                color: activeInstrumentTab === k ? 'var(--text-primary)' : 'var(--text-secondary)',
+                fontWeight: activeInstrumentTab === k ? 600 : 500,
+                transition: 'all var(--duration-fast) var(--ease-spring)',
               }}
             >
               {instrumentsData[k].icon} {instrumentsData[k].title.split(' ')[0]}
@@ -349,219 +429,267 @@ export function HomePage() {
         </div>
 
         {/* Detalhe do Instrumento Selecionado */}
-        <div className="card" style={{ padding: 28, background: '#0e0f17' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <span style={{ fontSize: 32 }}>{instrumentsData[activeInstrumentTab].icon}</span>
+        <Card elevation={2} style={{ padding: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+            <span style={{ fontSize: 36 }}>{instrumentsData[activeInstrumentTab].icon}</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: 18 }}>{instrumentsData[activeInstrumentTab].title}</h3>
-              <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              <h3 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {instrumentsData[activeInstrumentTab].title}
+              </h3>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)', fontSize: 14 }}>
                 {instrumentsData[activeInstrumentTab].desc}
               </p>
             </div>
           </div>
 
-          <div style={{ marginTop: 16, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#3ddc97', marginBottom: 8 }}>
+          <div style={{ marginTop: 20, borderTop: '1px solid var(--border-subtle)', paddingTop: 20 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 10, letterSpacing: '0.04em' }}>
               ESPECIFICAÇÕES DO MOTOR:
             </div>
-            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: 'var(--text)', lineHeight: 1.8 }}>
+            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.8 }}>
               {instrumentsData[activeInstrumentTab].specs.map((s, idx) => (
                 <li key={idx}>{s}</li>
               ))}
             </ul>
           </div>
-        </div>
+        </Card>
       </section>
 
       {/* 5. Como Funciona (Fluxo de 4 Etapas) */}
-      <section id="como-funciona" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+      <section id="como-funciona" style={{ padding: '60px 0', borderTop: '1px solid var(--border-subtle)' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px' }}>Como Funciona o Fluxo Soberano</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)' }}>
+            Como Funciona o Fluxo Soberano
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
             Da importação da faixa até o ensaio no palco em quatro etapas transparentes.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
           {[
-            { step: '01', title: 'Ingestão Autorizada', desc: 'Envie seu arquivo de áudio ou importe referências públicas com verificação estrita de segurança e defesa anti-SSRF.' },
-            { step: '02', title: 'DSP & Teoria Musical', desc: 'Extração de envelope RMS, fluxo espectral de onsets, autocorrelação interpolada e cromas Goertzel.' },
-            { step: '03', title: 'Validação Física', desc: 'Dijkstra mapeia as notas no braço garantindo que cada acorde e digitação respeite a anatomia mecânica da mão.' },
-            { step: '04', title: 'Prática & Ensaio', desc: 'Estude com o equalizador de 5 bandas, receba feedback do Ouvinte Ativo e monte setlists sincronizadas para seu show.' },
+            {
+              step: '01',
+              title: 'Ingestão Autorizada',
+              desc: 'Envie seu arquivo de áudio ou importe referências públicas com verificação estrita de segurança e defesa anti-SSRF.',
+            },
+            {
+              step: '02',
+              title: 'DSP & Teoria Musical',
+              desc: 'Extração de envelope RMS, fluxo espectral de onsets, autocorrelação interpolada e cromas Goertzel.',
+            },
+            {
+              step: '03',
+              title: 'Validação Física',
+              desc: 'Dijkstra mapeia as notas no braço garantindo que cada acorde e digitação respeite a anatomia mecânica da mão.',
+            },
+            {
+              step: '04',
+              title: 'Prática & Ensaio',
+              desc: 'Estude com o equalizador de 5 bandas, receba feedback do Ouvinte Ativo e monte setlists sincronizadas para seu show.',
+            },
           ].map((item) => (
-            <div key={item.step} className="card" style={{ padding: 20, background: '#0e0f17' }}>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#10b981', marginBottom: 8 }}>{item.step}</div>
-              <h4 style={{ margin: '0 0 6px', fontSize: 15 }}>{item.title}</h4>
-              <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>{item.desc}</p>
-            </div>
+            <Card key={item.step} elevation={1} style={{ padding: 24 }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--accent-primary)', marginBottom: 10 }}>
+                {item.step}
+              </div>
+              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {item.title}
+              </h4>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{item.desc}</p>
+            </Card>
           ))}
         </div>
       </section>
 
       {/* 6. Planos e Acesso Transparente */}
-      <section id="planos" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+      <section id="planos" style={{ padding: '60px 0', borderTop: '1px solid var(--border-subtle)' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px' }}>Planos Claros & Sem Pegadinhas</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)' }}>
+            Planos Claros & Sem Pegadinhas
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
             Experimente gratuitamente e evolua conforme a necessidade do seu aprendizado ou estúdio.
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           {/* Card Free */}
-          <div className="card" style={{ padding: 24, background: '#0e0f17' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>Iniciante (Free)</h3>
-            <div style={{ fontSize: 24, fontWeight: 800, margin: '12px 0' }}>Grátis</div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-              Ideal para testar a plataforma e estudar uma música por vez.
-            </p>
-            <ul style={{ fontSize: 13, paddingLeft: 18, lineHeight: 1.8, marginBottom: 24 }}>
-              <li>1 música na biblioteca pessoal</li>
-              <li>5 análises de áudio por mês</li>
-              <li>Acesso ao afinador cromático em cents</li>
-              <li>Visualizador interativo de tablaturas</li>
-            </ul>
-            <Link to="/register" className="btn secondary" style={{ width: '100%', textAlign: 'center', display: 'block' }}>
-              Cadastrar Grátis
+          <Card elevation={1} style={{ padding: 28, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: 18, color: 'var(--text-primary)' }}>Iniciante (Free)</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '14px 0', color: 'var(--text-primary)' }}>Grátis</div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                Ideal para testar a plataforma e estudar uma música por vez.
+              </p>
+              <ul style={{ fontSize: 13, color: 'var(--text-secondary)', paddingLeft: 18, lineHeight: 1.8, marginBottom: 28 }}>
+                <li>1 música na biblioteca pessoal</li>
+                <li>5 análises de áudio por mês</li>
+                <li>Acesso ao afinador cromático em cents</li>
+                <li>Visualizador interativo de tablaturas</li>
+              </ul>
+            </div>
+            <Link to="/register" style={{ display: 'block' }}>
+              <Button variant="secondary" style={{ width: '100%' }}>
+                Cadastrar Grátis
+              </Button>
             </Link>
-          </div>
+          </Card>
 
           {/* Card Pro (Destacado) */}
-          <div className="card" style={{ padding: 24, background: '#0e0f17', border: '1px solid #10b981', position: 'relative' }}>
-            <div style={{
-              position: 'absolute',
-              top: -10,
-              right: 16,
-              background: '#10b981',
-              color: '#000',
-              fontSize: 10,
-              fontWeight: 800,
-              padding: '2px 8px',
-              borderRadius: 10,
-            }}>
-              7 DIAS DE TRIAL GRÁTIS
+          <Card
+            elevation={2}
+            style={{
+              padding: 28,
+              border: '1px solid var(--accent-primary)',
+              boxShadow: 'var(--shadow-md)',
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: -11,
+                  right: 20,
+                  background: 'var(--accent-primary)',
+                  color: '#ffffff',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: '3px 10px',
+                  borderRadius: 'var(--radius-sm)',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                7 DIAS DE TRIAL GRÁTIS
+              </div>
+              <h3 style={{ margin: '0 0 4px', fontSize: 18, color: 'var(--text-primary)' }}>Músico Pro</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '14px 0', color: 'var(--text-primary)' }}>
+                R$ 29,90 <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/mês</span>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                Para músicos praticantes, estudantes e bandas ativas.
+              </p>
+              <ul style={{ fontSize: 13, color: 'var(--text-primary)', paddingLeft: 18, lineHeight: 1.8, marginBottom: 28 }}>
+                <li>200 músicas na biblioteca</li>
+                <li>60 análises musicais por mês</li>
+                <li>Inteligência de Duas Guitarras (Lead/Rhythm)</li>
+                <li>Equalizador de 5 faixas e Stems Mixer</li>
+                <li>Coordenação de Repertórios e Setlists ao vivo</li>
+              </ul>
             </div>
-            <h3 style={{ margin: '0 0 4px', fontSize: 18, color: '#10b981' }}>Músico Pro</h3>
-            <div style={{ fontSize: 24, fontWeight: 800, margin: '12px 0' }}>
-              R$ 29,90 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>/mês</span>
-            </div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-              Para músicos praticantes, estudantes e bandas ativas.
-            </p>
-            <ul style={{ fontSize: 13, paddingLeft: 18, lineHeight: 1.8, marginBottom: 24 }}>
-              <li>200 músicas na biblioteca</li>
-              <li>60 análises musicais por mês</li>
-              <li>Inteligência de Duas Guitarras (Lead/Rhythm)</li>
-              <li>Equalizador de 5 faixas e Stems Mixer</li>
-              <li>Coordenação de Repertórios e Setlists ao vivo</li>
-            </ul>
-            <Link to="/register" className="btn" style={{ width: '100%', textAlign: 'center', display: 'block', background: '#10b981', color: '#000', fontWeight: 700 }}>
-              Ativar 7 Dias Grátis
+            <Link to="/register" style={{ display: 'block' }}>
+              <Button variant="primary" style={{ width: '100%' }}>
+                Ativar 7 Dias Grátis
+              </Button>
             </Link>
-          </div>
+          </Card>
 
           {/* Card Premium */}
-          <div className="card" style={{ padding: 24, background: '#0e0f17' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>Estúdio Premium</h3>
-            <div style={{ fontSize: 24, fontWeight: 800, margin: '12px 0' }}>
-              R$ 69,90 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>/mês</span>
+          <Card elevation={1} style={{ padding: 28, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: 18, color: 'var(--text-primary)' }}>Estúdio Premium</h3>
+              <div style={{ fontSize: 28, fontWeight: 800, margin: '14px 0', color: 'var(--text-primary)' }}>
+                R$ 69,90 <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 400 }}>/mês</span>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                Para produtores, arranjadores e estúdios musicais.
+              </p>
+              <ul style={{ fontSize: 13, color: 'var(--text-secondary)', paddingLeft: 18, lineHeight: 1.8, marginBottom: 28 }}>
+                <li>Biblioteca ilimitada (5.000 músicas)</li>
+                <li>500 análises musicais mensais</li>
+                <li>Exportação de tablaturas em MIDI e MusicXML</li>
+                <li>Suporte técnico prioritário de engenharia</li>
+              </ul>
             </div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-              Para produtores, arranjadores e estúdios musicais.
-            </p>
-            <ul style={{ fontSize: 13, paddingLeft: 18, lineHeight: 1.8, marginBottom: 24 }}>
-              <li>Biblioteca ilimitada (5.000 músicas)</li>
-              <li>500 análises musicais mensais</li>
-              <li>Exportação de tablaturas em MIDI e MusicXML</li>
-              <li>Suporte técnico prioritário de engenharia</li>
-            </ul>
-            <Link to="/register" className="btn secondary" style={{ width: '100%', textAlign: 'center', display: 'block' }}>
-              Conhecer Estúdio
+            <Link to="/register" style={{ display: 'block' }}>
+              <Button variant="secondary" style={{ width: '100%' }}>
+                Conhecer Estúdio
+              </Button>
             </Link>
-          </div>
+          </Card>
         </div>
       </section>
 
       {/* 7. FAQ (Perguntas Frequentes) */}
-      <section id="faq" style={{ padding: '60px 0', borderTop: '1px solid var(--border)' }}>
+      <section id="faq" style={{ padding: '60px 0', borderTop: '1px solid var(--border-subtle)' }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px' }}>Perguntas Frequentes</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
+          <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 10px', color: 'var(--text-primary)' }}>
+            Perguntas Frequentes
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
             Respostas diretas e honestas sobre a engenharia e o uso do OnTabs.
           </p>
         </div>
 
-        <div style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ maxWidth: 780, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {faqs.map((f, idx) => {
             const isOpen = activeFaq === idx;
             return (
-              <div
+              <Card
                 key={idx}
-                className="card"
+                elevation={1}
+                interactive
                 onClick={() => setActiveFaq(isOpen ? null : idx)}
-                style={{ padding: 18, cursor: 'pointer', background: '#0e0f17' }}
+                style={{ padding: '18px 24px' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>{f.q}</h4>
-                  <span style={{ fontSize: 14, color: '#10b981' }}>{isOpen ? '▲' : '▼'}</span>
+                  <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{f.q}</h4>
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 16 }}>{isOpen ? '▲' : '▼'}</span>
                 </div>
                 {isOpen && (
-                  <p style={{ margin: '12px 0 0', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                  <p style={{ margin: '14px 0 0', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                     {f.a}
                   </p>
                 )}
-              </div>
+              </Card>
             );
           })}
         </div>
       </section>
 
-      {/* 8. CTA Final e Footer */}
-      <section style={{
-        textAlign: 'center',
-        padding: '50px 20px',
-        background: 'linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, transparent 100%)',
-        borderRadius: 12,
-        border: '1px solid rgba(16, 185, 129, 0.2)',
-        margin: '40px 0',
-      }}>
-        <h2 style={{ fontSize: 28, fontWeight: 800, margin: '0 0 12px' }}>
+      {/* 8. CTA Final */}
+      <section
+        style={{
+          textAlign: 'center',
+          padding: '48px 24px',
+          background: 'radial-gradient(ellipse at center, rgba(16, 185, 129, 0.12) 0%, transparent 70%)',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid rgba(16, 185, 129, 0.25)',
+          margin: '40px 0',
+        }}
+      >
+        <h2 style={{ fontSize: 30, fontWeight: 800, margin: '0 0 12px', color: 'var(--text-primary)' }}>
           Pronto para elevar seu estudo musical?
         </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: 15, maxWidth: 520, margin: '0 auto 24px' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 540, margin: '0 auto 24px' }}>
           Comece agora mesmo com sua primeira análise gratuita e experimente a diferença da engenharia de áudio soberana.
         </p>
-        <Link
-          to="/register"
-          className="btn"
-          style={{
-            background: '#10b981',
-            color: '#000',
-            fontWeight: 700,
-            padding: '12px 32px',
-            fontSize: 15,
-            borderRadius: 8,
-          }}
-        >
-          Criar Conta Gratuita →
+        <Link to="/register">
+          <Button variant="primary" size="lg">
+            Criar Conta Gratuita →
+          </Button>
         </Link>
       </section>
 
       {/* Footer */}
-      <footer style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 32,
-        borderTop: '1px solid var(--border)',
-        fontSize: 12,
-        color: 'var(--text-muted)',
-        flexWrap: 'wrap',
-        gap: 16,
-      }}>
-        <div>
-          © 2026 OnTabs Platform. Todos os direitos reservados. Motor independente de engenharia musical.
-        </div>
+      <footer
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingTop: 32,
+          borderTop: '1px solid var(--border-subtle)',
+          fontSize: 13,
+          color: 'var(--text-muted)',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
+        <div>© 2026 OnTabs Platform. Todos os direitos reservados. Motor independente de engenharia musical.</div>
         <div style={{ display: 'flex', gap: 16 }}>
           <Link to="/library">Biblioteca</Link>
           <Link to="/converter">Converter</Link>

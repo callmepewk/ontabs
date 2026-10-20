@@ -292,11 +292,11 @@ export function LibraryPage() {
           style={{
             padding: '10px 18px',
             fontSize: 14,
-            fontWeight: activeTab === 'library' ? 700 : 500,
-            color: activeTab === 'library' ? 'var(--accent-neon)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'library' ? 600 : 500,
+            color: activeTab === 'library' ? 'var(--text-primary)' : 'var(--text-secondary)',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'library' ? '2px solid var(--accent-neon)' : '2px solid transparent',
+            borderBottom: activeTab === 'library' ? '2px solid var(--accent-primary)' : '2px solid transparent',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -304,15 +304,14 @@ export function LibraryPage() {
             transition: 'all var(--duration-fast) var(--ease-spring)',
           }}
         >
-          <span>📁</span>
           <span>Meu Repertório & Análises</span>
           <span
             style={{
               fontSize: 11,
               padding: '2px 8px',
-              borderRadius: 'var(--radius-pill)',
-              background: activeTab === 'library' ? 'rgba(16, 185, 129, 0.18)' : 'var(--surface-overlay)',
-              color: activeTab === 'library' ? 'var(--accent-neon)' : 'var(--text-muted)',
+              borderRadius: 'var(--radius-sm)',
+              background: activeTab === 'library' ? 'rgba(99, 102, 241, 0.15)' : 'var(--surface-overlay)',
+              color: activeTab === 'library' ? 'var(--accent-primary)' : 'var(--text-muted)',
               fontWeight: 600,
             }}
           >
@@ -325,11 +324,11 @@ export function LibraryPage() {
           style={{
             padding: '10px 18px',
             fontSize: 14,
-            fontWeight: activeTab === 'catalog' ? 700 : 500,
-            color: activeTab === 'catalog' ? 'var(--accent-neon)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'catalog' ? 600 : 500,
+            color: activeTab === 'catalog' ? 'var(--text-primary)' : 'var(--text-secondary)',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'catalog' ? '2px solid var(--accent-neon)' : '2px solid transparent',
+            borderBottom: activeTab === 'catalog' ? '2px solid var(--accent-primary)' : '2px solid transparent',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -337,15 +336,14 @@ export function LibraryPage() {
             transition: 'all var(--duration-fast) var(--ease-spring)',
           }}
         >
-          <span>🛡️</span>
           <span>Catálogo Soberano Verificado (Direitos & Proveniência)</span>
           <span
             style={{
               fontSize: 11,
               padding: '2px 8px',
-              borderRadius: 'var(--radius-pill)',
-              background: activeTab === 'catalog' ? 'rgba(16, 185, 129, 0.18)' : 'var(--surface-overlay)',
-              color: activeTab === 'catalog' ? 'var(--accent-neon)' : 'var(--text-muted)',
+              borderRadius: 'var(--radius-sm)',
+              background: activeTab === 'catalog' ? 'rgba(99, 102, 241, 0.15)' : 'var(--surface-overlay)',
+              color: activeTab === 'catalog' ? 'var(--accent-primary)' : 'var(--text-muted)',
               fontWeight: 600,
             }}
           >
@@ -373,7 +371,7 @@ export function LibraryPage() {
               }}
             >
               <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                <span style={{ color: 'var(--accent-neon)', fontWeight: 700 }}>👁️ Modo Demonstração Pública:</span>{' '}
+                <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Modo Demonstração Pública:</span>{' '}
                 Você está explorando o catálogo de referência do OnTabs. Navegue livremente por instrumentos, tablaturas e paginação antes de se cadastrar.
               </div>
               <Link to="/register">
@@ -406,14 +404,14 @@ export function LibraryPage() {
                     alignItems: 'center',
                     gap: 6,
                     padding: '8px 14px',
-                    borderRadius: 'var(--radius-pill)',
+                    borderRadius: 'var(--radius-md)',
                     fontSize: 13,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    border: isActive ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
-                    background: isActive ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-base)',
-                    color: isActive ? 'var(--accent-neon)' : 'var(--text-secondary)',
-                    fontWeight: isActive ? 700 : 500,
+                    border: isActive ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                    background: isActive ? 'var(--accent-subtle)' : 'var(--surface-base)',
+                    color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    fontWeight: isActive ? 600 : 500,
                     transition: 'all var(--duration-fast) var(--ease-spring)',
                   }}
                 >
@@ -463,10 +461,10 @@ export function LibraryPage() {
                       padding: '4px 10px',
                       borderRadius: 'var(--radius-sm)',
                       fontSize: 12,
-                      border: pageSize === size ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
-                      background: pageSize === size ? 'var(--accent-neon)' : 'var(--surface-base)',
-                      color: pageSize === size ? '#051a11' : 'var(--text-secondary)',
-                      fontWeight: pageSize === size ? 700 : 500,
+                      border: pageSize === size ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                      background: pageSize === size ? 'var(--accent-primary)' : 'var(--surface-base)',
+                      color: pageSize === size ? '#ffffff' : 'var(--text-secondary)',
+                      fontWeight: pageSize === size ? 600 : 500,
                       cursor: 'pointer',
                     }}
                   >
@@ -493,8 +491,8 @@ export function LibraryPage() {
                     cursor: 'pointer',
                     border: 'none',
                     background: viewMode === 'grid' ? 'var(--surface-overlay)' : 'transparent',
-                    color: viewMode === 'grid' ? 'var(--accent-neon)' : 'var(--text-secondary)',
-                    fontWeight: viewMode === 'grid' ? 700 : 500,
+                    color: viewMode === 'grid' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    fontWeight: viewMode === 'grid' ? 600 : 500,
                   }}
                   title="Visualização em Grade"
                 >
@@ -508,8 +506,8 @@ export function LibraryPage() {
                     cursor: 'pointer',
                     border: 'none',
                     background: viewMode === 'list' ? 'var(--surface-overlay)' : 'transparent',
-                    color: viewMode === 'list' ? 'var(--accent-neon)' : 'var(--text-secondary)',
-                    fontWeight: viewMode === 'list' ? 700 : 500,
+                    color: viewMode === 'list' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    fontWeight: viewMode === 'list' ? 600 : 500,
                   }}
                   title="Visualização em Lista"
                 >
@@ -568,13 +566,13 @@ export function LibraryPage() {
                       <span
                         style={{
                           fontSize: 11,
-                          background: 'rgba(16, 185, 129, 0.12)',
-                          color: 'var(--accent-neon)',
-                          border: '1px solid rgba(16, 185, 129, 0.25)',
+                          background: 'var(--surface-overlay)',
+                          color: 'var(--text-secondary)',
+                          border: '1px solid var(--border-subtle)',
                           padding: '2px 8px',
-                          borderRadius: 'var(--radius-pill)',
+                          borderRadius: 'var(--radius-sm)',
                           textTransform: 'uppercase',
-                          fontWeight: 700,
+                          fontWeight: 600,
                           letterSpacing: '0.04em',
                         }}
                       >
@@ -598,7 +596,7 @@ export function LibraryPage() {
                     </Link>
                     <Link to={`/play/${s.id}`} style={{ flex: 1 }}>
                       <Button variant="primary" size="sm" style={{ width: '100%', fontSize: 12 }}>
-                        🎮 Praticar
+                        Praticar
                       </Button>
                     </Link>
                   </div>
@@ -658,7 +656,7 @@ export function LibraryPage() {
                       <td style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>
                         {s.bpm || '—'}
                       </td>
-                      <td style={{ padding: '14px 18px', color: 'var(--accent-neon)', fontWeight: 600 }}>
+                      <td style={{ padding: '14px 18px', color: 'var(--text-primary)', fontWeight: 600 }}>
                         {s.key || '—'}
                       </td>
                       <td style={{ padding: '14px 18px', textAlign: 'right' }}>
@@ -733,10 +731,10 @@ export function LibraryPage() {
                       borderRadius: 'var(--radius-sm)',
                       fontSize: 12,
                       cursor: 'pointer',
-                      border: currentPage === p ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
-                      background: currentPage === p ? 'var(--accent-neon)' : 'var(--surface-base)',
-                      color: currentPage === p ? '#051a11' : 'var(--text-secondary)',
-                      fontWeight: currentPage === p ? 700 : 500,
+                      border: currentPage === p ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                      background: currentPage === p ? 'var(--accent-primary)' : 'var(--surface-base)',
+                      color: currentPage === p ? '#ffffff' : 'var(--text-secondary)',
+                      fontWeight: currentPage === p ? 600 : 500,
                     }}
                   >
                     {p}
@@ -774,15 +772,15 @@ export function LibraryPage() {
           <Card
             elevation={1}
             style={{
-              background: 'rgba(16, 185, 129, 0.04)',
-              borderColor: 'rgba(16, 185, 129, 0.25)',
+              background: 'var(--surface-elevated)',
+              borderColor: 'var(--border-subtle)',
               padding: 20,
               marginBottom: 24,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <span style={{ fontSize: 20 }}>🛡️</span>
-              <strong style={{ color: 'var(--accent-neon)', fontSize: 15 }}>
+              <strong style={{ color: 'var(--text-primary)', fontSize: 15 }}>
                 Catálogo Auditado & Inteligência de Direitos Autorais
               </strong>
             </div>
@@ -815,14 +813,14 @@ export function LibraryPage() {
                   onClick={() => setCatalogFilter(f.id as any)}
                   style={{
                     padding: '8px 14px',
-                    borderRadius: 'var(--radius-pill)',
+                    borderRadius: 'var(--radius-md)',
                     fontSize: 13,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    border: isSelected ? '1px solid var(--accent-neon)' : '1px solid var(--border-subtle)',
-                    background: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'var(--surface-base)',
-                    color: isSelected ? 'var(--accent-neon)' : 'var(--text-secondary)',
-                    fontWeight: isSelected ? 700 : 500,
+                    border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                    background: isSelected ? 'var(--accent-subtle)' : 'var(--surface-base)',
+                    color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    fontWeight: isSelected ? 600 : 500,
                     transition: 'all var(--duration-fast) var(--ease-spring)',
                   }}
                 >

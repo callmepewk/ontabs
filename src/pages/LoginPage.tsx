@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '@/services/authService';
+import { Button, Card, Input } from '@/components/ui';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -30,84 +31,73 @@ export function LoginPage() {
   };
 
   return (
-    <div className="page" style={{ maxWidth: 400, margin: '40px auto' }}>
-      <div className="card">
-        <h1 className="page-title" style={{ fontSize: 22, textAlign: 'center' }}>Entrar no OnTabs</h1>
-        <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: 20 }}>
+    <div className="page" style={{ maxWidth: 420, margin: '48px auto' }}>
+      <Card elevation={2} style={{ padding: 32 }}>
+        <h1 className="page-title" style={{ fontSize: 24, textAlign: 'center', marginBottom: 6 }}>
+          Entrar no OnTabs
+        </h1>
+        <p className="page-subtitle" style={{ textAlign: 'center', marginBottom: 24 }}>
           Acesse suas tablaturas, músicas salvas e histórico de treino.
         </p>
 
         {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: 6,
-            padding: 10,
-            marginBottom: 16,
-            fontSize: 13,
-            color: '#ef4444',
-          }}>
-            {error}
+          <div
+            role="alert"
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
+              marginBottom: 20,
+              fontSize: 13,
+              color: 'var(--accent-coral)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>E-mail</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text)',
-              }}
-              placeholder="seu@email.com"
-            />
-          </div>
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Input
+            label="E-mail"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+          />
 
-          <div>
-            <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Senha</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-                background: 'var(--bg-elevated)',
-                color: 'var(--text)',
-              }}
-              placeholder="Sua senha"
-            />
-          </div>
+          <Input
+            label="Senha"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Sua senha"
+          />
 
-          <button
+          <Button
             type="submit"
-            className="btn"
+            variant="primary"
             disabled={loading}
-            style={{ marginTop: 10, width: '100%', background: '#10b981', color: '#000', fontWeight: 600 }}
+            isLoading={loading}
+            style={{ marginTop: 8, width: '100%' }}
           >
             {loading ? 'Entrando...' : 'Entrar'}
-          </button>
+          </Button>
         </form>
 
-        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+        <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)' }}>
           Ainda não tem conta?{' '}
-          <Link to="/register" style={{ color: '#10b981', fontWeight: 500 }}>
+          <Link to="/register" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
             Criar conta (7 dias grátis)
           </Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
-
