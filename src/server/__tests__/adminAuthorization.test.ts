@@ -33,6 +33,7 @@ describe('FASE ADMIN: Acesso Ilimitado e Autorização Segura no Servidor', () =
   });
 
   afterEach(async () => {
+    delete process.env.ONTABS_ADMIN_SECRET;
     await new Promise<void>((resolve) => server.close(() => resolve()));
     if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
   });
@@ -111,26 +112,40 @@ describe('FASE ADMIN: Acesso Ilimitado e Autorização Segura no Servidor', () =
     expect(unauth.status).toBe(403);
   });
 
-  it('5. Bootstrap administrativo com chave secreta segura promove usuário para admin', async () => {
+  it('5. Bootstrap administrativo desabilita com 503 sem chave no ambiente e requer segredo estrito configurado', async () => {
     // Registra usuário comum
     await apiPost('/api/auth/register', {
       email: 'dev_lead@ontabs.com',
       password: 'password123',
     });
 
-    // Tentativa com chave errada
-    const badKeyRes = await apiPost(
-      '/api/admin/bootstrap',
-      { email: 'dev_lead@ontabs.com', role: 'admin' },
-      { 'X-Ontabs-Admin-Key': 'wrong_secret_attempt' }
-    );
-    expect(badKeyRes.status).toBe(401);
-
-    // Bootstrap legítimo com chave correta
-    const validRes = await apiPost(
+    // 1. Sem ONTABS_ADMIN_SECRET configurado no ambiente, endpoint deve falhar de forma segura (503)
+    delete process.env.ONTABS_ADMIN_SECRET;
+    const disabledRes = await apiPost(
       '/api/admin/bootstrap',
       { email: 'dev_lead@ontabs.com', role: 'admin' },
       { 'X-Ontabs-Admin-Key': 'ontabs-admin-secure-key-2026' }
+    );
+    expect(disabledRes.status).toBe(503);
+    expect(disabledRes.data.error).toContain('desabilitado');
+
+    // 2. Configura segredo estrito no ambiente
+    const CONFIGURED_SECRET = 'sovereign_hardened_secret_key_8849';
+    process.env.ONTABS_ADMIN_SECRET = CONFIGURED_SECRET;
+
+    // Tentativa com chave errada ou com a chave antiga descontinuada
+    const badKeyRes = await apiPost(
+      '/api/admin/bootstrap',
+      { email: 'dev_lead@ontabs.com', role: 'admin' },
+      { 'X-Ontabs-Admin-Key': 'ontabs-admin-secure-key-2026' }
+    );
+    expect(badKeyRes.status).toBe(401);
+
+    // Bootstrap legítimo com o segredo correto do ambiente
+    const validRes = await apiPost(
+      '/api/admin/bootstrap',
+      { email: 'dev_lead@ontabs.com', role: 'admin' },
+      { 'X-Ontabs-Admin-Key': CONFIGURED_SECRET }
     );
     expect(validRes.status).toBe(200);
     expect(validRes.data.success).toBe(true);

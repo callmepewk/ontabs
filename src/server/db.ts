@@ -100,6 +100,14 @@ export interface SetlistRecord {
   updatedAt: string;
 }
 
+export interface IdempotencyRecord {
+  key: string;
+  userId: string;
+  payloadHash: string;
+  responseData: any;
+  createdAt: string;
+}
+
 export interface DatabaseSchema {
   version: number;
   users: UserRecord[];
@@ -109,6 +117,7 @@ export interface DatabaseSchema {
   tablatures: TabRecord[];
   practiceSessions: PracticeRecord[];
   setlists?: SetlistRecord[];
+  idempotencyRecords?: IdempotencyRecord[];
 }
 
 const DEFAULT_DB_PATH = path.resolve(process.cwd(), 'data', 'ontabs-store.json');
@@ -127,6 +136,7 @@ export class Database {
       songs: [],
       tablatures: [],
       practiceSessions: [],
+      idempotencyRecords: [],
     };
     this.init();
   }
@@ -141,6 +151,9 @@ export class Database {
       try {
         const raw = fs.readFileSync(this.filePath, 'utf8');
         this.data = JSON.parse(raw);
+        if (!this.data.idempotencyRecords) {
+          this.data.idempotencyRecords = [];
+        }
       } catch (err) {
         console.error('Erro ao ler banco de dados. Restaurando snapshot vazio.', err);
         this.save();
@@ -460,6 +473,25 @@ export class Database {
     const deleted = this.data.setlists.length < prev;
     if (deleted) this.save();
     return deleted;
+  }
+
+  // --- Idempotência de Operações ---
+  public getIdempotencyRecord(key: string, userId: string): IdempotencyRecord | null {
+    if (!this.data.idempotencyRecords) return null;
+    return this.data.idempotencyRecords.find((r) => r.key === key && r.userId === userId) || null;
+  }
+
+  public saveIdempotencyRecord(record: IdempotencyRecord): void {
+    if (!this.data.idempotencyRecords) {
+      this.data.idempotencyRecords = [];
+    }
+    const idx = this.data.idempotencyRecords.findIndex((r) => r.key === record.key && r.userId === record.userId);
+    if (idx >= 0) {
+      this.data.idempotencyRecords[idx] = record;
+    } else {
+      this.data.idempotencyRecords.push(record);
+    }
+    this.save();
   }
 }
 

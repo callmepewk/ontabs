@@ -5,6 +5,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { Database, UserRecord, SongRecord, TabRecord } from './db';
 import { hashPassword, verifyPassword, createSessionForUser, getSessionFromToken } from './auth';
 import {
@@ -32,13 +33,15 @@ export interface RequestContext {
   visitorId: string;
 }
 
+const ALLOWED_CORS_HEADERS = 'Content-Type, Authorization, X-Visitor-Id, Idempotency-Key, X-Idempotency-Key, X-Ontabs-Admin-Key';
+
 function sendJson(res: http.ServerResponse, statusCode: number, data: any): void {
   const json = JSON.stringify(data);
   res.writeHead(statusCode, {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Visitor-Id',
+    'Access-Control-Allow-Headers': ALLOWED_CORS_HEADERS,
   });
   res.end(json);
 }
@@ -48,12 +51,55 @@ export function handleCors(req: http.IncomingMessage, res: http.ServerResponse):
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Visitor-Id',
+      'Access-Control-Allow-Headers': ALLOWED_CORS_HEADERS,
     });
     res.end();
     return true;
   }
   return false;
+}
+
+export function computePayloadHash(payload: any): string {
+  if (!payload || typeof payload !== 'object') {
+    return crypto.createHash('sha256').update(String(payload || '')).digest('hex');
+  }
+  const sortedKeys = Object.keys(payload).sort();
+  const normalized: Record<string, any> = {};
+  for (const k of sortedKeys) {
+    normalized[k] = payload[k];
+  }
+  return crypto.createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+}
+
+const RESERVED_IDENTITIES = new Set([
+  'system',
+  'admin',
+  'owner',
+  'root',
+  'visitor',
+  'visitor_default',
+  'public',
+  'internal',
+  'superuser',
+  'moderator',
+  'test',
+]);
+
+const VISITOR_ID_REGEX = /^[a-zA-Z0-9_\-]{3,64}$/;
+
+export function sanitizeVisitorId(headerValue: string | string[] | undefined): string {
+  if (typeof headerValue !== 'string') {
+    return `vis_${crypto.randomUUID()}`;
+  }
+  const cleaned = headerValue.trim();
+  if (!VISITOR_ID_REGEX.test(cleaned)) {
+    return `vis_${crypto.randomUUID()}`;
+  }
+  const lower = cleaned.toLowerCase();
+  if (RESERVED_IDENTITIES.has(lower) || lower.startsWith('system') || lower.startsWith('admin')) {
+    return `vis_${crypto.randomUUID()}`;
+  }
+  return lower.startsWith('vis_') ? lower : `vis_${lower}`;
 }
 
 export async function parseRequestBody(req: http.IncomingMessage): Promise<any> {
@@ -156,7 +202,7 @@ export async function dispatchApiRequest(
   if (tryServeStatic(req, res, pathname)) return;
 
   const user = extractAuthUser(req, db);
-  const visitorId = (req.headers['x-visitor-id'] as string) || 'visitor_default';
+  const visitorId = sanitizeVisitorId(req.headers['x-visitor-id']);
   const visitorConsumed = db.hasVisitorConsumedFreeUse(visitorId);
   const body = method === 'POST' || method === 'PUT' ? await parseRequestBody(req) : {};
 
@@ -370,8 +416,9 @@ export async function dispatchApiRequest(
     const page = parseInt(url.searchParams.get('page') || '1', 10);
     const pageSize = parseInt(url.searchParams.get('pageSize') || '10', 10);
 
+    const isAdmin = user && (user.role === 'admin' || user.role === 'owner');
     const result = db.listSongs({
-      userId: user?.id,
+      userId: isAdmin ? undefined : (user ? user.id : visitorId),
       search,
       instrument,
       page,
@@ -387,6 +434,16 @@ export async function dispatchApiRequest(
     if (!song) {
       return sendJson(res, 404, { error: 'Música não encontrada.' });
     }
+
+    const isSystemResource = song.userId === 'system';
+    const isOwner = user
+      ? (user.id === song.userId || user.role === 'admin' || user.role === 'owner')
+      : (song.userId === visitorId);
+
+    if (!isSystemResource && !isOwner) {
+      return sendJson(res, 403, { error: 'Acesso negado: recurso privado restrito ao proprietário.' });
+    }
+
     const tab = song.tabId ? db.getTab(song.tabId) : db.getTabBySongId(song.id);
     return sendJson(res, 200, { song, tab });
   }
@@ -471,6 +528,29 @@ export async function dispatchApiRequest(
 
   // --- PIPELINE DE CONVERSÃO PROTEGIDA ---
   if (pathname === '/api/music/convert' && method === 'POST') {
+    const rawIdempotencyKey = req.headers['idempotency-key'] || req.headers['x-idempotency-key'];
+    const idempotencyKey = typeof rawIdempotencyKey === 'string' && rawIdempotencyKey.trim().length > 0
+      ? rawIdempotencyKey.trim()
+      : null;
+    const actorId = user?.id || visitorId;
+
+    // Se chave de idempotência foi fornecida, verifica se já existe resposta salva
+    if (idempotencyKey) {
+      const payloadHash = computePayloadHash(body);
+      const existing = db.getIdempotencyRecord(idempotencyKey, actorId);
+      if (existing) {
+        if (existing.payloadHash !== payloadHash) {
+          return sendJson(res, 409, {
+            error: 'Conflito de idempotência: a chave fornecida já foi utilizada com um payload diferente.',
+            idempotencyKey,
+          });
+        }
+        res.setHeader('X-Cache-Lookup', 'HIT');
+        res.setHeader('Idempotent-Replayed', 'true');
+        return sendJson(res, 200, existing.responseData);
+      }
+    }
+
     // 0. Validação binária de mídia prévia (se enviada)
     if (body.mediaBase64 && body.mediaFilename) {
       const mediaBuf = Buffer.from(body.mediaBase64, 'base64');
@@ -521,9 +601,14 @@ export async function dispatchApiRequest(
       ? optimizeFretSequence(notes, instrument as Instrument)
       : [];
 
+    const effectiveOwnerId = user ? user.id : visitorId;
+    if (effectiveOwnerId === 'system' || effectiveOwnerId.startsWith('system')) {
+      return sendJson(res, 400, { error: 'Identificador de titularidade reservado inválido.' });
+    }
+
     const newSong: SongRecord = {
       id: songId,
-      userId: user?.id || 'visitor',
+      userId: effectiveOwnerId,
       title,
       artist,
       durationSeconds: Number(durationSeconds),
@@ -540,7 +625,7 @@ export async function dispatchApiRequest(
     const newTab: TabRecord = {
       id: tabId,
       songId,
-      userId: user?.id || 'visitor',
+      userId: effectiveOwnerId,
       title: `${title} (${instrument})`,
       artist,
       instrument,
@@ -556,7 +641,7 @@ export async function dispatchApiRequest(
     db.createSong(newSong);
     db.saveTab(newTab);
 
-    return sendJson(res, 200, {
+    const responsePayload = {
       success: true,
       job: {
         stage: 'done',
@@ -566,7 +651,20 @@ export async function dispatchApiRequest(
       },
       song: newSong,
       tab: newTab,
-    });
+    };
+
+    if (idempotencyKey) {
+      const payloadHash = computePayloadHash(body);
+      db.saveIdempotencyRecord({
+        key: idempotencyKey,
+        userId: actorId,
+        payloadHash,
+        responseData: responsePayload,
+        createdAt: now,
+      });
+    }
+
+    return sendJson(res, 200, responsePayload);
   }
 
   // --- TABLATURAS ---
@@ -576,6 +674,16 @@ export async function dispatchApiRequest(
     if (!tab) {
       return sendJson(res, 404, { error: 'Tablatura não encontrada.' });
     }
+
+    const isSystemResource = tab.userId === 'system';
+    const isOwner = user
+      ? (user.id === tab.userId || user.role === 'admin' || user.role === 'owner')
+      : (tab.userId === visitorId);
+
+    if (!isSystemResource && !isOwner) {
+      return sendJson(res, 403, { error: 'Acesso negado: recurso privado restrito ao proprietário.' });
+    }
+
     return sendJson(res, 200, tab);
   }
 
@@ -679,9 +787,15 @@ export async function dispatchApiRequest(
   }
 
   if (pathname === '/api/admin/bootstrap' && method === 'POST') {
+    const configuredSecret = process.env.ONTABS_ADMIN_SECRET;
+    if (!configuredSecret || configuredSecret.trim().length === 0) {
+      return sendJson(res, 503, {
+        error: 'Endpoint de bootstrap administrativo desabilitado. Configure ONTABS_ADMIN_SECRET no ambiente.',
+      });
+    }
+
     const adminKey = req.headers['x-ontabs-admin-key'];
-    const expectedKey = process.env.ONTABS_ADMIN_SECRET || 'ontabs-admin-secure-key-2026';
-    if (!adminKey || adminKey !== expectedKey) {
+    if (!adminKey || adminKey !== configuredSecret) {
       return sendJson(res, 401, { error: 'Chave de segurança de bootstrap administrativo inválida.' });
     }
 
