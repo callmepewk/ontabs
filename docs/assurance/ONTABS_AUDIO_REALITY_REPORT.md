@@ -1,5 +1,5 @@
 # ONTABS — RELATÓRIO OPERACIONAL DE REALIDADE ACÚSTICA & ARRANJO DE BANDA
-**Data de Execução:** 2026-10-20T01:37:38.853Z  
+**Data de Execução:** 2026-10-20T02:31:55.147Z  
 **Versão do Runner:** 1.2.0-reality-runner  
 **Status Consolidado:** **PASS**
 
@@ -28,7 +28,7 @@
 - **Formato:** WAV 32-bit Float PCM Stereo (Downmixed to Mono for DSP)
 - **Taxa de Amostragem:** 44100 Hz
 - **Duração Analisada:** 8 s
-- **Nível RMS:** 0.2056
+- **Nível RMS:** 0.2058
 - **Pico Máximo:** 0.95
 - **Presença de Clipping Digital:** Não (Integridade Preservada)
 - **BPM Estimado por Autocorrelação de Fluxo:** **60 BPM** (Confiança: 100.0%)

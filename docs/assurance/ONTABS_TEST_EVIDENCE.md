@@ -1,4 +1,4 @@
-# OnTabs — Evidências de Testes e Linha de Base Reproduzível (136 Testes em 14 Suítes)
+# OnTabs — Evidências de Testes e Linha de Base Reproduzível (154 Testes em 16 Suítes)
 
 **Data**: 2026-10-19  
 **Responsável**: Antigravity — Hardening & Technical Assurance  
@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Inventário Real dos Testes Executados (136 Testes em 14 Suítes)
+## 1. Inventário Real dos Testes Executados (154 Testes em 16 Suítes)
 
 Comando de Execução Canônico:
 ```powershell
@@ -14,15 +14,17 @@ npm test -- --run
 ```
 Saída Oficial Medida:
 - **Runner**: Vitest v2.1.9
-- **Arquivos de Teste**: 14
-- **Total de Testes**: 136
-- **Resultado**: 136 aprovados (100% PASS, 0 falhas)
-- **Tempo de Execução**: ~1.9s
+- **Arquivos de Teste**: 16
+- **Total de Testes**: 154
+- **Resultado**: 154 aprovados (100% PASS, 0 falhas)
+- **Tempo de Execução**: ~1.76s
 
 ### Classificação Estrita por Categoria
 
 | Arquivo de Teste | Quantidade | Classificação Real | Escopo Coberto | O que NÃO Cobre |
 |---|---|---|---|---|
+| `src/engine/__tests__/admissionGate.test.ts` | 9 | **Governança & Portão de Admissão** | **Validação determinística de elegibilidade por operação (`INTERNAL_TEST`, `COMMERCIAL_PROCESSING`, `PUBLIC_PLAYBACK`), bloqueio estrito de licenças Não-Comerciais (NC) no fluxo comercial, bloqueio de links externos protegidos por DRM (Spotify/YouTube), não-inferência de reprodução pública a partir de processamento privado, verificação de atribuição mandatória e cessação imediata de operações em ativos revogados/takedown** | Não substitui parecer advocatício individual |
+| `src/server/__tests__/mediaValidator.test.ts` | 9 | **Segurança & Ingestão de Mídia** | **Detecção de assinaturas binárias reais (magic bytes) para MP3 (ID3v2 e Frame Sync puro) e MP4/M4A (caixa ftyp isom/m4a), rejeição de extensões mascaradas/spoofing, rejeição de arquivos vazios (0 bytes) e acima do limite (30MB), higienização de nomes contra Path Traversal e garantia de isolamento de diretório entre usuários distintos** | Não substitui antivírus em nível de sistema operacional |
 | `src/engine/__tests__/mathAndDijkstra.test.ts` | 19 | **Matemático & Prova de Otimização** | **Conversão frequência-MIDI, cálculo de cents Ellis, invariante de oitava (12 semitons = 2x), reversibilidade f->midi->f, F0 por autocorrelação calibrada (A4, A2, A3), rejeição de ruído/silêncio, prova de Dijkstra com oráculo de busca exaustiva independente, resposta analítica de biquad filters e sanitização de ganhos** | Não modela acústica não-linear de salas |
 | `src/engine/__tests__/f0StressAndAcoustics.test.ts` | 6 | **Estresse Acústico & Limites de F0** | **Rastreamento de F0 com múltiplos harmônicos fortes (corda de guitarra), estabilidade sob ruído aditivo (SNR ~18 dB), corte de baixíssima energia (RMS < 0.005), comprovação do limite acústico em sinal polifônico denso (tríade C-E-G), histerese de Schmitt trigger contra micro-jitter e detecção de vibrato legítimo** | Não cobre separação de stems por redes neurais de grande porte |
 | `src/engine/__tests__/techniquesAndEvents.test.ts` | 13 | **Unitário & DSP de Articulação** | **Modelo canônico versionado de eventos (`CanonicalMusicalEvent`), validação física de trastes/cordas, quantização musical (1/16, tercinas), conversão para compassos/tempos/ticks, taxonomia de técnicas multi-instrumento (Guitarra, Baixo, Bateria, Saxofone), detecção de bends e vibrato por zero-crossing de F0 com histerese, acordes estendidos (maj9, m7b5), inversões slash chords e cálculo de ambiguidade harmônica** | Não substitui anotação manual com partitura orquestral completa |
@@ -59,5 +61,5 @@ Relatório oficial gravado em `docs/assurance/reality_e2e_report.json`.
 
 Executado via `scripts/audioRealityRunner.ts`:
 - **Track A (Spotify)**: Faixa *The Rolling Stones - Can't You Hear Me Knocking* resolvida como `METADATA_ONLY` com conformidade de termos estritamente preservada.
-- **Track B (Audio Pipeline Real)**: Áudio multitrack de banda decodificado (44.1kHz, 8s), RMS 0.2056, pico 0.9500 sem clipping, BPM estimado em 60 BPM por fluxo espectral, separação de stems validada (alinhamento temporal <= 25ms, distinção de acompanhamento aprovada), contrabaixo elétrico 4 cordas transcrito (8 notas, casas médias 1.4 no braço), guitarra solo otimizada via Dijkstra (custo 3.25), e inferência de Lead vs Rhythm concluída com 82% de confiança.
+- **Track B (Audio Pipeline Real)**: Áudio multitrack de banda decodificado (44.1kHz, 8s), RMS 0.2058, pico 0.9500 sem clipping, BPM estimado em 60 BPM por fluxo espectral, separação de stems validada (alinhamento temporal <= 25ms, distinção de acompanhamento aprovada), contrabaixo elétrico 4 cordas transcrito (8 notas, casas médias 1.4 no braço), guitarra solo otimizada via Dijkstra (custo 3.25), e inferência de Lead vs Rhythm concluída com 82% de confiança.
 - **Relatório Oficial**: `docs/assurance/ONTABS_AUDIO_REALITY_REPORT.md` e `docs/assurance/reality_run_report.json`.

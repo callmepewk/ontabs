@@ -46,3 +46,4 @@ describe('Ontabs Audio Reality Runner & Regulatory Compliance (Gate 0 & 1)', () 
     expect(metadata.message).toContain('Termos de Serviço');
   });
 });
+

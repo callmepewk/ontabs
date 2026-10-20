@@ -20,3 +20,4 @@ export * from './techniques';
 export * from './canonicalEvents';
 export * from './electricBass';
 export * from './stemSeparation';
+export * from './admissionGate';

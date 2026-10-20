@@ -16,7 +16,9 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea
 *.tsbuildinfo
-data/
+data/*
+!data/music-library/
+!data/music-library/**
 *.tmp
 vite.config.js
 vite.config.d.ts
