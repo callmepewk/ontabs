@@ -17,6 +17,11 @@ import {
 import { Instrument } from '@/types/domain';
 import { optimizeFretSequence } from '../engine/fretOptimization';
 import { resolveExternalConnectorUrl } from '../engine/connectors';
+import {
+  validateMediaBuffer,
+  sanitizeSafeFilename,
+  getIsolatedUserUploadPath,
+} from './mediaValidator';
 
 export interface RequestContext {
   req: http.IncomingMessage;
@@ -398,8 +403,87 @@ export async function dispatchApiRequest(
     return sendJson(res, 200, { success: true });
   }
 
+  // --- CATÁLOGO VERIFICADO & DIREITOS AUTORAIS ---
+  if (pathname === '/api/catalog' && method === 'GET') {
+    const catalogPath = path.resolve(process.cwd(), 'data', 'music-library', 'catalog.json');
+    if (!fs.existsSync(catalogPath)) {
+      return sendJson(res, 404, { error: 'Catálogo de músicas não encontrado no servidor.' });
+    }
+    try {
+      const catalogData = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'));
+      const collection = url.searchParams.get('collection');
+      const genre = url.searchParams.get('genre');
+      let filteredAssets = catalogData.assets || [];
+
+      if (collection) {
+        filteredAssets = filteredAssets.filter((a: any) => a.targetCollection === collection);
+      }
+      if (genre) {
+        filteredAssets = filteredAssets.filter((a: any) =>
+          a.genre?.toLowerCase() === genre.toLowerCase()
+        );
+      }
+
+      return sendJson(res, 200, {
+        version: catalogData.version,
+        updatedAt: catalogData.updatedAt,
+        totalAssets: filteredAssets.length,
+        collectionsCount: catalogData.collectionsCount,
+        assets: filteredAssets,
+      });
+    } catch (err: any) {
+      return sendJson(res, 500, { error: 'Erro ao processar catálogo.', details: err?.message });
+    }
+  }
+
+  // --- VALIDAÇÃO RIGOROSA DE MÍDIA BINÁRIA & MAGIC BYTES ---
+  if (pathname === '/api/media/validate' && method === 'POST') {
+    const { filename = 'audio.mp3', dataBase64 } = body;
+    if (!dataBase64 || typeof dataBase64 !== 'string') {
+      return sendJson(res, 400, {
+        error: 'O parâmetro "dataBase64" é obrigatório para validação binária de mídia.',
+        reasonCode: 'MISSING_DATA',
+      });
+    }
+
+    try {
+      const buffer = Buffer.from(dataBase64, 'base64');
+      const validation = validateMediaBuffer(buffer, filename);
+      const sanitizedFilename = sanitizeSafeFilename(filename);
+
+      let isolatedPath = null;
+      if (validation.isValid) {
+        const uploadBase = path.resolve(process.cwd(), 'uploads');
+        const userId = user?.id || visitorId;
+        const isolated = getIsolatedUserUploadPath(uploadBase, userId, sanitizedFilename);
+        isolatedPath = isolated.safePath;
+      }
+
+      return sendJson(res, validation.isValid ? 200 : 400, {
+        ...validation,
+        sanitizedFilename,
+        isolatedPath: isolatedPath ? path.basename(isolatedPath) : null,
+      });
+    } catch (err: any) {
+      return sendJson(res, 500, { error: 'Erro ao validar buffer de mídia.', details: err?.message });
+    }
+  }
+
   // --- PIPELINE DE CONVERSÃO PROTEGIDA ---
   if (pathname === '/api/music/convert' && method === 'POST') {
+    // 0. Validação binária de mídia prévia (se enviada)
+    if (body.mediaBase64 && body.mediaFilename) {
+      const mediaBuf = Buffer.from(body.mediaBase64, 'base64');
+      const validation = validateMediaBuffer(mediaBuf, body.mediaFilename);
+      if (!validation.isValid) {
+        return sendJson(res, 400, {
+          error: validation.error || 'Arquivo de mídia inválido ou corrompido.',
+          reasonCode: validation.reasonCode,
+          detectedFormat: validation.detectedFormat,
+        });
+      }
+    }
+
     // 1. Verificação de Entitlement Server-Side
     const auth = authorizeProtectedOperation(user, visitorConsumed, 'audio_analysis');
     if (!auth.isAuthorized) {

@@ -134,6 +134,35 @@ export async function runRealityE2E(): Promise<{
     });
     console.log(`    - Cards de Músicas/Ações Detectados: ${songCards}`);
 
+    // 3B. Catálogo Soberano Verificado & Badges de Direitos Autorais
+    t0 = Date.now();
+    console.log('\n[+] Passo 3B [Desktop]: Testando Aba do Catálogo Soberano Verificado & Direitos...');
+    const catalogTabBtn = desktopPage.locator('button', { hasText: 'Catálogo Soberano Verificado' });
+    await catalogTabBtn.click();
+    await desktopPage.waitForSelector('text=DOMÍNIO PÚBLICO', { timeout: 5000 });
+    const verifiedCards = await desktopPage.locator('.card').count();
+    const hasPublicDomainBadge = (await desktopPage.locator('text=DOMÍNIO PÚBLICO').count()) > 0;
+    const hasCCByBadge = (await desktopPage.locator('text=CC BY 4.0').count()) > 0;
+
+    const catalogScreenshot = 'reality_desktop_verified_catalog.png';
+    await desktopPage.screenshot({ path: path.join(screenshotDir, catalogScreenshot) });
+
+    results.push({
+      step: 'Verified Catalog Tab & Multi-Tier Rights Badges',
+      viewport: 'desktop_1920x1080',
+      passed: verifiedCards >= 9 && hasPublicDomainBadge && hasCCByBadge,
+      durationMs: Date.now() - t0,
+      screenshot: catalogScreenshot,
+      details: {
+        verifiedCardsFound: verifiedCards,
+        hasPublicDomainBadge,
+        hasCCByBadge,
+      },
+    });
+    console.log(`    - Cards do Catálogo Verificado: ${verifiedCards}`);
+    console.log(`    - Badges [DOMÍNIO PÚBLICO] Presentes: ${hasPublicDomainBadge}`);
+    console.log(`    - Badges [CC BY 4.0] Presentes: ${hasCCByBadge}`);
+
     // 4. OnTabs Play Mode (Verificação de Proveniência & Distinção de Modos)
     t0 = Date.now();
     console.log('\n[+] Passo 4 [Desktop]: Verificando OnTabs Play Mode & Badges...');

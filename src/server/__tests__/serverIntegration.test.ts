@@ -312,4 +312,62 @@ describe('Ontabs Independent Server - End-to-End API Integration', () => {
     const freeBody = await selectFreeRes.json();
     expect(freeBody.user.planCode).toBe('free');
   });
+
+  it('GET /api/catalog retorna catálogo soberano verificado com 9 ativos e metadados de direitos', async () => {
+    const res = await fetch(`${BASE_URL}/api/catalog`);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.version).toBe('1.0.0');
+    expect(data.totalAssets).toBe(9);
+    expect(data.assets).toHaveLength(9);
+    expect(data.collectionsCount).toBeDefined();
+
+    // Filtro por coleção
+    const resDemo = await fetch(`${BASE_URL}/api/catalog?collection=public_demo`);
+    expect(resDemo.status).toBe(200);
+    const demoData = await resDemo.json();
+    expect(demoData.totalAssets).toBe(5);
+    expect(demoData.assets.every((a: any) => a.targetCollection === 'public_demo')).toBe(true);
+  });
+
+  it('POST /api/media/validate aceita MP3 autêntico com ID3 e rejeita arquivo mascarado com erro descritivo', async () => {
+    // 1. Buffer MP3 autêntico com ID3v2
+    const mp3Buf = Buffer.concat([
+      Buffer.from([0x49, 0x44, 0x33, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20]),
+      Buffer.alloc(128),
+    ]);
+
+    const validRes = await fetch(`${BASE_URL}/api/media/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: 'solo_guitarra.mp3',
+        dataBase64: mp3Buf.toString('base64'),
+      }),
+    });
+
+    expect(validRes.status).toBe(200);
+    const validData = await validRes.json();
+    expect(validData.isValid).toBe(true);
+    expect(validData.detectedFormat).toBe('mp3');
+    expect(validData.reasonCode).toBe('ACCEPTED_SAFE');
+    expect(validData.sanitizedFilename).toBe('solo_guitarra.mp3');
+
+    // 2. Arquivo falso/mascarado (texto renomeado para .mp3)
+    const spoofBuf = Buffer.from('ESTE E UM ARQUIVO DE TEXTO E NAO UM MP3');
+    const spoofRes = await fetch(`${BASE_URL}/api/media/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: 'falso_audio.mp3',
+        dataBase64: spoofBuf.toString('base64'),
+      }),
+    });
+
+    expect(spoofRes.status).toBe(400);
+    const spoofData = await spoofRes.json();
+    expect(spoofData.isValid).toBe(false);
+    expect(spoofData.reasonCode).toBe('SIGNATURE_MISMATCH');
+    expect(spoofData.error).toContain('Assinatura binária do arquivo não corresponde');
+  });
 });

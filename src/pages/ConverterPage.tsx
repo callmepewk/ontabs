@@ -59,6 +59,23 @@ export function ConverterPage() {
     setConverting(true);
 
     try {
+      // Validação soberana de Magic Bytes no servidor antes de decodificar
+      const sampleChunk = await file.slice(0, 1024 * 32).arrayBuffer();
+      const uint8 = new Uint8Array(sampleChunk);
+      let binaryStr = '';
+      for (let i = 0; i < uint8.length; i++) binaryStr += String.fromCharCode(uint8[i]);
+      const base64Data = btoa(binaryStr);
+
+      const valRes = await fetch('/api/media/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, dataBase64: base64Data }),
+      });
+      const val = await valRes.json();
+      if (!valRes.ok || !val.isValid) {
+        throw new Error(val.error || 'Arquivo de mídia com assinatura binária inválida ou corrompida.');
+      }
+
       const job = await conversionService.startConversion(file, instrument, (stage, p) => {
         setCurrentStage(stage);
         setProgress(p);
@@ -70,6 +87,27 @@ export function ConverterPage() {
     } catch (err: any) {
       setError(err?.message || 'Falha ao processar arquivo.');
       // Atualiza entitlement para refletir se cota foi consumida
+      authService.getEntitlementStatus().then(setEntitlement).catch(() => null);
+    } finally {
+      setConverting(false);
+    }
+  }
+
+  async function handleVerifiedSampleSubmit(title: string, artist: string) {
+    setError(null);
+    setConverting(true);
+
+    try {
+      const job = await conversionService.startConversion(`${title} — ${artist}`, instrument, (stage, p) => {
+        setCurrentStage(stage);
+        setProgress(p);
+      });
+
+      if (job.resultTabId) {
+        navigate(`/tab/${job.resultTabId}`);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Falha ao processar obra verificada.');
       authService.getEntitlementStatus().then(setEntitlement).catch(() => null);
     } finally {
       setConverting(false);
@@ -257,6 +295,45 @@ export function ConverterPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Catálogo Verificado para Teste Rápido */}
+        <div className="card" style={{ gridColumn: 'span 2', background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+            <strong style={{ color: '#10b981' }}>🛡️ Obras Auditadas de Domínio Público (Teste Instantâneo)</strong>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Gravações históricas & licenças livres auditadas</span>
+          </div>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '0 0 12px 0' }}>
+            Selecione uma obra clássica com direitos verificados para analisar ritmo, acordes e dedilhados sem precisar subir arquivos locais:
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[
+              { title: 'Odeon (Tango Brasileiro)', artist: 'Ernesto Nazareth (1912)', badge: 'Domínio Público BR' },
+              { title: 'Atraente (Choro Histórico)', artist: 'Chiquinha Gonzaga (1907)', badge: 'Domínio Público BR' },
+              { title: 'Sinfonia Nº 5 em Dó menor', artist: 'Beethoven / Musopen', badge: 'CC0 Domínio Público' },
+              { title: 'Acoustic Solo Excerpt', artist: 'GuitarSet Dataset', badge: 'CC BY 4.0' },
+            ].map((sample) => (
+              <button
+                key={sample.title}
+                disabled={Boolean(converting || (entitlement && !entitlement.isAuthorized))}
+                onClick={() => handleVerifiedSampleSubmit(sample.title, sample.artist)}
+                className="btn secondary"
+                style={{
+                  fontSize: 12,
+                  padding: '6px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                }}
+              >
+                <span>🎵 {sample.title}</span>
+                <span style={{ fontSize: 10, padding: '1px 5px', borderRadius: 3, background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                  {sample.badge}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

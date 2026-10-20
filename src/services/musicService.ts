@@ -12,12 +12,66 @@ export interface PaginatedSongs {
   totalPages: number;
 }
 
+export interface VerifiedAsset {
+  id: string;
+  title: string;
+  artist: string;
+  album?: string;
+  releaseYear?: number;
+  genre: string;
+  subgenre?: string;
+  countryOfOrigin?: string;
+  targetCollection: string;
+  licenseId: string;
+  licenseUrl: string;
+  isPublicDomain: boolean;
+  attribution: {
+    required: boolean;
+    creditText: string;
+    licenseName: string;
+    licenseUrl: string;
+  };
+  rightsHolder: {
+    compositionAuthor: string;
+    isCompositionPublicDomain: boolean;
+    recordingPerformer: string;
+    phonogramProducer: string;
+    isPhonogramPublicDomain: boolean;
+  };
+  permissions: {
+    internalTest: string;
+    privateProcessing: string;
+    commercialProcessing: string;
+    stemGeneration: string;
+    tablatureDisplay: string;
+    publicPlayback: string;
+    redistribution: string;
+    modelTraining: string;
+  };
+  durationSeconds: number;
+  hasStems: boolean;
+  hasGroundTruthTab: boolean;
+  groundTruthType: string;
+  ingestionStatus: string;
+  processingStatus: string;
+  publicationStatus: string;
+}
+
+export interface CatalogResponse {
+  version: string;
+  updatedAt: string;
+  totalAssets: number;
+  collectionsCount: Record<string, number>;
+  assets: VerifiedAsset[];
+}
+
 export interface MusicService {
   listLibrary(page?: number, pageSize?: number, search?: string, instrument?: string): Promise<PaginatedSongs>;
   getSong(id: string): Promise<Song | null>;
   deleteSong(id: string): Promise<boolean>;
   uploadAudioFile(file: File, instrument?: string): Promise<Song>;
   submitYoutubeUrl(url: string, instrument?: string): Promise<Song>;
+  listCatalog(collection?: string, genre?: string): Promise<CatalogResponse>;
 }
 
 class SovereignMusicService implements MusicService {
@@ -124,6 +178,23 @@ class SovereignMusicService implements MusicService {
 
     const data = await res.json();
     return data.song;
+  }
+
+  async listCatalog(collection?: string, genre?: string): Promise<CatalogResponse> {
+    const params = new URLSearchParams();
+    if (collection) params.set('collection', collection);
+    if (genre) params.set('genre', genre);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    const res = await fetch(`/api/catalog${queryString}`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!res.ok) {
+      throw new Error('Falha ao obter catálogo verificado de músicas.');
+    }
+
+    return await res.json();
   }
 }
 

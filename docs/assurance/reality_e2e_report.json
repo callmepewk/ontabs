@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-10-20T02:32:03.359Z",
-  "totalSteps": 7,
-  "passedSteps": 7,
+  "timestamp": "2026-10-20T02:48:19.424Z",
+  "totalSteps": 8,
+  "passedSteps": 8,
   "failedSteps": 0,
   "results": [
     {
       "step": "Landing Page Hero & Value Proposition",
       "viewport": "desktop_1920x1080",
       "passed": true,
-      "durationMs": 960,
+      "durationMs": 913,
       "screenshot": "reality_desktop_landing.png",
       "details": {
         "heroTitle": "Da gravação à tablatura perfeita, com precisão matemática e inteligência de banda.",
@@ -19,7 +19,7 @@
       "step": "Spotify Connector Resolution & TOS Compliance UI",
       "viewport": "desktop_1920x1080",
       "passed": true,
-      "durationMs": 702,
+      "durationMs": 704,
       "screenshot": "reality_desktop_spotify_resolution.png",
       "details": {
         "resolvedTrack": "Can't You Hear Me Knocking",
@@ -31,17 +31,29 @@
       "step": "Song Library & Catalog Navigation",
       "viewport": "desktop_1920x1080",
       "passed": true,
-      "durationMs": 675,
+      "durationMs": 660,
       "screenshot": "reality_desktop_library.png",
       "details": {
-        "songCardsFound": 1
+        "songCardsFound": 2
+      }
+    },
+    {
+      "step": "Verified Catalog Tab & Multi-Tier Rights Badges",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 168,
+      "screenshot": "reality_desktop_verified_catalog.png",
+      "details": {
+        "verifiedCardsFound": 9,
+        "hasPublicDomainBadge": true,
+        "hasCCByBadge": true
       }
     },
     {
       "step": "OnTabs Play Mode & Provenance Badges",
       "viewport": "desktop_1920x1080",
       "passed": true,
-      "durationMs": 650,
+      "durationMs": 662,
       "screenshot": "reality_desktop_play_selector.png",
       "details": {
         "playHeading": "OnTabs Play",
@@ -52,7 +64,7 @@
       "step": "Pricing Plans & Tier Presentation",
       "viewport": "desktop_1920x1080",
       "passed": true,
-      "durationMs": 606,
+      "durationMs": 621,
       "screenshot": "reality_desktop_plans.png",
       "details": {
         "planCardsCount": 3
@@ -62,7 +74,7 @@
       "step": "Mobile Responsiveness & Zero Horizontal Overflow",
       "viewport": "mobile_375x812",
       "passed": true,
-      "durationMs": 745,
+      "durationMs": 760,
       "screenshot": "reality_mobile_landing.png",
       "details": {
         "hasHorizontalOverflow": false
@@ -72,7 +84,7 @@
       "step": "Mobile Converter Page Layout",
       "viewport": "mobile_375x812",
       "passed": true,
-      "durationMs": 596,
+      "durationMs": 612,
       "screenshot": "reality_mobile_converter.png",
       "details": {
         "hasHorizontalOverflow": false

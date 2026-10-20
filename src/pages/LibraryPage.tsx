@@ -3,7 +3,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { musicService, PaginatedSongs } from '@/services/musicService';
+import {
+  musicService,
+  PaginatedSongs,
+  VerifiedAsset,
+  CatalogResponse,
+} from '@/services/musicService';
 import { Song } from '@/types/domain';
 
 // Acervo demonstrativo soberano para exploração pública antes do cadastro
@@ -101,7 +106,45 @@ const PUBLIC_DEMO_SONGS: Song[] = [
 type SegmentType = 'all' | 'guitar' | 'bass' | 'acoustic_guitar' | 'drums' | 'saxophone' | 'recent';
 type ViewMode = 'grid' | 'list';
 
+function getRightsBadge(asset: VerifiedAsset) {
+  if (asset.isPublicDomain) {
+    return {
+      text: '✓ DOMÍNIO PÚBLICO',
+      bg: 'rgba(16, 185, 129, 0.15)',
+      color: '#10b981',
+      border: 'rgba(16, 185, 129, 0.4)',
+    };
+  }
+  if (asset.licenseId === 'CC-BY-4.0') {
+    return {
+      text: 'CC BY 4.0 · CRÉDITO OBRIGATÓRIO',
+      bg: 'rgba(59, 130, 246, 0.15)',
+      color: '#3b82f6',
+      border: 'rgba(59, 130, 246, 0.4)',
+    };
+  }
+  if (asset.licenseId?.includes('NC') || asset.licenseId?.includes('NON-COMMERCIAL')) {
+    return {
+      text: 'CC BY-NC-SA · NÃO COMERCIAL',
+      bg: 'rgba(168, 85, 247, 0.15)',
+      color: '#a855f7',
+      border: 'rgba(168, 85, 247, 0.4)',
+    };
+  }
+  return {
+    text: 'RESTRITO · METADATA ONLY / DRM',
+    bg: 'rgba(245, 158, 11, 0.15)',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+  };
+}
+
 export function LibraryPage() {
+  const [activeTab, setActiveTab] = useState<'library' | 'catalog'>('library');
+  const [catalogData, setCatalogData] = useState<CatalogResponse | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogFilter, setCatalogFilter] = useState<'all' | 'public_demo' | 'internal_validation' | 'restricted_or_pending'>('all');
+
   const [data, setData] = useState<PaginatedSongs>({
     items: [],
     total: 0,
@@ -116,6 +159,24 @@ export function LibraryPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [isDemoMode, setIsDemoMode] = useState(false);
+
+  async function loadCatalog() {
+    setCatalogLoading(true);
+    try {
+      const res = await musicService.listCatalog();
+      setCatalogData(res);
+    } catch (err) {
+      console.error('Erro ao carregar catálogo verificado:', err);
+    } finally {
+      setCatalogLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'catalog' && !catalogData) {
+      loadCatalog();
+    }
+  }, [activeTab]);
 
   async function loadSongs(page = currentPage, segment = activeSegment, query = search, limit = pageSize) {
     setLoading(true);
@@ -214,6 +275,75 @@ export function LibraryPage() {
         </div>
       </div>
 
+      {/* Abas Principais de Seção */}
+      <div style={{
+        display: 'flex',
+        gap: 12,
+        marginTop: 18,
+        borderBottom: '1px solid var(--border)',
+        paddingBottom: 2,
+      }}>
+        <button
+          onClick={() => setActiveTab('library')}
+          style={{
+            padding: '10px 18px',
+            fontSize: 14,
+            fontWeight: activeTab === 'library' ? 700 : 500,
+            color: activeTab === 'library' ? '#10b981' : 'var(--text-muted)',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'library' ? '2px solid #10b981' : '2px solid transparent',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <span>📁</span>
+          <span>Meu Repertório & Análises</span>
+          <span style={{
+            fontSize: 11,
+            padding: '2px 6px',
+            borderRadius: 10,
+            background: activeTab === 'library' ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
+            color: activeTab === 'library' ? '#10b981' : 'var(--text-muted)',
+          }}>
+            {data.total}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('catalog')}
+          style={{
+            padding: '10px 18px',
+            fontSize: 14,
+            fontWeight: activeTab === 'catalog' ? 700 : 500,
+            color: activeTab === 'catalog' ? '#10b981' : 'var(--text-muted)',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'catalog' ? '2px solid #10b981' : '2px solid transparent',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <span>🛡️</span>
+          <span>Catálogo Soberano Verificado (Direitos & Proveniência)</span>
+          <span style={{
+            fontSize: 11,
+            padding: '2px 6px',
+            borderRadius: 10,
+            background: activeTab === 'catalog' ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
+            color: activeTab === 'catalog' ? '#10b981' : 'var(--text-muted)',
+          }}>
+            9 Obras
+          </span>
+        </button>
+      </div>
+
+      {activeTab === 'library' ? (
+        <>
       {/* Banner de Demonstração Pública para Visitantes */}
       {isDemoMode && (
         <div style={{
@@ -578,6 +708,175 @@ export function LibraryPage() {
               »
             </button>
           </div>
+        </div>
+      )}
+        </>
+      ) : (
+        /* Seção do Catálogo Verificado */
+        <div style={{ marginTop: 18 }}>
+          {/* Header Explicativo de Direitos e Soberania */}
+          <div style={{
+            background: 'rgba(16, 185, 129, 0.05)',
+            border: '1px solid rgba(16, 185, 129, 0.2)',
+            borderRadius: 8,
+            padding: 16,
+            marginBottom: 20,
+            fontSize: 13,
+            lineHeight: 1.6,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 18 }}>🛡️</span>
+              <strong style={{ color: '#10b981', fontSize: 14 }}>
+                Catálogo Auditado & Inteligência de Direitos Autorais
+              </strong>
+            </div>
+            <p style={{ margin: 0, color: 'var(--text-muted)' }}>
+              Todas as 9 obras abaixo foram catalogadas com <strong>separação tripartite de direitos</strong> (Composição, Arranjo e Fonograma) segundo a Lei 9.610/98 e convenções internacionais. Apenas obras de domínio público integral e licenças Creative Commons estritas com atribuição são liberadas para processamento e execução. Áudios protegidos por DRM (ex: Spotify) são restritos a <em>METADATA_ONLY</em> sem extração de áudio.
+            </p>
+          </div>
+
+          {/* Filtros de Coleção do Catálogo */}
+          <div style={{
+            display: 'flex',
+            gap: 8,
+            overflowX: 'auto',
+            paddingBottom: 12,
+            marginBottom: 16,
+            borderBottom: '1px solid var(--border)',
+          }}>
+            {[
+              { id: 'all', label: 'Todas as Obras (9)' },
+              { id: 'public_demo', label: 'Domínio Público & Demo (5)' },
+              { id: 'internal_validation', label: 'Pesquisa & Validação (3)' },
+              { id: 'restricted_or_pending', label: 'Restrito DRM / TOS (1)' },
+            ].map((f) => {
+              const isSelected = catalogFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setCatalogFilter(f.id as any)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 6,
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    border: isSelected ? '1px solid #10b981' : '1px solid var(--border)',
+                    background: isSelected ? 'rgba(16, 185, 129, 0.18)' : 'var(--bg-elevated)',
+                    color: isSelected ? '#10b981' : 'var(--text-muted)',
+                    fontWeight: isSelected ? 700 : 400,
+                  }}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Listagem de Ativos do Catálogo */}
+          {catalogLoading ? (
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+              Carregando catálogo verificado de obras e metadados de direitos...
+            </div>
+          ) : (
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+              {(catalogData?.assets || [])
+                .filter((asset) => {
+                  if (catalogFilter === 'all') return true;
+                  return asset.targetCollection === catalogFilter;
+                })
+                .map((asset) => {
+                  const badge = getRightsBadge(asset);
+                  return (
+                    <div
+                      key={asset.id}
+                      className="card"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: 18,
+                        background: '#0e0f17',
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '3px 8px',
+                              borderRadius: 4,
+                              background: badge.bg,
+                              color: badge.color,
+                              border: `1px solid ${badge.border}`,
+                              letterSpacing: 0.5,
+                            }}
+                          >
+                            {badge.text}
+                          </span>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: 4 }}>
+                            {asset.genre} · {asset.releaseYear || 'Histórico'}
+                          </span>
+                        </div>
+
+                        <h3 style={{ margin: '12px 0 4px', fontSize: 15 }}>{asset.title}</h3>
+                        <p style={{ color: '#10b981', fontSize: 13, margin: '0 0 10px', fontWeight: 500 }}>{asset.artist}</p>
+
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, background: 'rgba(0,0,0,0.25)', padding: 10, borderRadius: 6, marginBottom: 12 }}>
+                          <div><strong>Composição:</strong> {asset.rightsHolder?.compositionAuthor || 'N/A'} {asset.rightsHolder?.isCompositionPublicDomain ? '(Domínio Público)' : ''}</div>
+                          <div><strong>Fonograma:</strong> {asset.rightsHolder?.recordingPerformer || 'N/A'} {asset.rightsHolder?.isPhonogramPublicDomain ? '(Domínio Público)' : ''}</div>
+                          <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af' }}>
+                            <em>"{asset.attribution?.creditText}"</em>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', fontSize: 11, marginBottom: 14 }}>
+                          <span style={{ padding: '2px 6px', borderRadius: 4, background: asset.hasStems ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', color: asset.hasStems ? '#10b981' : 'var(--text-muted)' }}>
+                            {asset.hasStems ? '✓ Stems Isolados' : 'Mixdown Estéreo'}
+                          </span>
+                          <span style={{ padding: '2px 6px', borderRadius: 4, background: asset.hasGroundTruthTab ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.05)', color: asset.hasGroundTruthTab ? '#3b82f6' : 'var(--text-muted)' }}>
+                            {asset.hasGroundTruthTab ? '✓ Tab de Referência' : 'Transcrição Estimada'}
+                          </span>
+                          <span style={{ padding: '2px 6px', borderRadius: 4, background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
+                            {asset.durationSeconds}s
+                          </span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                        <Link
+                          to={`/tab/${asset.id}`}
+                          className="btn secondary"
+                          style={{ flex: 1, textAlign: 'center', fontSize: 12, padding: '8px 10px' }}
+                        >
+                          Ver Tablatura
+                        </Link>
+                        {asset.permissions?.publicPlayback === 'ALLOWED' ? (
+                          <Link
+                            to={`/play/${asset.id}`}
+                            className="btn"
+                            style={{ flex: 1, textAlign: 'center', fontSize: 12, background: '#10b981', color: '#000', padding: '8px 10px', fontWeight: 600 }}
+                          >
+                            🎮 Praticar (Play)
+                          </Link>
+                        ) : (
+                          <button
+                            disabled
+                            className="btn secondary"
+                            style={{ flex: 1, fontSize: 11, opacity: 0.5, cursor: 'not-allowed', padding: '8px 10px' }}
+                            title="Reprodução de áudio restrita pelos termos do provedor (apenas metadados)."
+                          >
+                            DRM Restrito
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
         </div>
       )}
     </div>
