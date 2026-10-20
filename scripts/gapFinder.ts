@@ -57,7 +57,16 @@ function runGapAnalysis(): GapCheckReport {
   const serverTests = fs
     .readdirSync(path.join(rootDir, 'src', 'server', '__tests__'))
     .filter((f) => f.endsWith('.test.ts'));
-  const totalTestSuites = [...engineTests.map((t) => `engine/${t}`), ...serverTests.map((t) => `server/${t}`)];
+  const playTestsDir = path.join(rootDir, 'src', 'features', 'play', '__tests__');
+  const playTests = fs.existsSync(playTestsDir)
+    ? fs.readdirSync(playTestsDir).filter((f) => f.endsWith('.test.ts'))
+    : [];
+
+  const totalTestSuites = [
+    ...engineTests.map((t) => `engine/${t}`),
+    ...serverTests.map((t) => `server/${t}`),
+    ...playTests.map((t) => `play/${t}`),
+  ];
 
   console.log(`\n[+] Suítes de Teste Automatizado (${totalTestSuites.length}):`);
   totalTestSuites.forEach((t) => console.log(`    - [✓] ${t}`));

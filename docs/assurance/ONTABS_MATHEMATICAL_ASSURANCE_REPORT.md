@@ -1,8 +1,8 @@
-# OnTabs — Relatório de Assurance Matemático e Numérico (FASE MAT)
+# OnTabs — Relatório de Assurance Matemático e Numérico (FASE MAT & ARTICULAÇÃO)
 
 **Data de Referência**: 2026-10-19  
 **Status**: **VERIFICADO & COMPROVADO POR ORÁCULOS INDEPENDENTES**  
-**Suíte de Testes**: `src/engine/__tests__/mathAndDijkstra.test.ts` (19 testes dedicados)
+**Suítes de Testes**: `mathAndDijkstra.test.ts` (19 testes), `techniquesAndEvents.test.ts` (13 testes), `playEngine.test.ts` (9 testes)
 
 ---
 
@@ -20,6 +20,8 @@
 | **EQ Digital (Biquad Peaking)** | RBJ Audio EQ Cookbook: $H(z)$ | $f_0 < f_s / 2$, ganho $\in [-12, +12]\ \text{dB}$ | Equação analítica de resposta de magnitude | Ganho em $f_0$ | $\|G(f_0) - G_{\text{alvo}}\| \le 0.1\ \text{dB}$ | $+6.0\ \text{dB}$ exato no centro; atenuação em frequências distantes | Efeito de cramping próximo da frequência de Nyquist ($f_s / 2$) | **`VERIFIED`** |
 | **EQ Digital (Biquad Lowshelf)** | RBJ Lowshelf transfer function | $80\ \text{Hz}$, ganho $\in [-12, +12]\ \text{dB}$ | Equação analítica | Ganho em $f \ll f_0$ | $\|G_{\text{sub}} - G_{\text{alvo}}\| \le 1.0\ \text{dB}$ | $+5.0\ \text{dB}$ em subgraves; $0\ \text{dB}$ em agudos | Requer sample rate adequado ($\ge 44.1\ \text{kHz}$) | **`VERIFIED`** |
 | **Sanitização Numérica de Áudio** | Clamp $[-12, +12]\ \text{dB}$, `NaN`/`Infinity` $\to 0$ | $\mathbb{R} \cup \{\text{NaN}, \pm\infty\}$ | Teoria de sistemas digitais LTI | Estabilidade numérica | Zero `NaN` ou `Infinity` | $100\%$ estável sob entradas degeneradas | Ganhos fora do intervalo são truncados aos limites | **`VERIFIED`** |
+| **Detecção de Vibrato** | Zero-crossings $Z$ do desvio de F0 em torno da média: $f_v = \frac{Z / 2}{\Delta t}$ | Trajetórias com $clarity > 0.6$, $\Delta t \ge 0.25\text{s}$ | Oscilador senoidal a 5.0 Hz ($\pm 30\text{ cents}$) | Frequência estimada ($f_v$) e profundidade ($C_d$) | $f_v \in [4.5, 5.5]\text{ Hz}$, $C_d \ge 25\text{ cents}$ | $f_v = 5.0\text{ Hz}$, $C_d = 30\text{ cents}$ exatos | Exige sustain estável sem ataque percussivo sobreposto | **`VERIFIED`** |
+| **Ambiguidade Harmônica** | Ratio de semelhança de cosseno: $R_a = \frac{S_2}{S_1}$ | Chroma vectors de 12 dimensões | Conjuntos de pitch-classes homônimos (ex: C6 vs Am7) | $R_a \ge 0.95$ e flag `isAmbiguous` | Detecção positiva de ambiguidade | $R_a = 1.000$, `isAmbiguous = true` | Sem contexto harmônico de baixo ou função tonal | **`VERIFIED`** |
 
 ---
 
@@ -31,7 +33,24 @@
    - Adulteração do relógio local no navegador (`localStorage` ou `Date.now` client-side) não tem qualquer efeito sobre a autorização no servidor.
 2. **Concorrência e Persistência Atômica**:
    - 10 gravações simultâneas em paralelo via fila de Mutex assíncrono em `dbConcurrency.test.ts`.
+   - Retry com backoff para locks transientes no sistema de arquivos do Windows (`EPERM`/`EBUSY`).
    - Zero registros perdidos, integridade de JSON validada após execução.
 3. **Proteção contra SSRF em Conectores**:
    - Rejeição de IPs de metadados da nuvem (`169.254.169.254`), `localhost` (`127.0.0.1`), faixas privadas RFC 1918 (`10.x`, `192.168.x`).
 
+---
+
+## 3. Motor Rítmico OnTabs Play — Janelas e Multiplicadores
+
+1. **Janelas de Julgamento Determinísticas**:
+   - Padrão: Perfect ($\le 35\text{ms}$), Great ($\le 70\text{ms}$), Good ($\le 120\text{ms}$), Miss ($> 120\text{ms}$ ou timeout aos $160\text{ms}$).
+   - Strict Pro: Perfect ($\le 25\text{ms}$), Great ($\le 50\text{ms}$), Good ($\le 100\text{ms}$), Miss ($> 100\text{ms}$).
+2. **Progressão de Multiplicadores de Combo**:
+   - Combo 0–9: $1\times$
+   - Combo 10–19: $2\times$
+   - Combo 20–29: $3\times$
+   - Combo 30+: $4\times$
+   - Qualquer Miss zera imediatamente o combo e o multiplicador retorna a $1\times$.
+3. **Fórmula de Pontuação Acumulada**:
+   $$S = \sum_{i=1}^N B(j_i) \times M(c_i)$$
+   Onde $B(\text{perfect}) = 100$, $B(\text{great}) = 70$, $B(\text{good}) = 40$, $B(\text{miss}) = 0$.

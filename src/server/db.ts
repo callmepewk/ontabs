@@ -208,7 +208,20 @@ export class Database {
     const payload = JSON.stringify(this.data, null, 2);
     try {
       fs.writeFileSync(tmpPath, payload, 'utf8');
-      fs.renameSync(tmpPath, this.filePath);
+      let retries = 5;
+      while (retries > 0) {
+        try {
+          fs.renameSync(tmpPath, this.filePath);
+          return;
+        } catch (renameErr: any) {
+          if ((renameErr.code === 'EPERM' || renameErr.code === 'EBUSY') && retries > 1) {
+            retries--;
+            Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 15);
+          } else {
+            throw renameErr;
+          }
+        }
+      }
     } catch (err) {
       if (fs.existsSync(tmpPath)) {
         try { fs.unlinkSync(tmpPath); } catch { /* ignore cleanup error */ }
@@ -224,7 +237,20 @@ export class Database {
       const payload = JSON.stringify(this.data, null, 2);
       try {
         await fs.promises.writeFile(tmpPath, payload, 'utf8');
-        await fs.promises.rename(tmpPath, this.filePath);
+        let retries = 5;
+        while (retries > 0) {
+          try {
+            await fs.promises.rename(tmpPath, this.filePath);
+            return;
+          } catch (renameErr: any) {
+            if ((renameErr.code === 'EPERM' || renameErr.code === 'EBUSY') && retries > 1) {
+              retries--;
+              await new Promise((resolve) => setTimeout(resolve, 20));
+            } else {
+              throw renameErr;
+            }
+          }
+        }
       } catch (err) {
         if (fs.existsSync(tmpPath)) {
           try { await fs.promises.unlink(tmpPath); } catch { /* ignore cleanup error */ }

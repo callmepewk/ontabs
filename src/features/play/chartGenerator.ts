@@ -43,8 +43,8 @@ export function generateGameChart(tabEvents: TabEvent[], opts: GenerateOptions):
 
     // Filtro de densidade por dificuldade (mantém distribuição uniforme, não aleatória)
     keepCounter += rules.keepRatio;
-    const shouldKeepByDensity = keepCounter >= 1;
-    if (shouldKeepByDensity) keepCounter -= 1;
+    const shouldKeepByDensity = keepCounter >= 1 || sorted.length === 1;
+    if (shouldKeepByDensity && keepCounter >= 1) keepCounter -= 1;
     if (!shouldKeepByDensity) return;
 
     // Evita notas grudadas demais para a dificuldade (jogabilidade real)

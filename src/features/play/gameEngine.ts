@@ -8,16 +8,33 @@
 // notificado (via subscribe) quando o HUD precisa mudar de fato: um hit,
 // um miss, uma mudança de combo/score — nunca a cada tick de animação.
 
-import { AudioEngine } from './audioEngine';
 import { GameChart, ChartNote, GameStats, HitResult, HitJudgement } from './types';
 
-// Janelas de julgamento, em ms de diferença entre o timestamp da nota e o hit do jogador
-const WINDOWS: { judgement: HitJudgement; ms: number }[] = [
-  { judgement: 'perfect', ms: 35 },
-  { judgement: 'great', ms: 70 },
-  { judgement: 'good', ms: 120 },
-];
-const MISS_WINDOW_MS = 160; // além disso, a nota é dada como perdida
+export interface IPlayAudioEngine {
+  getCurrentTime(): number;
+  isPlaying(): boolean;
+}
+
+export interface TimingWindowsConfig {
+  perfectMs?: number;
+  greatMs?: number;
+  goodMs?: number;
+  missMs?: number;
+}
+
+export const DEFAULT_TIMING_WINDOWS: Required<TimingWindowsConfig> = {
+  perfectMs: 35,
+  greatMs: 70,
+  goodMs: 120,
+  missMs: 160,
+};
+
+export const STRICT_PRO_WINDOWS: Required<TimingWindowsConfig> = {
+  perfectMs: 25,
+  greatMs: 50,
+  goodMs: 100,
+  missMs: 150,
+};
 
 const BASE_SCORE: Record<HitJudgement, number> = {
   perfect: 100,
@@ -45,8 +62,9 @@ export interface DrawConfig {
 
 export class GameEngine {
   private chart: GameChart;
-  private audio: AudioEngine;
+  private audio: IPlayAudioEngine;
   private callbacks: EngineCallbacks;
+  private windows: Required<TimingWindowsConfig>;
   private ctx2d: CanvasRenderingContext2D | null = null;
   private drawConfig: DrawConfig | null = null;
 
@@ -55,10 +73,16 @@ export class GameEngine {
   private rafId: number | null = null;
   private running = false;
 
-  constructor(chart: GameChart, audio: AudioEngine, callbacks: EngineCallbacks = {}) {
+  constructor(
+    chart: GameChart,
+    audio: IPlayAudioEngine,
+    callbacks: EngineCallbacks = {},
+    customWindows: TimingWindowsConfig = {}
+  ) {
     this.chart = chart;
     this.audio = audio;
     this.callbacks = callbacks;
+    this.windows = { ...DEFAULT_TIMING_WINDOWS, ...customWindows };
     this.notes = chart.notes.map((n) => ({ ...n }));
     this.stats = {
       score: 0,
@@ -99,14 +123,18 @@ export class GameEngine {
     if (this.rafId) cancelAnimationFrame(this.rafId);
   }
 
-  private tick(): void {
-    const t = this.audio.getCurrentTime();
+  /**
+   * Executa um ciclo de atualização do jogo.
+   * Suporta currentTimeOverride para testes unitários matemáticos determinísticos.
+   */
+  tick(currentTimeOverride?: number): void {
+    const t = currentTimeOverride !== undefined ? currentTimeOverride : this.audio.getCurrentTime();
 
     // Notas que passaram da janela de miss e não foram tocadas -> miss automático
     for (const note of this.notes) {
       if (note.hit || note.missed) continue;
       const diffMs = (t - note.timestamp) * 1000;
-      if (diffMs > MISS_WINDOW_MS) {
+      if (diffMs > this.windows.missMs) {
         note.missed = true;
         this.registerJudgement(note, 'miss', diffMs);
       }
@@ -121,8 +149,9 @@ export class GameEngine {
   }
 
   /** Chamado pelo InputManager quando o jogador pressiona a lane correspondente. */
-  hitLane(lane: number): void {
-    const t = this.audio.getCurrentTime();
+  hitLane(lane: number, currentTimeOverride?: number): HitResult | null {
+    const t = currentTimeOverride !== undefined ? currentTimeOverride : this.audio.getCurrentTime();
+
     // Encontra a nota não julgada mais próxima dessa lane dentro da janela de miss
     let best: ChartNote | null = null;
     let bestDiff = Infinity;
@@ -136,19 +165,21 @@ export class GameEngine {
         best = note;
       }
     }
-    if (!best || bestDiff > MISS_WINDOW_MS) return; // nenhuma nota pra acertar agora
+    if (!best || bestDiff > this.windows.missMs) return null; // nenhuma nota pra acertar agora
 
     const judgement = this.judge(bestDiff);
     best.hit = true;
-    this.registerJudgement(best, judgement, bestDiff);
+    return this.registerJudgement(best, judgement, bestDiff);
   }
 
   private judge(diffMs: number): HitJudgement {
-    for (const w of WINDOWS) if (diffMs <= w.ms) return w.judgement;
+    if (diffMs <= this.windows.perfectMs) return 'perfect';
+    if (diffMs <= this.windows.greatMs) return 'great';
+    if (diffMs <= this.windows.goodMs) return 'good';
     return 'miss';
   }
 
-  private registerJudgement(note: ChartNote, judgement: HitJudgement, deltaMs: number): void {
+  private registerJudgement(note: ChartNote, judgement: HitJudgement, deltaMs: number): HitResult {
     this.stats.judged += 1;
     if (judgement === 'miss') {
       this.stats.miss += 1;
@@ -167,6 +198,7 @@ export class GameEngine {
     const result: HitResult = { noteId: note.id, judgement, deltaMs };
     this.callbacks.onHit?.(result, { ...this.stats });
     this.callbacks.onStatsChange?.({ ...this.stats });
+    return result;
   }
 
   private comboToMultiplier(combo: number): 1 | 2 | 3 | 4 {
@@ -178,6 +210,10 @@ export class GameEngine {
 
   getStats(): GameStats {
     return { ...this.stats };
+  }
+
+  getNotes(): ChartNote[] {
+    return this.notes;
   }
 
   // ---- Renderização (fora do React) ----
