@@ -1,4 +1,4 @@
-# OnTabs — Evidências de Testes e Linha de Base Reproduzível (119 Testes em 11 Suítes)
+# OnTabs — Evidências de Testes e Linha de Base Reproduzível (120 Testes em 11 Suítes)
 
 **Data**: 2026-10-19  
 **Responsável**: Antigravity — Hardening & Technical Assurance  
@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Inventário Real dos Testes Executados (119 Testes em 11 Suítes)
+## 1. Inventário Real dos Testes Executados (120 Testes em 11 Suítes)
 
 Comando de Execução Canônico:
 ```powershell
@@ -15,9 +15,9 @@ npm test -- --run
 Saída Oficial Medida:
 - **Runner**: Vitest v2.1.9
 - **Arquivos de Teste**: 11
-- **Total de Testes**: 119
-- **Resultado**: 119 aprovados (100% PASS, 0 falhas)
-- **Tempo de Execução**: ~1.4s
+- **Total de Testes**: 120
+- **Resultado**: 120 aprovados (100% PASS, 0 falhas)
+- **Tempo de Execução**: ~1.5s
 
 ### Classificação Estrita por Categoria
 
@@ -33,7 +33,7 @@ Saída Oficial Medida:
 | `src/engine/__tests__/connectors.test.ts` | 7 | **Unitário** | Validação estrita de URLs do YouTube (padrão e encurtada), Spotify (faixas), rejeição de formatos inválidos e **defesa contra SSRF (IPs de nuvem, localhost, redes privadas)** | Não cobre download de streams de áudio (proibido por TOS) |
 | `src/server/__tests__/accessStateMachine.test.ts` | 8 | **Unitário** | Regras de transição de estado de acesso, injeção de relógio simulado, cálculo de 168h do trial, autorização de operações | Não cobre chamadas HTTP de rede ou banco de dados |
 | `src/server/__tests__/dbConcurrency.test.ts` | 1 | **Integração / Concorrência** | **Fila de mutex assíncrono e persistência atômica com arquivos temporários únicos sob 10 gravações simultâneas paralelas com tolerância a locks no Windows** | Não cobre distribuição multi-servidor em cluster |
-| `src/server/__tests__/serverIntegration.test.ts` | 11 | **Integração de API & SPA** (In-Process HTTP) | Endpoints `/api/health`, `/api/entitlement/status`, `/api/auth/register`, `/api/songs`, isolamento de segurança entre usuários, **bloqueio de ativação não faturada de planos pagos (402), resolução de conectores externos e entrega estática de SPA (HTTP 200)** | Não cobre testes visuais em browsers com WebGL |
+| `src/server/__tests__/serverIntegration.test.ts` | 12 | **Integração de API & SPA** (In-Process HTTP) | Endpoints `/api/health`, `/api/entitlement/status`, `/api/auth/register`, `/api/songs`, isolamento de segurança entre usuários, **bloqueio de ativação não faturada de planos pagos (402), resolução de conectores externos, entrega estática de SPA (HTTP 200) e conversão honesta de áudio silencioso (zero notas fabricadas)** | Não cobre testes visuais em browsers com WebGL |
 
 ---
 

@@ -432,14 +432,10 @@ export async function dispatchApiRequest(
     const tabId = `tab_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const now = new Date().toISOString();
 
-    // 3. Execução da Otimização Musical de Domínio
+    // 3. Execução da Otimização Musical de Domínio (sem notas sintéticas fabricadas)
     const mappedNotes = notes.length > 0
       ? optimizeFretSequence(notes, instrument as Instrument)
-      : [
-          { timestamp: 0.5, midi: 60, stringNumber: 2, fret: 1, duration: 0.5 },
-          { timestamp: 1.0, midi: 64, stringNumber: 1, fret: 0, duration: 0.5 },
-          { timestamp: 1.5, midi: 67, stringNumber: 1, fret: 3, duration: 0.5 },
-        ];
+      : [];
 
     const newSong: SongRecord = {
       id: songId,

@@ -180,6 +180,29 @@ describe('Ontabs Independent Server - End-to-End API Integration', () => {
     expect(body.tab.instrument).toBe('bass');
   });
 
+  it('Conversão sem notas detectadas gera tablatura vazia sem fabricar notas sintéticas', async () => {
+    const visitorId = `visitor_empty_test_${Date.now()}`;
+    const res = await fetch(`${BASE_URL}/api/music/convert`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Visitor-Id': visitorId,
+      },
+      body: JSON.stringify({
+        title: 'Áudio Silencioso',
+        artist: 'Sem Notas',
+        instrument: 'guitar',
+        durationSeconds: 10,
+        bpm: 120,
+        notes: [],
+      }),
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.tab.notes).toHaveLength(0);
+  });
+
   it('GET /api/songs suporta paginação e filtros reais', async () => {
     const res = await fetch(`${BASE_URL}/api/songs?page=1&pageSize=5`);
     expect(res.status).toBe(200);
