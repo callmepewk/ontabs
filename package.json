@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "server": "tsx src/server/server.ts",
-    "lint": "eslint . --ext ts,tsx"
+    "lint": "eslint . --ext ts,tsx",
+    "gap-check": "tsx scripts/gapFinder.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

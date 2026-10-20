@@ -63,3 +63,31 @@ export function reorderSetlistItems(setlist: Setlist, fromIndex: number, toIndex
     updatedAt: new Date().toISOString(),
   };
 }
+
+export interface TuningTransition {
+  fromIndex: number;
+  toIndex: number;
+  fromSong: string;
+  toSong: string;
+  fromTuning: string;
+  toTuning: string;
+}
+
+export function detectTuningTransitions(setlist: Setlist): TuningTransition[] {
+  const transitions: TuningTransition[] = [];
+  for (let i = 0; i < setlist.items.length - 1; i++) {
+    const cur = setlist.items[i];
+    const next = setlist.items[i + 1];
+    if (cur.tuning && next.tuning && cur.tuning.trim().toLowerCase() !== next.tuning.trim().toLowerCase()) {
+      transitions.push({
+        fromIndex: i,
+        toIndex: i + 1,
+        fromSong: cur.title,
+        toSong: next.title,
+        fromTuning: cur.tuning,
+        toTuning: next.tuning,
+      });
+    }
+  }
+  return transitions;
+}

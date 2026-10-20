@@ -10,6 +10,7 @@ import { LibraryPage } from '@/pages/LibraryPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { PlansPage } from '@/pages/PlansPage';
 import { TabViewerPage } from '@/pages/TabViewerPage';
+import { SetlistsPage } from '@/pages/SetlistsPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 
@@ -26,6 +27,8 @@ export default function App() {
           <Route path="/play/:songId" element={<PlayPage />} />
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/app/biblioteca" element={<LibraryPage />} />
+          <Route path="/setlists" element={<SetlistsPage />} />
+          <Route path="/app/setlists" element={<SetlistsPage />} />
           <Route path="/tab/:id" element={<TabViewerPage />} />
           <Route path="/app/tab/:id" element={<TabViewerPage />} />
           <Route path="/planos" element={<PlansPage />} />

@@ -11,6 +11,7 @@ const LINKS = [
   { to: '/converter', label: 'Converter', icon: '🎛️' },
   { to: '/play', label: 'OnTabs Play', icon: '🎮' },
   { to: '/library', label: 'Biblioteca', icon: '📚' },
+  { to: '/setlists', label: 'Repertórios', icon: '📋' },
   { to: '/planos', label: 'Planos', icon: '💎' },
   { to: '/settings', label: 'Configurações', icon: '⚙️' },
 ];

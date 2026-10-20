@@ -15,6 +15,7 @@ import {
   createEmptySetlist,
   addSongToSetlist,
   reorderSetlistItems,
+  detectTuningTransitions,
 } from '../setlists';
 
 describe('Equalizador Paramétrico de 5 Bandas & Presets de Estudo', () => {
@@ -127,5 +128,28 @@ describe('Coordenação de Setlist & Repertório de Banda', () => {
     const reordered = reorderSetlistItems(setlist, 0, 1);
     expect(reordered.items[0].title).toBe('Música 2');
     expect(reordered.items[1].title).toBe('Música 1');
+  });
+
+  it('Detecta transições de afinação entre faixas consecutivas', () => {
+    let setlist = createEmptySetlist('Show com Troca de Guitarras');
+    setlist = addSongToSetlist(setlist, {
+      songId: 's1', title: 'Faixa 1', artist: 'Banda', targetInstrument: 'guitar',
+      tuning: 'Standard E', bpm: 120, targetBpm: 120, key: 'E',
+    });
+    setlist = addSongToSetlist(setlist, {
+      songId: 's2', title: 'Faixa 2', artist: 'Banda', targetInstrument: 'guitar',
+      tuning: 'Drop D', bpm: 140, targetBpm: 140, key: 'D',
+    });
+    setlist = addSongToSetlist(setlist, {
+      songId: 's3', title: 'Faixa 3', artist: 'Banda', targetInstrument: 'guitar',
+      tuning: 'Drop D', bpm: 130, targetBpm: 130, key: 'G',
+    });
+
+    const transitions = detectTuningTransitions(setlist);
+    expect(transitions.length).toBe(1);
+    expect(transitions[0].fromSong).toBe('Faixa 1');
+    expect(transitions[0].toSong).toBe('Faixa 2');
+    expect(transitions[0].fromTuning).toBe('Standard E');
+    expect(transitions[0].toTuning).toBe('Drop D');
   });
 });

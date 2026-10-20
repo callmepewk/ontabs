@@ -83,6 +83,9 @@ export interface Song {
   coverUrl?: string;
   status: 'pending' | 'processing' | 'ready' | 'error';
   tabId?: string;           // referência à Tab gerada, quando existir
+  bpm?: number;
+  key?: string;
+  instrument?: Instrument;
 }
 
 export interface UserSettings {

@@ -1,17 +1,25 @@
 // src/pages/TabViewerPage.tsx
 // Visualizador e Validador Interativo de Tablatura do Ontabs
+// Com Inteligência de Arranjo Coletivo, Adaptação Multi-Instrumental, EQ de Estudo e Afinador
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Tab } from '@/types/domain';
+import { Tab, Instrument } from '@/types/domain';
 import { tabService } from '@/services/tabService';
 import { validateTabNotes, TabValidationResult } from '@/engine/tabValidation';
+import { ArrangementMapViewer } from '@/components/ArrangementMapViewer';
+import { MultiInstrumentAdapter } from '@/components/MultiInstrumentAdapter';
+import { EqualizerControl } from '@/components/EqualizerControl';
+import { ActiveListenerWidget } from '@/components/ActiveListenerWidget';
 
 export function TabViewerPage() {
   const { id } = useParams<{ id: string }>();
   const [tab, setTab] = useState<Tab | null>(null);
   const [loading, setLoading] = useState(true);
   const [validation, setValidation] = useState<TabValidationResult | null>(null);
+  const [currentInstrument, setCurrentInstrument] = useState<Instrument>('guitar');
+  const [currentDifficulty, setCurrentDifficulty] = useState<string>('intermediate');
+  const [activeTabTool, setActiveTabTool] = useState<'tab' | 'arrangement' | 'eq' | 'tuner'>('tab');
 
   useEffect(() => {
     async function loadTab() {
@@ -20,6 +28,8 @@ export function TabViewerPage() {
         const data = await tabService.get(id);
         if (data) {
           setTab(data);
+          setCurrentInstrument(data.instrument || 'guitar');
+          setCurrentDifficulty(data.difficulty || 'intermediate');
           // Executa validação de integridade musical
           const val = validateTabNotes(
             (data.notes || []).map((n: any) => ({
@@ -54,19 +64,20 @@ export function TabViewerPage() {
     );
   }
 
-  const stringCount = tab.instrument === 'bass' || tab.instrument === 'ukulele' ? 4 : 6;
-  const stringNames = tab.tuning && tab.tuning.length === stringCount
-    ? [...tab.tuning].reverse() // Corda 1 (mais aguda) no topo
-    : stringCount === 4 ? ['G', 'D', 'A', 'E'] : ['e', 'B', 'G', 'D', 'A', 'E'];
+  const stringNames = currentInstrument === 'bass'
+    ? ['G', 'D', 'A', 'E']
+    : currentInstrument === 'ukulele'
+    ? ['A', 'E', 'C', 'G']
+    : ['e', 'B', 'G', 'D', 'A', 'E'];
 
   return (
-    <div className="page" style={{ maxWidth: 1000, margin: '0 auto' }}>
+    <div className="page" style={{ maxWidth: 1040, margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
         <div>
           <Link to="/library" style={{ color: 'var(--text-muted)', fontSize: 13 }}>← Biblioteca</Link>
           <h1 className="page-title" style={{ marginTop: 4, marginBottom: 4 }}>{tab.title}</h1>
           <p className="page-subtitle">
-            {tab.artist} · {tab.instrument.toUpperCase()} · BPM: {tab.bpm} · Afinação: {tab.tuning?.join(' ')}
+            {tab.artist} · Instrumento Atual: <strong style={{ color: '#10b981' }}>{currentInstrument.toUpperCase()}</strong> · BPM: {tab.bpm} · Dificuldade: {currentDifficulty.toUpperCase()}
           </p>
         </div>
 
@@ -76,6 +87,54 @@ export function TabViewerPage() {
           </Link>
         </div>
       </div>
+
+      {/* Seletor de Ferramenta / Aba */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+        {[
+          { id: 'tab', label: '🎼 Tablatura & Arranjo', icon: '🎼' },
+          { id: 'arrangement', label: '🗺️ Mapa de Duas Guitarras & Banda', icon: '🗺️' },
+          { id: 'eq', label: '🎚️ Equalizador de Estudo (5 Faixas)', icon: '🎚️' },
+          { id: 'tuner', label: '🎙️ Ouvinte Ativo & Afinador (Cents)', icon: '🎙️' },
+        ].map((tool) => (
+          <button
+            key={tool.id}
+            onClick={() => setActiveTabTool(tool.id as any)}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              border: activeTabTool === tool.id ? '1px solid #10b981' : '1px solid var(--border)',
+              background: activeTabTool === tool.id ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-elevated)',
+              color: activeTabTool === tool.id ? '#10b981' : 'var(--text-muted)',
+              fontWeight: activeTabTool === tool.id ? 700 : 400,
+              fontSize: 13,
+              cursor: 'pointer',
+            }}
+          >
+            {tool.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Multi-Instrument Adaptation Panel ("Toque do Seu Jeito") */}
+      <MultiInstrumentAdapter
+        currentInstrument={currentInstrument}
+        currentDifficulty={currentDifficulty}
+        onInstrumentChange={(inst) => setCurrentInstrument(inst)}
+        onDifficultyChange={(diff) => setCurrentDifficulty(diff)}
+      />
+
+      {/* Conteúdo Dinâmico por Ferramenta */}
+      {activeTabTool === 'arrangement' && (
+        <ArrangementMapViewer durationSeconds={tab.durationSeconds || 120} />
+      )}
+
+      {activeTabTool === 'eq' && (
+        <EqualizerControl />
+      )}
+
+      {activeTabTool === 'tuner' && (
+        <ActiveListenerWidget />
+      )}
 
       {/* Relatório de Validação Musical de Domínio */}
       {validation && (
@@ -89,7 +148,7 @@ export function TabViewerPage() {
         }}>
           <strong>Validação Física do Instrumento: </strong>
           {validation.isValid ? (
-            <span style={{ color: '#10b981' }}>✓ Tablatura 100% válida e ergonomicamente compatível com {tab.instrument}.</span>
+            <span style={{ color: '#10b981' }}>✓ Tablatura 100% válida e ergonomicamente compatível com {currentInstrument}.</span>
           ) : (
             <span style={{ color: '#ef4444' }}>Foram detectados {validation.errors.length} conflitos físicos na partitura.</span>
           )}
@@ -148,7 +207,8 @@ export function TabViewerPage() {
 
       <div style={{ marginTop: 24, display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', fontSize: 13 }}>
         <div>Total de notas detectadas: {tab.notes?.length || 0}</div>
-        <div>Dificuldade: {tab.difficulty.toUpperCase()}</div>
+        <div>Afinação: {stringNames.join(' ')}</div>
+        <div>Dificuldade: {currentDifficulty.toUpperCase()}</div>
       </div>
     </div>
   );
