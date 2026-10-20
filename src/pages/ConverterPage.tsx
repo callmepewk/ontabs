@@ -227,12 +227,34 @@ export function ConverterPage() {
               background: 'rgba(59, 130, 246, 0.1)',
               border: '1px solid rgba(59, 130, 246, 0.3)',
               borderRadius: 6,
-              padding: 10,
+              padding: 12,
               marginTop: 10,
               fontSize: 13,
             }}>
-              <div><strong>{externalMeta.title}</strong> ({externalMeta.provider.toUpperCase()})</div>
-              <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{externalMeta.message}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div><strong>{externalMeta.title}</strong> ({externalMeta.provider.toUpperCase()})</div>
+                {externalMeta.accessMode && (
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: '2px 6px',
+                    borderRadius: 4,
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    color: '#f87171',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                  }}>
+                    {externalMeta.accessMode}
+                  </span>
+                )}
+              </div>
+              {externalMeta.artist && (
+                <div style={{ color: 'var(--text-muted)', marginTop: 2 }}>
+                  Artista: <strong>{externalMeta.artist}</strong> {externalMeta.album ? `| Álbum: ${externalMeta.album}` : ''}
+                </div>
+              )}
+              <div style={{ color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.4 }}>
+                {externalMeta.message}
+              </div>
             </div>
           )}
         </div>

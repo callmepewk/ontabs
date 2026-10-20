@@ -16,4 +16,7 @@ export * from './activeListener';
 export * from './equalizer';
 export * from './stemsMixer';
 export * from './setlists';
-
+export * from './techniques';
+export * from './canonicalEvents';
+export * from './electricBass';
+export * from './stemSeparation';

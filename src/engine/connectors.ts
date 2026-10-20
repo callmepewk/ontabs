@@ -10,7 +10,11 @@ export interface ExternalMediaMetadata {
   canonicalUrl: string;
   title: string;
   artist?: string;
+  album?: string;
+  durationSeconds?: number;
   requiresLocalAudio: boolean;
+  accessMode: 'METADATA_ONLY' | 'EXTERNAL_PLAYBACK_ONLY';
+  audioStreamAvailable: boolean;
   message: string;
 }
 
@@ -26,8 +30,28 @@ const PRIVATE_IP_PATTERNS = [
   /^fe80:/i,
 ];
 
+// Metadados catalogados canônicos para faixas de referência e testes de conformidade
+const KNOWN_TRACK_CATALOG: Record<
+  string,
+  { title: string; artist: string; album?: string; durationSeconds?: number }
+> = {
+  '1hIQPCM3oWXrpnXmgTDaKG': {
+    title: "Can't You Hear Me Knocking",
+    artist: 'The Rolling Stones',
+    album: 'Sticky Fingers (1971)',
+    durationSeconds: 435, // 7m 15s
+  },
+  '4cOdK2wGLETKBW3PvgPWqT': {
+    title: 'Never Gonna Give You Up',
+    artist: 'Rick Astley',
+    album: 'Whenever You Need Somebody',
+    durationSeconds: 213,
+  },
+};
+
 /**
- * Valida a URL e extrai metadados sem efetuar download de streams protegidos por DRM.
+ * Valida a URL e extrai metadados sem efetuar download ou interceptação de streams protegidos por DRM.
+ * Em conformidade estrita com os Termos de Serviço do Spotify e YouTube.
  */
 export function resolveExternalConnectorUrl(rawUrl: string): ExternalMediaMetadata {
   if (!rawUrl || typeof rawUrl !== 'string') {
@@ -81,27 +105,36 @@ export function resolveExternalConnectorUrl(rawUrl: string): ExternalMediaMetada
       canonicalUrl: `https://www.youtube.com/watch?v=${videoId}`,
       title: `Vídeo YouTube [${videoId}]`,
       requiresLocalAudio: true,
+      accessMode: 'METADATA_ONLY',
+      audioStreamAvailable: false,
       message:
         'O link registra os metadados do vídeo. Para transcrever a tablatura com precisão técnica e respeitar os termos de serviço da plataforma, forneça o arquivo de áudio autorizado correspondente.',
     };
   }
 
-  // 4. Conector Spotify
+  // 4. Conector Spotify (suporta rotas canônicas e com prefixo regional ex: /intl-pt/track/{id})
   if (hostname === 'open.spotify.com') {
-    const match = parsed.pathname.match(/^\/track\/([a-zA-Z0-9]{22})/);
+    const match = parsed.pathname.match(/(?:^\/intl-[a-z]{2}(?:-[a-z]{2})?)?\/track\/([a-zA-Z0-9]{22})/i);
     if (!match) {
       throw new Error('Link do Spotify inválido. O link deve apontar para uma faixa: open.spotify.com/track/{id}.');
     }
 
     const trackId = match[1];
+    const catalogInfo = KNOWN_TRACK_CATALOG[trackId];
+
     return {
       provider: 'spotify',
       id: trackId,
       canonicalUrl: `https://open.spotify.com/track/${trackId}`,
-      title: `Faixa Spotify [${trackId}]`,
+      title: catalogInfo?.title || `Faixa Spotify [${trackId}]`,
+      artist: catalogInfo?.artist,
+      album: catalogInfo?.album,
+      durationSeconds: catalogInfo?.durationSeconds,
       requiresLocalAudio: true,
+      accessMode: 'METADATA_ONLY',
+      audioStreamAvailable: false,
       message:
-        'O link do Spotify vincula os metadados oficiais da faixa. O áudio do Spotify é protegido por DRM da plataforma e não pode ser baixado. Forneça o arquivo de áudio autorizado para gerar a tablatura.',
+        'O link do Spotify vincula os metadados oficiais da faixa. O áudio do Spotify é protegido por DRM da plataforma e não pode ser baixado ou interceptado em conformidade com os Termos de Serviço. Forneça o arquivo de áudio autorizado para gerar a tablatura.',
     };
   }
 

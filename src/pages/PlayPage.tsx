@@ -254,8 +254,8 @@ export function PlayPage() {
           <h2 style={{ fontSize: 18, margin: 0, color: '#ffd166', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>⚙️</span> Modo 2: Demonstração Sintética Calibrada
           </h2>
-          <span className="otp-pill" style={{ background: 'rgba(255, 209, 102, 0.15)', color: '#ffd166', border: '1px solid #ffd166', fontSize: 11 }}>
-            Web Audio Sintetizado
+          <span className="otp-pill" style={{ background: 'rgba(255, 209, 102, 0.15)', color: '#ffd166', border: '1px solid #ffd166', fontSize: 11, fontWeight: 700 }}>
+            [DEMO SINTÉTICA] Web Audio
           </span>
         </div>
         <p style={{ fontSize: 13, color: '#aaa', lineHeight: 1.6, margin: '0 0 16px 0' }}>

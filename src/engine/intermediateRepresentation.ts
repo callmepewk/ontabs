@@ -70,6 +70,29 @@ export interface IntermediateMusicalRepresentation {
 }
 
 /**
+ * Utilitário canônico para criar instâncias de MusicalNoteEvent com valores padronizados.
+ */
+export function createMusicalNoteEvent(params: {
+  timestamp: number;
+  duration: number;
+  midi: number;
+  confidence?: number;
+  id?: string;
+  provenance?: MusicalProvenance;
+}): MusicalNoteEvent {
+  const freq = 440 * Math.pow(2, (params.midi - 69) / 12);
+  return {
+    id: params.id || `n_${Math.round(params.timestamp * 1000)}_${params.midi}`,
+    timestamp: params.timestamp,
+    duration: params.duration,
+    midi: params.midi,
+    frequency: Number(freq.toFixed(2)),
+    confidence: params.confidence ?? 0.95,
+    provenance: params.provenance || 'OBSERVED',
+  };
+}
+
+/**
  * Constrói uma representação musical intermediária básica a partir de parâmetros analisados.
  */
 export function createEmptyIntermediateRepresentation(params: {

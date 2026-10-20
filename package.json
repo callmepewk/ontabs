@@ -11,7 +11,9 @@
     "test:watch": "vitest",
     "server": "tsx src/server/server.ts",
     "lint": "eslint . --ext ts,tsx",
-    "gap-check": "tsx scripts/gapFinder.ts"
+    "gap-check": "tsx scripts/gapFinder.ts",
+    "reality-runner": "tsx scripts/audioRealityRunner.ts",
+    "reality-e2e": "tsx scripts/realityE2E.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

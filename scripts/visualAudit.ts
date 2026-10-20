@@ -205,3 +205,4 @@ runVisualAudit().catch((err) => {
   console.error('Falha na execução da auditoria visual:', err);
   process.exit(1);
 });
+
