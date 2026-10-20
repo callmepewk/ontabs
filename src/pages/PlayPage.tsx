@@ -10,7 +10,8 @@ import { generateGameChart } from '@/features/play/chartGenerator';
 import { GameChart, TabEvent } from '@/features/play/types';
 import { musicService, PaginatedSongs } from '@/services/musicService';
 import { tabService } from '@/services/tabService';
-import { Song } from '@/types/domain';
+import { Song, TabNoteEvent } from '@/types/domain';
+import { Button, Card } from '@/components/ui';
 
 function toPlayDifficulty(d?: string): 'easy' | 'medium' | 'hard' | 'expert' {
   if (d === 'beginner' || d === 'easy') return 'easy';
@@ -18,6 +19,43 @@ function toPlayDifficulty(d?: string): 'easy' | 'medium' | 'hard' | 'expert' {
   if (d === 'advanced' || d === 'hard') return 'hard';
   if (d === 'expert') return 'expert';
   return 'medium';
+}
+
+function tabNotesToTabEvents(notes: TabNoteEvent[]): TabEvent[] {
+  const map = new Map<number, { strings: number[]; maxDuration: number }>();
+  for (const n of notes) {
+    const key = Math.round((n.timestamp || 0) * 100) / 100;
+    const stringList: number[] = Array.isArray(n.strings)
+      ? n.strings
+      : [n.stringNumber !== undefined ? n.stringNumber : 1];
+    const dur: number = n.sustainMs
+      ? n.sustainMs / 1000
+      : (n.duration !== undefined ? n.duration : 0);
+
+    const existing = map.get(key);
+    if (existing) {
+      for (const s of stringList) {
+        if (!existing.strings.includes(s)) existing.strings.push(s);
+      }
+      if (dur > existing.maxDuration) existing.maxDuration = dur;
+    } else {
+      map.set(key, {
+        strings: [...stringList],
+        maxDuration: dur,
+      });
+    }
+  }
+
+  const events: TabEvent[] = [];
+  for (const [timestamp, data] of map.entries()) {
+    events.push({
+      timestamp,
+      strings: data.strings,
+      sustainMs: data.maxDuration > 0 ? Math.round(data.maxDuration * 1000) : undefined,
+    });
+  }
+
+  return events.sort((a, b) => a.timestamp - b.timestamp);
 }
 
 // Eventos da demonstração sintética do Canon Rock (claramente rotulados)
@@ -85,7 +123,8 @@ export function PlayPage() {
               return;
             }
 
-            const realChart = generateGameChart(tab.notes, {
+            const tabEvents = tabNotesToTabEvents(tab.notes);
+            const realChart = generateGameChart(tabEvents, {
               songId: tab.id,
               title: tab.title,
               artist: tab.artist,
@@ -99,8 +138,10 @@ export function PlayPage() {
           } else {
             setEmptyExtractionReason('Tablatura associada não foi encontrada no servidor.');
           }
-        } else {
+        } else if (s) {
           setEmptyExtractionReason('Música ainda não possui tablatura processada associada.');
+        } else {
+          setEmptyExtractionReason('Música ou tablatura solicitada não foi encontrada no servidor local.');
         }
       } catch (err: any) {
         setEmptyExtractionReason(err?.message || 'Erro ao carregar dados da faixa.');
@@ -134,28 +175,32 @@ export function PlayPage() {
 
   if (loading) {
     return (
-      <div className="page" style={{ padding: '40px 16px', textAlign: 'center' }}>
+      <div className="page" style={{ padding: '60px 16px', textAlign: 'center' }}>
         <p className="page-subtitle">Carregando faixa e gerando chart de execução...</p>
       </div>
     );
   }
 
-  // Estado honesto de falha na extração de notas (zero notas fabricadas)
+  // Estado honesto de falha na extração de notas ou recurso não encontrado
   if (emptyExtractionReason) {
     return (
-      <div className="page" style={{ maxWidth: 640, margin: '40px auto', textAlign: 'center', padding: '0 16px' }}>
-        <div className="card" style={{ padding: 32, border: '1px solid #ffd166', background: 'rgba(255, 209, 102, 0.05)', borderRadius: 12 }}>
-          <span style={{ fontSize: 44 }}>⚠️</span>
-          <h2 style={{ fontSize: 20, margin: '16px 0 8px', color: '#ffd166' }}>Sem Notas Extraídas</h2>
-          <p style={{ color: '#aaa', fontSize: 14, lineHeight: 1.6 }}>{emptyExtractionReason}</p>
-          <p style={{ color: '#777', fontSize: 13, marginTop: 8 }}>
-            Para preservar a integridade científica do OnTabs, <strong>não fabricamos notas sintéticas</strong> quando a extração acústica não detecta eventos reais.
+      <div className="page" style={{ maxWidth: 640, margin: '60px auto', textAlign: 'center', padding: '0 16px' }}>
+        <Card elevation={1} style={{ padding: 36 }}>
+          <span style={{ fontSize: 40 }}>⚠️</span>
+          <h2 style={{ fontSize: 20, margin: '16px 0 8px', color: 'var(--text-primary)' }}>Recurso Indisponível</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6 }}>{emptyExtractionReason}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 8 }}>
+            Para preservar a integridade científica do OnTabs, <strong>não fabricamos notas sintéticas</strong> quando a extração acústica não detecta eventos reais ou a faixa não está indexada.
           </p>
           <div style={{ marginTop: 24, display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn" onClick={() => navigate('/library')}>Voltar à Biblioteca</button>
-            <button className="btn btn-primary" onClick={() => navigate('/converter')}>Converter Novo Arquivo</button>
+            <Button variant="secondary" onClick={() => navigate('/library')}>
+              Voltar à Biblioteca
+            </Button>
+            <Button variant="primary" onClick={() => navigate('/converter')}>
+              Converter Novo Arquivo
+            </Button>
           </div>
-        </div>
+        </Card>
       </div>
     );
   }

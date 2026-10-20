@@ -54,12 +54,16 @@ export interface TabSection {
 
 export interface TabNoteEvent {
   timestamp: number;
-  strings: number[]; // cordas/casas tocadas simultaneamente
+  strings?: number[]; // cordas tocadas simultaneamente
   sustainMs?: number;
+  stringNumber?: number; // corda individual (1-6)
+  fret?: number; // traste/casa
+  duration?: number; // duracao em segundos
 }
 
 export interface Tab {
   id: string;
+  songId?: string;
   title: string;
   artist: string;
   instrument: Instrument;

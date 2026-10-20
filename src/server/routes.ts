@@ -430,7 +430,14 @@ export async function dispatchApiRequest(
 
   if (pathname.startsWith('/api/songs/') && method === 'GET') {
     const songId = pathname.replace('/api/songs/', '');
-    const song = db.getSong(songId);
+    let song = db.getSong(songId);
+    if (!song) {
+      // Se não encontrou diretamente por song.id, tenta resolver unívoca e referencialmente via tabId associado
+      const associatedTab = db.getTab(songId);
+      if (associatedTab?.songId) {
+        song = db.getSong(associatedTab.songId);
+      }
+    }
     if (!song) {
       return sendJson(res, 404, { error: 'Música não encontrada.' });
     }
@@ -670,7 +677,11 @@ export async function dispatchApiRequest(
   // --- TABLATURAS ---
   if (pathname.startsWith('/api/tabs/') && method === 'GET') {
     const tabId = pathname.replace('/api/tabs/', '');
-    const tab = db.getTab(tabId);
+    let tab = db.getTab(tabId);
+    if (!tab) {
+      // Se não encontrou diretamente por tab.id, tenta resolver unívoca e referencialmente via songId
+      tab = db.getTabBySongId(tabId);
+    }
     if (!tab) {
       return sendJson(res, 404, { error: 'Tablatura não encontrada.' });
     }

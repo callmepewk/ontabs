@@ -11,6 +11,7 @@ import { ArrangementMapViewer } from '@/components/ArrangementMapViewer';
 import { MultiInstrumentAdapter } from '@/components/MultiInstrumentAdapter';
 import { EqualizerControl } from '@/components/EqualizerControl';
 import { ActiveListenerWidget } from '@/components/ActiveListenerWidget';
+import { Button, Card } from '@/components/ui';
 
 export function TabViewerPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,14 +53,26 @@ export function TabViewerPage() {
   }, [id]);
 
   if (loading) {
-    return <div className="page"><p>Carregando tablatura...</p></div>;
+    return (
+      <div className="page" style={{ maxWidth: 640, margin: '60px auto', textAlign: 'center', padding: '0 16px' }}>
+        <p className="page-subtitle">Carregando tablatura...</p>
+      </div>
+    );
   }
 
   if (!tab) {
     return (
-      <div className="page">
-        <p>Tablatura não encontrada.</p>
-        <Link to="/library" className="btn">Voltar para a biblioteca</Link>
+      <div className="page" style={{ maxWidth: 640, margin: '60px auto', textAlign: 'center', padding: '0 16px' }}>
+        <Card elevation={1} style={{ padding: 36 }}>
+          <span style={{ fontSize: 40 }}>⚠️</span>
+          <h2 style={{ fontSize: 20, margin: '16px 0 8px', color: 'var(--text-primary)' }}>Tablatura não encontrada</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>
+            O identificador solicitado não corresponde a nenhuma tablatura válida registrada no catálogo local.
+          </p>
+          <Link to="/library">
+            <Button variant="secondary">Voltar para a biblioteca</Button>
+          </Link>
+        </Card>
       </div>
     );
   }
@@ -71,19 +84,23 @@ export function TabViewerPage() {
     : ['e', 'B', 'G', 'D', 'A', 'E'];
 
   return (
-    <div className="page" style={{ maxWidth: 1040, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+    <div className="page" style={{ maxWidth: 1040, margin: '0 auto', paddingBottom: 60 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <Link to="/library" style={{ color: 'var(--text-muted)', fontSize: 13 }}>← Biblioteca</Link>
+          <Link to="/library" style={{ color: 'var(--text-secondary)', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            ← Voltar à Biblioteca
+          </Link>
           <h1 className="page-title" style={{ marginTop: 4, marginBottom: 4 }}>{tab.title}</h1>
-          <p className="page-subtitle">
-            {tab.artist} · Instrumento Atual: <strong style={{ color: '#10b981' }}>{currentInstrument.toUpperCase()}</strong> · BPM: {tab.bpm} · Dificuldade: {currentDifficulty.toUpperCase()}
+          <p className="page-subtitle" style={{ margin: 0 }}>
+            {tab.artist} · Instrumento Atual: <strong style={{ color: 'var(--accent-primary)' }}>{currentInstrument.toUpperCase()}</strong> · BPM: {tab.bpm} · Dificuldade: {currentDifficulty.toUpperCase()}
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <Link to={`/play/${tab.id}`} className="btn" style={{ background: '#10b981', color: '#000', fontWeight: 600 }}>
-            🎮 Tocar no OnTabs Play
+          <Link to={`/play/${tab.songId || tab.id}`}>
+            <Button variant="primary">
+              Tocar no OnTabs Play
+            </Button>
           </Link>
         </div>
       </div>

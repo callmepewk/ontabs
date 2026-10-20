@@ -966,34 +966,30 @@ export function LibraryPage() {
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-                        <Link to={`/tab/${asset.id}`} style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center' }}>
+                        <Link to="/converter" style={{ flex: 1 }}>
                           <Button variant="secondary" size="sm" style={{ width: '100%', fontSize: 12 }}>
-                            Ver Tablatura
+                            Processar Áudio
                           </Button>
                         </Link>
-                        {asset.permissions?.publicPlayback === 'ALLOWED' ? (
-                          <Link to={`/play/${asset.id}`} style={{ flex: 1 }}>
-                            <Button variant="primary" size="sm" style={{ width: '100%', fontSize: 12 }}>
-                              🎮 Praticar (Play)
-                            </Button>
-                          </Link>
-                        ) : (
-                          <button
-                            disabled
-                            className="btn secondary"
-                            style={{
-                              flex: 1,
-                              fontSize: 11,
-                              opacity: 0.5,
-                              cursor: 'not-allowed',
-                              padding: '8px 10px',
-                            }}
-                            title="Reprodução de áudio restrita pelos termos do provedor (apenas metadados)."
-                          >
-                            DRM Restrito
-                          </button>
-                        )}
+                        <span
+                          style={{
+                            flex: 1,
+                            fontSize: 11,
+                            color: 'var(--text-secondary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            background: 'var(--surface-overlay)',
+                            border: '1px solid var(--border-subtle)',
+                            borderRadius: 'var(--radius-sm)',
+                            padding: '6px 8px',
+                            fontWeight: 500,
+                          }}
+                        >
+                          {asset.isPublicDomain ? 'Domínio Público Integral' : 'Direitos Verificados'}
+                        </span>
                       </div>
                     </Card>
                   );
