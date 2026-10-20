@@ -9,100 +9,7 @@ import {
   VerifiedAsset,
   CatalogResponse,
 } from '@/services/musicService';
-import { Song } from '@/types/domain';
 import { Button, Card, Input, Skeleton } from '@/components/ui';
-
-// Acervo demonstrativo soberano para exploração pública antes do cadastro
-const PUBLIC_DEMO_SONGS: Song[] = [
-  {
-    id: 'demo_canon',
-    title: 'Canon Rock',
-    artist: 'JerryC',
-    durationSeconds: 312,
-    bpm: 130,
-    key: 'D',
-    instrument: 'guitar',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_come_together',
-    title: 'Come Together',
-    artist: 'The Beatles',
-    durationSeconds: 259,
-    bpm: 84,
-    key: 'Dm',
-    instrument: 'bass',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_hotel_california',
-    title: 'Hotel California',
-    artist: 'Eagles',
-    durationSeconds: 391,
-    bpm: 75,
-    key: 'Bm',
-    instrument: 'acoustic_guitar',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_billie_jean',
-    title: 'Billie Jean (Groove Grid)',
-    artist: 'Michael Jackson',
-    durationSeconds: 294,
-    bpm: 117,
-    key: 'F#m',
-    instrument: 'drums',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_careless_whisper',
-    title: 'Careless Whisper (Alto Sax Eb)',
-    artist: 'George Michael',
-    durationSeconds: 302,
-    bpm: 76,
-    key: 'Dm',
-    instrument: 'saxophone',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_master_puppets',
-    title: 'Master of Puppets (Lead & Rhythm)',
-    artist: 'Metallica',
-    durationSeconds: 515,
-    bpm: 212,
-    key: 'Em',
-    instrument: 'guitar',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_autumn_leaves',
-    title: 'Autumn Leaves (Jazz Voicings)',
-    artist: 'Miles Davis & Cannonball',
-    durationSeconds: 340,
-    bpm: 95,
-    key: 'Gm',
-    instrument: 'saxophone',
-    status: 'ready',
-    tabId: 'demo',
-  },
-  {
-    id: 'demo_hysteria',
-    title: 'Hysteria (Distorted Bassline)',
-    artist: 'Muse',
-    durationSeconds: 227,
-    bpm: 118,
-    key: 'Am',
-    instrument: 'bass',
-    status: 'ready',
-    tabId: 'demo',
-  },
-];
 
 type SegmentType = 'all' | 'guitar' | 'bass' | 'acoustic_guitar' | 'drums' | 'saxophone' | 'recent';
 type ViewMode = 'grid' | 'list';
@@ -140,26 +47,39 @@ function getRightsBadge(asset: VerifiedAsset) {
   };
 }
 
-export function LibraryPage() {
+export interface LibraryPageProps {
+  initialLoading?: boolean;
+  initialData?: PaginatedSongs;
+  initialSearch?: string;
+  initialSegment?: SegmentType;
+}
+
+export function LibraryPage({
+  initialLoading,
+  initialData,
+  initialSearch = '',
+  initialSegment = 'all',
+}: LibraryPageProps = {}) {
   const [activeTab, setActiveTab] = useState<'library' | 'catalog'>('library');
   const [catalogData, setCatalogData] = useState<CatalogResponse | null>(null);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [catalogFilter, setCatalogFilter] = useState<'all' | 'public_demo' | 'internal_validation' | 'restricted_or_pending'>('all');
 
-  const [data, setData] = useState<PaginatedSongs>({
-    items: [],
-    total: 0,
-    page: 1,
-    pageSize: 6,
-    totalPages: 1,
-  });
-  const [activeSegment, setActiveSegment] = useState<SegmentType>('all');
+  const [data, setData] = useState<PaginatedSongs>(
+    initialData ?? {
+      items: [],
+      total: 0,
+      page: 1,
+      pageSize: 6,
+      totalPages: 1,
+    }
+  );
+  const [activeSegment, setActiveSegment] = useState<SegmentType>(initialSegment);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [pageSize, setPageSize] = useState<number>(6);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [search, setSearch] = useState(initialSearch);
+  const [loading, setLoading] = useState(initialLoading ?? true);
 
   async function loadCatalog() {
     setCatalogLoading(true);
@@ -186,40 +106,15 @@ export function LibraryPage() {
         segment === 'all' || segment === 'recent' ? undefined : segment;
 
       const res = await musicService.listLibrary(page, limit, query || undefined, instrumentFilter);
-
-      // Se a biblioteca pessoal estiver vazia (novo usuário ou visitante),
-      // disponibiliza o catálogo de demonstração pública navegável
-      if (res.total === 0 && !query) {
-        setIsDemoMode(true);
-        let filteredDemo = [...PUBLIC_DEMO_SONGS];
-        if (instrumentFilter) {
-          filteredDemo = filteredDemo.filter((s) => s.instrument === instrumentFilter);
-        }
-        const total = filteredDemo.length;
-        const totalPages = Math.max(1, Math.ceil(total / limit));
-        const startIndex = (page - 1) * limit;
-        const items = filteredDemo.slice(startIndex, startIndex + limit);
-
-        setData({
-          items,
-          total,
-          page,
-          pageSize: limit,
-          totalPages,
-        });
-      } else {
-        setIsDemoMode(false);
-        setData(res);
-      }
+      setData(res);
     } catch (err) {
       console.error('Erro ao listar músicas da biblioteca:', err);
-      setIsDemoMode(true);
       setData({
-        items: PUBLIC_DEMO_SONGS.slice(0, limit),
-        total: PUBLIC_DEMO_SONGS.length,
+        items: [],
+        total: 0,
         page: 1,
         pageSize: limit,
-        totalPages: Math.ceil(PUBLIC_DEMO_SONGS.length / limit),
+        totalPages: 1,
       });
     } finally {
       setLoading(false);
@@ -227,6 +122,7 @@ export function LibraryPage() {
   }
 
   useEffect(() => {
+    if (initialLoading === false) return;
     loadSongs(1, activeSegment, search, pageSize);
     setCurrentPage(1);
   }, [activeSegment, pageSize]);
@@ -354,34 +250,6 @@ export function LibraryPage() {
 
       {activeTab === 'library' ? (
         <>
-          {/* Banner de Demonstração Pública para Visitantes */}
-          {isDemoMode && (
-            <Card
-              elevation={1}
-              style={{
-                marginTop: 20,
-                background: 'rgba(16, 185, 129, 0.05)',
-                borderColor: 'rgba(16, 185, 129, 0.25)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 12,
-                padding: '14px 18px',
-              }}
-            >
-              <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Modo Demonstração Pública:</span>{' '}
-                Você está explorando o catálogo de referência do OnTabs. Navegue livremente por instrumentos, tablaturas e paginação antes de se cadastrar.
-              </div>
-              <Link to="/register">
-                <Button variant="secondary" size="sm">
-                  Criar conta para salvar seu acervo →
-                </Button>
-              </Link>
-            </Card>
-          )}
-
           {/* Segmentação por Clique (Botões de Categoria de Instrumento) */}
           <div
             style={{
@@ -533,19 +401,46 @@ export function LibraryPage() {
               ))}
             </div>
           ) : data.items.length === 0 ? (
-            <Card elevation={1} style={{ textAlign: 'center', padding: 48 }}>
-              <p style={{ fontSize: 16, color: 'var(--text-secondary)', margin: '0 0 16px' }}>
-                Nenhuma música encontrada para os critérios selecionados.
+            <Card elevation={1} style={{ textAlign: 'center', padding: 48, maxWidth: 640, margin: '20px auto' }}>
+              <span style={{ fontSize: 36, display: 'block', marginBottom: 12 }}>
+                {search || activeSegment !== 'all' ? '🔍' : '🎸'}
+              </span>
+              <h3 style={{ fontSize: 18, margin: '0 0 8px', color: 'var(--text-primary)' }}>
+                {search || activeSegment !== 'all'
+                  ? 'Nenhuma música encontrada'
+                  : 'Sua Biblioteca Musical'}
+              </h3>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 24px' }}>
+                {search || activeSegment !== 'all'
+                  ? 'Nenhum resultado corresponde à busca ou ao filtro de instrumento selecionado.'
+                  : 'Você ainda não possui músicas salvas no seu acervo pessoal. Você pode praticar com a demonstração oficial do sistema ou converter um novo arquivo de áudio.'}
               </p>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setActiveSegment('all');
-                  setSearch('');
-                }}
-              >
-                Limpar Filtros de Pesquisa
-              </Button>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                {search || activeSegment !== 'all' ? (
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setActiveSegment('all');
+                      setSearch('');
+                    }}
+                  >
+                    Limpar Filtros de Pesquisa
+                  </Button>
+                ) : (
+                  <>
+                    <Link to="/play/song_demo_canon_rock">
+                      <Button variant="primary">
+                        Tocar Demo: Canon Rock
+                      </Button>
+                    </Link>
+                    <Link to="/converter">
+                      <Button variant="secondary">
+                        Processar Áudio no Conversor
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </Card>
           ) : viewMode === 'grid' ? (
             /* Visualização em Grade (Cards) */
