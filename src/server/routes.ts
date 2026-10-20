@@ -3,6 +3,8 @@
 // Suporte a CORS, parsing JSON, autenticação por Bearer/Cookie e autorização estrita.
 
 import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
 import { Database, UserRecord, SongRecord, TabRecord } from './db';
 import { hashPassword, verifyPassword, createSessionForUser, getSessionFromToken } from './auth';
 import {
@@ -70,6 +72,59 @@ export async function parseRequestBody(req: http.IncomingMessage): Promise<any> 
   });
 }
 
+const STATIC_MIME_TYPES: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.ico': 'image/x-icon',
+  '.map': 'application/json',
+};
+
+function tryServeStatic(req: http.IncomingMessage, res: http.ServerResponse, pathname: string): boolean {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return false;
+  if (pathname.startsWith('/api')) return false;
+
+  const distDir = path.resolve(process.cwd(), 'dist');
+  if (!fs.existsSync(distDir)) return false;
+
+  // 1. Arquivo exato requisitado (ex: /assets/index-xxx.js)
+  const normalized = path.normalize(pathname).replace(/^(\.\.[/\\])+/, '');
+  const filePath = path.join(distDir, normalized);
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = STATIC_MIME_TYPES[ext] || 'application/octet-stream';
+    const content = fs.readFileSync(filePath);
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Content-Length': content.length,
+      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
+    });
+    res.end(content);
+    return true;
+  }
+
+  // 2. SPA Fallback: rotas de aplicação (/, /library, /converter, /setlists, etc.)
+  const indexPath = path.join(distDir, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    const content = fs.readFileSync(indexPath);
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Length': content.length,
+      'Cache-Control': 'no-cache',
+    });
+    res.end(content);
+    return true;
+  }
+
+  return false;
+}
+
 export function extractAuthUser(req: http.IncomingMessage, db: Database): UserRecord | null {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return null;
@@ -91,6 +146,9 @@ export async function dispatchApiRequest(
   const url = new URL(fullUrl);
   const pathname = url.pathname;
   const method = req.method || 'GET';
+
+  // Servir arquivos estáticos do frontend em produção/standalone (SPA fallback para /, /library, etc.)
+  if (tryServeStatic(req, res, pathname)) return;
 
   const user = extractAuthUser(req, db);
   const visitorId = (req.headers['x-visitor-id'] as string) || 'visitor_default';

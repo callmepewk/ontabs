@@ -34,3 +34,4 @@
    - Zero registros perdidos, integridade de JSON validada após execução.
 3. **Proteção contra SSRF em Conectores**:
    - Rejeição de IPs de metadados da nuvem (`169.254.169.254`), `localhost` (`127.0.0.1`), faixas privadas RFC 1918 (`10.x`, `192.168.x`).
+

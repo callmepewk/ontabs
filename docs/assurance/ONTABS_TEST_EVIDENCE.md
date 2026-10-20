@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Inventário Real dos Testes Executados (96 Testes em 9 Suítes)
+## 1. Inventário Real dos Testes Executados (97 Testes em 9 Suítes)
 
 Comando de Execução Canônico:
 ```powershell
@@ -15,8 +15,8 @@ npm test
 Saída Oficial Medida:
 - **Runner**: Vitest v2.1.9
 - **Arquivos de Teste**: 9
-- **Total de Testes**: 96
-- **Resultado**: 96 aprovados (100% PASS, 0 falhas)
+- **Total de Testes**: 97
+- **Resultado**: 97 aprovados (100% PASS, 0 falhas)
 - **Tempo de Execução**: ~1.2s - 1.3s
 
 ### Classificação Estrita por Categoria

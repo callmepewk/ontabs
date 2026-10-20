@@ -41,6 +41,15 @@ describe('Ontabs Independent Server - End-to-End API Integration', () => {
     expect(body.service).toBe('ontabs-independent-runtime');
   });
 
+  it('GET / serve a aplicação frontend SPA (HTML) na raiz', async () => {
+    const res = await fetch(`${BASE_URL}/`);
+    expect(res.status).toBe(200);
+    const contentType = res.headers.get('content-type') || '';
+    expect(contentType).toContain('text/html');
+    const text = await res.text();
+    expect(text).toContain('<!doctype html>');
+  });
+
   it('Visitante anônimo possui 1 uso gratuito disponível', async () => {
     const visitorId = `vis_${Date.now()}`;
     const res = await fetch(`${BASE_URL}/api/entitlement/status`, {
