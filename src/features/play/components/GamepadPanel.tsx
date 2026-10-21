@@ -32,7 +32,9 @@ export function GamepadPanel({ gamepadManager, bindings, onRemap }: GamepadPanel
       onRemap({ ...bindings, gamepadButtons: next });
       setRemapLane(null);
     });
-    return off;
+    return () => {
+      off();
+    };
   }, [remapLane, gamepadManager, bindings, onRemap]);
 
   if (pads.length === 0) {

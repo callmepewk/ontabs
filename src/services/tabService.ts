@@ -1,51 +1,71 @@
 // src/services/tabService.ts
-// MOCK — persistência em memória. Trocar por API real quando existir backend.
+// Serviço de Tablaturas do Ontabs - Integrado com backend soberano
 
 import { Tab } from '@/types/domain';
+import { authService } from './authService';
 
 export interface TabService {
-  list(): Promise<Tab[]>;
   get(id: string): Promise<Tab | null>;
   save(tab: Tab): Promise<Tab>;
   duplicate(id: string): Promise<Tab | null>;
   remove(id: string): Promise<void>;
 }
 
-class MockTabService implements TabService {
-  private tabs = new Map<string, Tab>();
-
-  async list(): Promise<Tab[]> {
-    return Array.from(this.tabs.values());
+class SovereignTabService implements TabService {
+  private getHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Visitor-Id': authService.getVisitorId(),
+    };
+    const token = authService.getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return headers;
   }
 
   async get(id: string): Promise<Tab | null> {
-    return this.tabs.get(id) ?? null;
+    const res = await fetch(`/api/tabs/${id}`, {
+      headers: this.getHeaders(),
+    });
+    if (!res.ok) return null;
+    return await res.json();
   }
 
   async save(tab: Tab): Promise<Tab> {
-    const now = new Date().toISOString();
-    const next: Tab = { ...tab, updatedAt: now, createdAt: tab.createdAt ?? now };
-    this.tabs.set(next.id, next);
-    return next;
+    const res = await fetch('/api/tabs', {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(tab),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Falha ao salvar tablatura.');
+    }
+
+    return await res.json();
   }
 
   async duplicate(id: string): Promise<Tab | null> {
-    const original = this.tabs.get(id);
+    const original = await this.get(id);
     if (!original) return null;
+
     const copy: Tab = {
       ...original,
-      id: crypto.randomUUID(),
-      title: `${original.title} (cópia)`,
+      id: `tab_${Date.now()}_copy`,
+      title: `${original.title} (Cópia)`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    this.tabs.set(copy.id, copy);
-    return copy;
+
+    return await this.save(copy);
   }
 
   async remove(id: string): Promise<void> {
-    this.tabs.delete(id);
+    await fetch(`/api/tabs/${id}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
   }
 }
 
-export const tabService: TabService = new MockTabService();
+export const tabService: TabService = new SovereignTabService();

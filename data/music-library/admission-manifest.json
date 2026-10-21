@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-10-19T23:30:00.000Z",
+  "standards": "Ontabs Sovereign Music Rights & Admission Governance (ONTABS-RIGHTS-001)",
+  "collections": {
+    "internal_validation": {
+      "description": "Fixtures de áudio autorizados, anotações de referência e amostras de regressão para testes internos.",
+      "allowNonCommercial": true,
+      "requiresPublicPlayback": false
+    },
+    "public_demo": {
+      "description": "Faixas com autorização explícita de reprodução pública e exibição para demonstrações no site.",
+      "allowNonCommercial": false,
+      "requiresPublicPlayback": true
+    },
+    "user_playable_catalog": {
+      "description": "Faixas com direitos patrimoniais e conexos desembaraçados para execução interativa no OnTabs Play.",
+      "allowNonCommercial": false,
+      "requiresPublicPlayback": true
+    },
+    "stem_reference_library": {
+      "description": "Multitracks e stems isolados autorizados para teste e calibração de mixagens e separação de áudio.",
+      "allowNonCommercial": true,
+      "requiresPublicPlayback": false
+    },
+    "transcription_ground_truth": {
+      "description": "Anotações canônicas de notas, MIDI e tablaturas de referência com proveniência comprovada.",
+      "allowNonCommercial": true,
+      "requiresPublicPlayback": false
+    },
+    "restricted_or_pending": {
+      "description": "Metadados externos (Spotify/YouTube), licenças pendentes de revisão jurídica ou com takedown ativo.",
+      "allowNonCommercial": true,
+      "requiresPublicPlayback": false
+    }
+  },
+  "admissionRules": [
+    "Cláusula Não-Comercial (NC) veta estritamente a admissão em coleções comerciais ou públicas.",
+    "Licença de código-fonte (MIT/GPL) não transfere direitos sobre gravações de áudio.",
+    "Composição em domínio público não confere domínio público automático a fonogramas modernos.",
+    "Permissão de processamento privado no navegador não autoriza streaming público nem redistribuição.",
+    "Streams do Spotify/YouTube são restritos a metadados por conformidade com Developer Policy (DRM inviolável)."
+  ]
+}

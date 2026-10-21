@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-10-20T01:26:28.396Z",
+  "totalTests": 13,
+  "passed": 13,
+  "failed": 0,
+  "overflowIssues": [],
+  "consoleErrors": [],
+  "screenshotsGenerated": [
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_landing_home.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_library_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_play_selector.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_converter_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_plans_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_setlists_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_login_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\desktop_register_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\mobile_landing_home.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\mobile_library_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\mobile_play_selector.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\mobile_converter_page.png",
+    "C:\\Users\\pedro\\OneDrive\\Desktop\\ontabs-app\\docs\\assurance\\screenshots\\mobile_plans_page.png"
+  ]
+}

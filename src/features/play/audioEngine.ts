@@ -28,9 +28,58 @@ export class AudioEngine {
   }
 
   async load(url: string): Promise<void> {
+    if (url === 'synthetic' || url.startsWith('demo://')) {
+      this.generateSyntheticDemoTrack(60);
+      return;
+    }
     const res = await fetch(url);
     const arrayBuffer = await res.arrayBuffer();
     this.buffer = await this.ctx.decodeAudioData(arrayBuffer);
+  }
+
+  /**
+   * Gera uma faixa de áudio harmônica sintetizada (Canon em Ré) via Web Audio nativo.
+   * Permite que qualquer usuário jogue o OnTabs Play de imediato sem upload prévio de MP3.
+   */
+  generateSyntheticDemoTrack(durationSeconds = 60): void {
+    const sampleRate = this.ctx.sampleRate || 44100;
+    const totalSamples = Math.floor(sampleRate * durationSeconds);
+    const buffer = this.ctx.createBuffer(2, totalSamples, sampleRate);
+    const left = buffer.getChannelData(0);
+    const right = buffer.getChannelData(1);
+
+    // Progressão Canon: D4 (293.66), A3 (220), B3 (246.94), F#3 (185), G3 (196), D3 (146.83), G3 (196), A3 (220)
+    const chords = [
+      [293.66, 369.99, 440.0], // D (D4, F#4, A4)
+      [220.0, 277.18, 329.63], // A (A3, C#4, E4)
+      [246.94, 293.66, 369.99], // Bm (B3, D4, F#4)
+      [185.0, 220.0, 277.18],  // F#m (F#3, A3, C#4)
+      [196.0, 246.94, 293.66], // G (G3, B3, D4)
+      [146.83, 220.0, 293.66], // D (D3, A3, D4)
+      [196.0, 246.94, 329.63], // Em (E3, G3, B3)
+      [220.0, 277.18, 329.63], // A (A3, C#4, E4)
+    ];
+
+    const chordDuration = 2.0; // 2 segundos por acorde (120 BPM)
+    for (let i = 0; i < totalSamples; i++) {
+      const t = i / sampleRate;
+      const chordIdx = Math.floor(t / chordDuration) % chords.length;
+      const chord = chords[chordIdx];
+      const localT = t % chordDuration;
+      const env = Math.exp(-localT * 2.5); // decaimento percussivo dedilhado
+
+      let sample = 0;
+      for (const freq of chord) {
+        // Fundamental + 2º harmônico
+        sample += 0.15 * Math.sin(2 * Math.PI * freq * t) * env;
+        sample += 0.05 * Math.sin(2 * Math.PI * (freq * 2) * t) * env;
+      }
+
+      left[i] = sample;
+      right[i] = sample;
+    }
+
+    this.buffer = buffer;
   }
 
   get durationSeconds(): number {

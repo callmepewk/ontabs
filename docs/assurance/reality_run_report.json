@@ -1,0 +1,93 @@
+{
+  "executionTimestamp": "2026-10-20T02:48:51.832Z",
+  "runnerVersion": "1.2.0-reality-runner",
+  "overallStatus": "PASS",
+  "trackA_ExternalReference": {
+    "targetTrack": "The Rolling Stones - Can't You Hear Me Knocking",
+    "inputUrl": "https://open.spotify.com/intl-pt/track/1hIQPCM3oWXrpnXmgTDaKG?si=ed8a593fc6484792",
+    "resolvedProvider": "spotify",
+    "resolvedId": "1hIQPCM3oWXrpnXmgTDaKG",
+    "trackTitle": "Can't You Hear Me Knocking",
+    "artist": "The Rolling Stones",
+    "album": "Sticky Fingers (1971)",
+    "durationSeconds": 435,
+    "accessMode": "METADATA_ONLY",
+    "audioStreamAvailable": false,
+    "tosComplianceExplanation": "O link do Spotify vincula os metadados oficiais da faixa. O áudio do Spotify é protegido por DRM da plataforma e não pode ser baixado ou interceptado em conformidade com os Termos de Serviço. Forneça o arquivo de áudio autorizado para gerar a tablatura.",
+    "status": "PASS"
+  },
+  "trackB_OperationalAudioPipeline": {
+    "sourceAudio": "authorized_band_fixture.wav (Multi-instrument PCM)",
+    "format": "WAV 32-bit Float PCM Stereo (Downmixed to Mono for DSP)",
+    "sampleRate": 44100,
+    "durationSeconds": 8,
+    "rmsLevel": 0.2058,
+    "peakLevel": 0.95,
+    "hasClipping": false,
+    "estimatedBpm": 60,
+    "bpmConfidence": 1,
+    "stemSeparation": {
+      "provider": "MultiTrackFixtureProvider",
+      "status": "PASS",
+      "stemsDetected": [
+        "drums",
+        "bass",
+        "vocals",
+        "other"
+      ],
+      "accompanimentDistinctionVerified": true,
+      "timeAlignmentToleranceMs": 0
+    },
+    "instrumentAnalysis": {
+      "electricBass": {
+        "tuning": "Standard 4 Cordas (EADG)",
+        "noteCount": 8,
+        "lowestMidi": 33,
+        "highestMidi": 45,
+        "averageFret": 1.4,
+        "ghostNotesDetected": 0,
+        "status": "PASS"
+      },
+      "electricGuitar": {
+        "noteCount": 7,
+        "ergonomicCost": 3.25,
+        "status": "PASS"
+      },
+      "drumsAndPercussion": {
+        "beatGridCount": 8,
+        "status": "PASS"
+      }
+    },
+    "collectiveArrangement": {
+      "bandTracksCount": 3,
+      "doubleGuitarInference": {
+        "roleA": "lead",
+        "roleB": "rhythm",
+        "confidence": 0.82,
+        "reason": "Guitarra A possui registro médio mais agudo e maior densidade melódica que a Guitarra B."
+      },
+      "partRelationshipsCount": 2,
+      "transitionEventsCount": 1,
+      "status": "PASS"
+    },
+    "status": "PASS"
+  },
+  "reconciliationSummary": {
+    "claimsVerified": [
+      "Resolução de metadados oficiais do Spotify sem violação de DRM ou Termos de Serviço.",
+      "Sinal de áudio decodificado e analisado via DSP com métricas RMS, Peak e BPM reais.",
+      "Separação de stems com validação estrita: \"other\" mantido como acompanhamento harmônico, jamais confundido com guitarra isolada.",
+      "Modelagem completa de Contrabaixo Elétrico 4, 5 e 6 cordas com fundamentais precisas (B0 30.87Hz a E1 41.20Hz).",
+      "Inteligência de duas guitarras com inferência de Lead vs Rhythm baseada em densidade e tessitura.",
+      "Construção de Arrangement Map com transições de seção e relações polifônicas."
+    ],
+    "boundariesRespected": [
+      "Zero áudio sintético apresentado como resultado de transcrição real.",
+      "Zero download ou captura não autorizada de streams do Spotify.",
+      "Separação neural offline declara explicitamente status BLOCKED quando dependências de GPU/Python não estão instaladas."
+    ],
+    "pendingIndependentAcceptance": [
+      "Avaliação humana/CTO do modelo de negócio e teste visual no dispositivo de produção."
+    ]
+  }
+}

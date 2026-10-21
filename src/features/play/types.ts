@@ -12,6 +12,7 @@ export interface ChartNote {
   duration?: number;       // ms, usado em 'sustain'
   hit?: boolean;
   missed?: boolean;
+  provenance?: 'USER_EXTRACTED' | 'SYNTHETIC_DEMO';
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
@@ -25,6 +26,7 @@ export interface GameChart {
   difficulty: Difficulty;
   notes: ChartNote[];
   durationSeconds: number;
+  provenance?: 'USER_EXTRACTED' | 'SYNTHETIC_DEMO';
 }
 
 // Evento de origem, derivado da tablatura real do OnTabs.

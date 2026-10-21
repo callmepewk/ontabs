@@ -1,0 +1,704 @@
+{
+  "corpus": {
+    "title": "CORPUS CIENTÍFICO INTEGRAL — 64 FORMULAÇÕES E MODELOS CANÔNICOS",
+    "author": "Pedro Henrique Brezolin de Freitas",
+    "affiliation": "BZN Industries / JIMI OmniCore",
+    "consolidationDate": "2026-09-25",
+    "registration": "OSF Pre-registration — osf.io/cnpt5 — + Git Workspace Canônico",
+    "epistemologicalStatus": "HYPOTHESIS / ARCHITECTURAL_SPECIFICATION / CANDIDATE_METRIC",
+    "invariant": "HYPOTHESIS ≠ EMPIRICAL TRUTH | REFORMULATION ≠ AUTHORSHIP TRANSFER",
+    "chainOfCustody": "CLAIM → ARTIFACT → REPOSITORY → TEST → RUNTIME → OBSERVATION → VERIFICATION",
+    "governance": "JIMI SIGNS THE ANALYSIS. PEDRO SIGNS THE AUTHORITY.",
+    "totalFoundationalFormulations": 64,
+    "totalMusicDSPFormulations": 10,
+    "totalProposedFormulations": 3
+  },
+  "blocks": [
+    {
+      "id": "BLOCO-I",
+      "name": "Estruturas Matemáticas Canônicas e Modelos Cognitivos",
+      "range": "1-10",
+      "formulations": [
+        {
+          "id": "FORM-GRAPH-001",
+          "name": "Cognitive Context Graph",
+          "formula": "G = (V, E, T, C, P, R)",
+          "definition": "Estrutura formal de modelagem de contexto dinâmico multi-relacional indexado por Vértices (V), Arestas causais (E), Coordenadas temporais (T), Contexto operacional (C), Proveniência estrita (P) e Recursos/Cotas (R).",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no modelo canônico de eventos musicais (CanonicalEvent) e grafo de notas temporais."
+        },
+        {
+          "id": "FORM-AB-001",
+          "name": "Autonomy Budget",
+          "formula": "B_{t+1} = B_t - C(a_t)",
+          "definition": "Modelo de consumo da margem de autonomia e cota computacional para agentes autônomos.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Mapeado na máquina de estados de acesso do OnTabs (accessStateMachine.ts), controlando consumo de análises gratuitas e cotas mensais de assinantes."
+        },
+        {
+          "id": "FORM-HCT-001",
+          "name": "Hash-Chain Trace",
+          "formula": "H_t = SHA256(H_{t-1} || e_t)",
+          "definition": "Encadeamento criptográfico append-only para integridade do ledger de eventos e auditoria forense.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Implementado no ledger imutável de proveniência de catálogo data/music-library/provenance.jsonl com checksum SHA-256 e encadeamento temporal."
+        },
+        {
+          "id": "FORM-KD-001",
+          "name": "Knowledge Decay",
+          "formula": "c(t) = c_0 e^{-λt} + U(evidence)",
+          "definition": "Degradação temporal da certeza mitigada estritamente por injeção de novas evidências observáveis.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no decaimento de confiança de F0 durante trechos de áudio sem transientes claros ou com ruído crescente."
+        },
+        {
+          "id": "FORM-CA-001",
+          "name": "Cognitive Allocation",
+          "formula": "A* = argmax[Q - λC - µR]",
+          "definition": "Otimização de alocação de esforço cognitivo entre qualidade, custo e risco operacional.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no balanceamento de janelas de FFT/STFT (tamanho de bloco 512 vs 2048) versus latência de decodificação."
+        },
+        {
+          "id": "FORM-REL-001",
+          "name": "Reliability & Realization Formula",
+          "formula": "R = B × V × D × I",
+          "definition": "Confiabilidade final como produto do Estado Cognitivo (B), Validação de Testes (V), Disponibilidade de Gateway/Delivery (D) e Integração/Binding Remoto (I).",
+          "status": "VERIFIED",
+          "ontabsMapping": "Comprovado no índice de confiabilidade geral medido no Audio Reality Runner (Gate 0 & 1)."
+        },
+        {
+          "id": "FORM-GOV-001",
+          "name": "Governance Function",
+          "formula": "G = f(I, C, N, V, T, K, P, R, H, E)",
+          "definition": "Função de governança soberana unindo Identidade, Contexto, Constraints, Invariantes, Trajetória, Conhecimento, Política, Risco, Autoridade Humana e Evidência.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Base conceitual do Admission Gate e políticas de retenção de dados por escopo de operação."
+        },
+        {
+          "id": "FORM-CSR-001",
+          "name": "Claim Surface Reduction",
+          "formula": "CSR = (C_before - C_after) / C_before",
+          "definition": "Métrica operacional para redução adversarial da superfície de alegações não verificadas.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Auditado na eliminação de fallbacks sintéticos não rotulados e substituição de mocks por testes com áudio real PCM."
+        },
+        {
+          "id": "FORM-EXD-001",
+          "name": "Eficiência Conceitual / Executive Density",
+          "formula": "D_eff = I_s / (A_v · C_c)",
+          "definition": "Densidade de informação útil ponderada pela área visual ocupada e complexidade cognitiva percebida.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no design dos cards de catálogo na biblioteca e no HUD do OnTabs Play."
+        },
+        {
+          "id": "FORM-PPE-001",
+          "name": "Physical Power & Energy Invariant",
+          "formula": "P = V · I; E = P · t",
+          "definition": "Relações fundamentais de potência e energia para futuros atuadores eletromecânicos e orçamentos térmicos.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Invariante de limite físico para dispositivos embarcados de áudio e interfaces de captação piezoelétrica/eletromagnética."
+        }
+      ]
+    },
+    {
+      "id": "BLOCO-II",
+      "name": "Modelos de Custo Total, Interação Humana e Degradação Contextual",
+      "range": "11-22",
+      "formulations": [
+        {
+          "id": "FORM-HIB-001",
+          "name": "Human Integration Burden",
+          "formula": "HIB = T_acq + T_recon + T_sem + T_ep + T_human + T_val + T_stab + T_delay",
+          "definition": "Custo total imposto ao operador atuando como middleware cognitivo.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no tempo de revisão de tablatura que o usuário gasta corrigindo notas mal inferidas."
+        },
+        {
+          "id": "FORM-TRT-001",
+          "name": "Total Rework Time",
+          "formula": "T_rework,total = T_direct + T_semantic + T_epistemic + T_validation + T_stabilization + T_downstream",
+          "definition": "Custo temporal total de retrabalho gerado por quebras de alinhamento e contexto.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado nas refatorações de tablatura por erros de oitava ou de digitação biomecânica."
+        },
+        {
+          "id": "FORM-CCE-001",
+          "name": "Contextual Continuity Efficiency",
+          "formula": "CCE = VUC / (T_acq + T_recon + T_sem + T_ep + T_human)",
+          "definition": "Razão de unidades de contexto úteis preservadas pelo esforço de reaquisição.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Preservação da tonalidade e andamento (BPM) detectados ao longo de todas as telas (Converter -> Tab -> Play)."
+        },
+        {
+          "id": "FORM-MRR-001",
+          "name": "Margem de Retenção Referencial - MRR",
+          "formula": "MRR = Ref_retained / Ref_total",
+          "definition": "Métrica de ancoragem de referências cruzadas entre sessões.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Persistência de tabId, songId e setlistId através do armazenamento atômico de banco de dados."
+        },
+        {
+          "id": "FORM-CDRT-001",
+          "name": "Curva de Degradação Temporal / Workload - CDRT/CDRW",
+          "formula": "CDRT(t, W) = S_0 e^{-γ t W}",
+          "definition": "Taxa de perda semântica por transcurso temporal e volume de janelas.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Degradação da estimativa de tempo/compasso em faixas longas com variações de andamento (rubato/acelerando)."
+        },
+        {
+          "id": "FORM-MD-001",
+          "name": "Margem de Desvio - MD",
+          "formula": "MD = ||Intention - Execution||",
+          "definition": "Desvio acumulado entre a intenção original e a execução agentiva.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Testado nos julgamentos de timing do OnTabs Play (Perfect <= 35ms, Great <= 70ms, Miss > 120ms)."
+        },
+        {
+          "id": "FORM-MRO-001",
+          "name": "Margem de Reconstrução Operacional - MRO",
+          "formula": "MRO = ComputationalCost(RestoreState)",
+          "definition": "Esforço computacional para restaurar um estado utilizável.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Recuperação de estado do player a partir do snapshot em disco (data/ontabs-store.json)."
+        },
+        {
+          "id": "FORM-URE-001",
+          "name": "Unidades / Horas de Re-explicação - URE/HRE",
+          "formula": "URE = Σ ReExplanations",
+          "definition": "Quantificação do desperdício cognitivo humano ao re-explicar conceitos ao modelo.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Necessidade do usuário reinserir afinações alternativas (Drop D, DADGAD) por falta de inferência automática."
+        },
+        {
+          "id": "FORM-PRAL-001",
+          "name": "Preservação Semântica e Alinhamento - PSR/RR/VR/CRAL",
+          "formula": "PRAL = (PSR, RR, VR, CRAL)",
+          "definition": "Quádrupla de retenção, verificação e alinhamento causal.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Alinhamento temporal estrito entre a timeline de áudio PCM e a highway de notas no OnTabs Play."
+        },
+        {
+          "id": "FORM-PRP-001",
+          "name": "Percentual de Retrabalho Potencial - PRP",
+          "formula": "PRP = Cost(PotentialRework) / Cost(Total)",
+          "definition": "Indicador de risco de colisão e refatoração por falta de contexto prévio.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Métrica de risco de digitação inviável (ex: saltos maiores que 5 casas na mesma corda sem tempo hábil)."
+        },
+        {
+          "id": "FORM-MSJS-001",
+          "name": "Minimum Sufficient JIMI State - MSJS",
+          "formula": "MSJS = {Identity, SessionToken, UserRights, EngineParams}",
+          "definition": "Payload mínimo para inicialização idempotente e transferência cross-platform.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Implementado no payload de sessão de autenticação do OnTabs (auth.ts e UserRecord)."
+        },
+        {
+          "id": "FORM-TASD-001",
+          "name": "Temporal-Agent Semantic Degradation - TASD / CAB / CRB",
+          "formula": "TASD = Loss(Spec_agentA, Spec_agentB)",
+          "definition": "Degradação de entendimento de especificações entre modelos heterogêneos.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Divergência entre especificações de partitura (MusicXML) e formatos de tablatura (ASCII/GuitarPro)."
+        }
+      ]
+    },
+    {
+      "id": "BLOCO-III",
+      "name": "Arquitetura AEGIS — Integridade, Resiliência e Sentinela",
+      "range": "23-40",
+      "formulations": [
+        {
+          "id": "FORM-AEGIS-INT",
+          "name": "Definição Ampla de Integridade Sistêmica",
+          "formula": "I_system != I_application; I_system = f(C,T,D,B,R,I,E,A,O,X)",
+          "definition": "Integridade de código, testes, dependências, build, release, infra, edge, disponibilidade, observabilidade e recuperação.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Auditado pela suíte de gap-check (gapFinder.ts) que verifica rotas, módulos de engine e testes sincronizadamente."
+        },
+        {
+          "id": "FORM-AEGIS-H1",
+          "name": "Hipótese de Validação Progressiva Independente",
+          "formula": "MTTR(ProgValidation) < MTTR(MonolithicValidation)",
+          "definition": "Menor tempo de propagação e recuperação via múltiplas barreiras.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Validação em dois estágios: primeiro validação de mídia (mediaValidator.ts), depois admissão de direitos (admissionGate.ts), depois análise acústica (activeListener.ts)."
+        },
+        {
+          "id": "FORM-AEGIS-H2",
+          "name": "Hipótese Fail-Safe de Separação de Falha",
+          "formula": "P(FalseRollback | AppInfraSeparation) < P(FalseRollback | Coupled)",
+          "definition": "Separação entre falha de aplicação e falha de infraestrutura reduz rollbacks falsos.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Separação explícita no conector do Spotify: falha de decodificação de DRM externa não derruba o backend soberano."
+        },
+        {
+          "id": "FORM-AEGIS-H3",
+          "name": "Hipótese de Correlação de Observabilidade",
+          "formula": "MTTD(CrossCorrelation) < MTTD(SingleSignal)",
+          "definition": "Correlação cruzada de sinais reduz tempo de diagnóstico.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Correlação entre RMS, Spectral Flux e Autocorrelação para confirmação de onset melódico."
+        },
+        {
+          "id": "FORM-AEGIS-H4",
+          "name": "Hipótese de Monitor Externo Independente",
+          "formula": "Observer não é subconjunto da infraestrutura observada.",
+          "definition": "Observador externo independente da infraestrutura monitorada.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Suíte Playwright headless (realityE2E.ts) rodando como oráculo externo verificando páginas e DOM do browser real."
+        },
+        {
+          "id": "FORM-AEGIS-H5",
+          "name": "Hipótese de Governança de Bloqueio em CI",
+          "formula": "DefectEscape(GatedCI) = 0 for tested invariants",
+          "definition": "Barreira mandatória pré-produção.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Pipeline com npm test + npm run gap-check + npm run build bloqueando commits defeituosos."
+        },
+        {
+          "id": "FORM-AEGIS-H6",
+          "name": "Hipótese de Redução de MTTR",
+          "formula": "MTTR = f(Backup, Rollback, Observabilidade)",
+          "definition": "Backup + Rollback + Observabilidade correlacionada.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Snapshots atômicos de banco de dados com renomeação de arquivo atômica temporária (.tmp -> .json)."
+        },
+        {
+          "id": "FORM-AEGIS-SRC",
+          "name": "Source Governance Invariant",
+          "formula": "Change → Review → Evidence",
+          "definition": "Invariante de governança de fonte.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Nenhuma alteração no OnTabs é promovida sem teste unitário aprovado e evidência documental registrada."
+        },
+        {
+          "id": "FORM-AEGIS-UPG",
+          "name": "Upgrade Score de Dependências",
+          "formula": "UpgradeScore = SecurityBenefit - CompatibilityRisk",
+          "definition": "Métrica de decisão de atualização de dependências.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Avaliação estrita de dependências: recusa de Essentia com licença AGPLv3 para proteger o núcleo comercial soberano."
+        },
+        {
+          "id": "FORM-AEGIS-RTC",
+          "name": "Runtime Contract Invariant",
+          "formula": "TypeSystem ⊆ RuntimeCapabilities",
+          "definition": "O sistema de tipos não deve declarar capacidades que o runtime não possui.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Comprovado na resolução de URLs: conector do Spotify declara METADATA_ONLY e streamAvailable: false, impedindo falsa promessa de áudio."
+        },
+        {
+          "id": "FORM-AEGIS-ART",
+          "name": "Build Integrity Invariant",
+          "formula": "Artifact_tested = Artifact_deployed",
+          "definition": "Artefato testado deve corresponder ao artefato implantado.",
+          "status": "VERIFIED",
+          "ontabsMapping": "O bundle gerado por tsc -b && vite build em dist/ é o mesmo servido diretamente pelo servidor soberano (tryServeStatic)."
+        },
+        {
+          "id": "FORM-AEGIS-RLB",
+          "name": "Evidence-Based Rollback",
+          "formula": "Rollback = 1 iff Evidence_bad_release >= Threshold",
+          "definition": "Rollback baseado em evidência suficiente de release defeituoso.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Regra operacional de reversão em caso de quebra de testes de regressão."
+        },
+        {
+          "id": "FORM-AEGIS-BKP",
+          "name": "Backup Validity Condition",
+          "formula": "BackupValidity = Exists ∧ Accessible ∧ Consistent ∧ RestoreTested",
+          "definition": "Backup válido somente quando existe, é acessível, consistente e teve restauração testada.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Testado em dbConcurrency.test.ts: persistência em disco validada após concorrência massiva de 10 escritas paralelas."
+        },
+        {
+          "id": "FORM-AEGIS-ISO",
+          "name": "Multi-Instance Isolation Invariant",
+          "formula": "Health_platform != Health_instance",
+          "definition": "Saúde da plataforma não deve ser confundida com saúde de uma instância.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Isolamento de sessões e pastas de uploads por usuário seguro (uploads/<userId>/)."
+        },
+        {
+          "id": "FORM-AEGIS-EDG",
+          "name": "Edge Security HTTP Taxonomy",
+          "formula": "Taxonomy = {2xx normal, 4xx app, 429 edge, 5xx origin, 5xx edge}",
+          "definition": "Taxonomia determinística de 2xx normal, 4xx app, 429 edge, 5xx origin versus 5xx edge.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Implementado nas respostas de erro do backend soberano (routes.ts): 400 Bad Request, 401 Unauthorized, 402 Payment Required, 403 Forbidden, 404 Not Found, 500 Internal Error."
+        },
+        {
+          "id": "FORM-AEGIS-SNT",
+          "name": "Availability Sentinel Diagnostic Algorithm",
+          "formula": "SentinelDiagnostic = f(ProbeExternal, ProbeInternal)",
+          "definition": "Diagnóstico externo desacoplado do container de execução.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Endpoint GET /api/health reportando saúde interna e scripts externos de realityE2E como sonda externa."
+        },
+        {
+          "id": "FORM-AEGIS-UNK",
+          "name": "Axioma de Desconhecimento Epistêmico",
+          "formula": "UNKNOWN != FAILURE; EDGE_FAILURE != APPLICATION_FAILURE",
+          "definition": "Desconhecimento não equivale a falha e falha de edge não equivale automaticamente a falha de aplicação.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Tratamento de conectores de áudio: quando Demucs v4 ou GPU não estão disponíveis, o sistema reporta PROVEDOR_BLOQUEADO em vez de inventar stems."
+        },
+        {
+          "id": "FORM-AEGIS-CLO",
+          "name": "Critical Layer Override",
+          "formula": "If CriticalLayer = 0 → SystemState != GREEN",
+          "definition": "Uma camada crítica indisponível impede classificação GREEN.",
+          "status": "VERIFIED",
+          "ontabsMapping": "No Reality Runner, Gate 0 (Compliance Legal) é mandatório: se falhar, o status geral do release é imediatamente BLOCKED/FAIL."
+        }
+      ]
+    },
+    {
+      "id": "BLOCO-IV",
+      "name": "AEGIS Adaptive Cybersecurity Layer",
+      "range": "41-57",
+      "formulations": [
+        {
+          "id": "FORM-CYB-OBS",
+          "name": "Security Observation Model",
+          "formula": "e_t = (a_t, s_t, r_t, x_t, c_t, τ_t)",
+          "definition": "Modelo de observação de segurança com ação, estado, recurso, contexto de execução, contexto e tempo.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Audit trail de operações protegidas gravadas no DB e no ledger de admissão."
+        },
+        {
+          "id": "FORM-CYB-ID",
+          "name": "Multi-Level Identity Vector",
+          "formula": "Identity = f(User, Session, Credential, Device, Network, Context)",
+          "definition": "Identidade contextual multinível.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Autenticação por Bearer token ou Cookie com suporte a visitorId isolado para degustação gratuita."
+        },
+        {
+          "id": "FORM-CYB-NORM",
+          "name": "Feature Normalization & Clipping",
+          "formula": "x_i = min(1, (y_i - b_i) / s_i)",
+          "definition": "Normalização e clipping de features.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Normalização de amostras de áudio PCM para [-1.0, +1.0] com sanitização de clipping e remoção de NaN/Infinity."
+        },
+        {
+          "id": "FORM-CYB-BASE",
+          "name": "Exponentially Weighted Behavioral Baseline",
+          "formula": "B_i(t) = α x_i(t) + (1-α) B_i(t-1)",
+          "definition": "Baseline comportamental ponderada exponencialmente.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "Implementado no envelope seguidor de amplitude e suavizador de fluxo espectral (audioAnalysis.ts)."
+        },
+        {
+          "id": "FORM-CYB-ANOM",
+          "name": "Anomaly Score vs Maliciousness",
+          "formula": "A_t = Σ w_i |x_i(t) - B_i(t)|; Anomaly != Attack",
+          "definition": "Score de anomalia separado semanticamente de ataque.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Detecção de arquivos com magic bytes divergentes da extensão declarada (EXTENSION_SPOOF_DETECTED)."
+        },
+        {
+          "id": "FORM-CYB-TRA",
+          "name": "Temporal Risk Accumulation",
+          "formula": "R_t = λ R_{t-1} + (1-λ) E_t",
+          "definition": "Acumulação temporal de risco.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Controle de taxa de requisições de conversão para evitar exaustão de CPU por usuários anônimos."
+        },
+        {
+          "id": "FORM-CYB-DEC",
+          "name": "Time Decay of Evidence",
+          "formula": "D(t, t_i) = e^{-µ(t - t_i)}; E_t = Σ w_i x_i D(t, t_i)",
+          "definition": "Decaimento temporal da evidência.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Decaimento de energia nas janelas temporais de transientes musicais."
+        },
+        {
+          "id": "FORM-CYB-GRA",
+          "name": "Behavioral Sequence Correlation Graph",
+          "formula": "G = (V,E); Q(S) = Σ w_i x_i + Σ c(e_i, e_{i+1})",
+          "definition": "Grafo de correlação de sequência comportamental.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Mapeado no grafo de transição de posições biomecânicas na escala do instrumento."
+        },
+        {
+          "id": "FORM-CYB-LOG",
+          "name": "Contextual Risk Logistic Model",
+          "formula": "P_t = σ(z_t) = 1 / (1 + e^{-(β_0 + Σ β_i z_i)}); Risk_t = 100 P_t",
+          "definition": "Modelo logístico contextual de risco.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Modelo de probabilidade de violação autoral baseado no ano da gravação, país de origem e termos do provedor."
+        },
+        {
+          "id": "FORM-CYB-SEV",
+          "name": "Severity and Impact Product",
+          "formula": "R_t = P_t · I_t; RiskScore_t = 100 R_t",
+          "definition": "Produto entre probabilidade e impacto.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Severidade de risco em admissão de áudio: gravações comerciais protegidas possuem impacto severo se executadas publicamente."
+        },
+        {
+          "id": "FORM-CYB-BLA",
+          "name": "Blast Radius Metric",
+          "formula": "B_t = AffectedScope_t / TotalScope_t",
+          "definition": "Fração do escopo afetado.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Isolamento de falha em stem separation: se o stem de bateria falhar, os stems de baixo e guitarra permanecem operacionais."
+        },
+        {
+          "id": "FORM-CYB-TIS",
+          "name": "Tenant Isolation Invariant",
+          "formula": "R_tenant,A não propaga para R_tenant,B sem evidência de propagação.",
+          "definition": "Invariante de isolamento entre tenants.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Implementado e testado em mediaValidator.ts: função getIsolatedUserUploadPath bloqueia qualquer path traversal entre diretórios de usuários."
+        },
+        {
+          "id": "FORM-CYB-STV",
+          "name": "Security State Evolution Vector",
+          "formula": "S_t = F(S_{t-1}, E_t)",
+          "definition": "Evolução do estado de segurança com desacoplamento estrito entre Risco e Confiança.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Transição de estados do usuário: ANONYMOUS -> FREE_TRIAL -> PRO_ACTIVE -> EXPIRED."
+        },
+        {
+          "id": "FORM-CYB-EVS",
+          "name": "Evidence Sufficiency Gate",
+          "formula": "EVID_t >= θ_E → ação; caso contrário Observe + Correlate + Diagnose.",
+          "definition": "Gate de suficiência de evidência para automação.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Implementado no Admission Gate: se a evidência jurídica da gravação não estiver comprovada, o ativo não é admitido no catálogo público."
+        },
+        {
+          "id": "FORM-CYB-DEC-FN",
+          "name": "Security Decision Optimization",
+          "formula": "a* = argmin Cost(a), sujeito a RiskAfter(a) <= RiskTarget",
+          "definition": "Otimização da decisão de segurança sob restrição de risco.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Decisão de mascarar streaming de áudio do Spotify e manter estritamente METADATA_ONLY."
+        },
+        {
+          "id": "FORM-CYB-HYST",
+          "name": "Anti-Oscillation Hysteresis",
+          "formula": "Threshold_activate > Threshold_deactivate",
+          "definition": "Histerese para evitar oscilação do estado de segurança.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Implementado no detector de vibrato e notas (techniques.ts): limiares de Schmitt Trigger (30 cents e 15 cents) para evitar chaveamento espúrio."
+        },
+        {
+          "id": "FORM-CYB-REC",
+          "name": "Post-Incident Verification Barrier",
+          "formula": "retorno a normal somente se V_post >= θ_V",
+          "definition": "Barreira de verificação pós-incidente.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Processo de reativação de faixas contestadas ou com take-down emitido: retorno ao catálogo apenas após validação jurídica explícita."
+        }
+      ]
+    },
+    {
+      "id": "BLOCO-V",
+      "name": "Living OmniCore Surface & Leis Espaciais-Semânticas",
+      "range": "58-64",
+      "formulations": [
+        {
+          "id": "FORM-USSF-001",
+          "name": "Universal Spatial-Semantic Field",
+          "formula": "F(x,y,t), com E_i = (S_i, G_i, M_i, O_i, T_i, P_i, V_i)",
+          "definition": "UI tratada como malha espacial-semântica contínua de proveniência de dados.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Apresentação unificada de proveniência na interface da biblioteca (/library) e no visualizador de tablatura (/tab/:id)."
+        },
+        {
+          "id": "FORM-SSF-001",
+          "name": "Semantic Spatial Force",
+          "formula": "F_ij = M_i M_j d_{ij}^{-α} S_ij",
+          "definition": "Força de atração/acoplamento entre módulos de UI baseada em proximidade e afinidade contextual.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Acoplamento visual entre a pista de tablatura e o painel de acordes e afinações no TabViewer."
+        },
+        {
+          "id": "FORM-ALIGN-001",
+          "name": "Alignment Field Error Metric",
+          "formula": "ε_A = (1/n) Σ |x_i - x_ref|",
+          "definition": "Métrica para diferenciação matemática de assimetria deliberada contra defeito geométrico.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Testado nos testes E2E do Playwright verificando alinhamento estrito e ausência de horizontal overflow (0px)."
+        },
+        {
+          "id": "FORM-EOS-001",
+          "name": "Epistemic Operating Substrate",
+          "formula": "EOS = Substrato onde causalidade e estado são manipuláveis diretamente.",
+          "definition": "Substrato operacional em que causalidade e estado são manipuláveis diretamente sem proxies textuais.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Manipulação direta de casas e cordas interativas na tablatura gráfica pelo usuário."
+        },
+        {
+          "id": "FORM-CST-001",
+          "name": "Causal State-Trace",
+          "formula": "CST = Unidade ontológica fundamental independente de geometria visual.",
+          "definition": "Unidade ontológica fundamental independente de geometria visual.",
+          "status": "IMPLEMENTED",
+          "ontabsMapping": "O modelo IntermediateRepresentation e CanonicalMusicalEvent desacoplado da renderização visual."
+        },
+        {
+          "id": "FORM-EZM-001",
+          "name": "Epistemic Semantic Zoom",
+          "formula": "Zoom = Macro → Meso → Micro → Provenance → Source → Execution → Byte",
+          "definition": "Zoom ontológico multinível: Macro → Meso → Micro → Provenance → Source → Execution → Byte.",
+          "status": "FORMALIZED",
+          "ontabsMapping": "Navegação da visão de Repertório (Macro) para Faixa (Meso), para Tablatura (Micro) e para o Hash SHA-256 e bytes do arquivo de áudio (Byte)."
+        },
+        {
+          "id": "FORM-CVL-001 / CAL-001",
+          "alias": "FORM-CVL-001",
+          "name": "Conservation of Visual Evidence & Causal Animation",
+          "formula": "VisualWeight <= EvidenceStrength",
+          "definition": "Proibição de animações decorativas contínuas desprovidas de eventos de propagação de estado causal.",
+          "status": "VERIFIED",
+          "ontabsMapping": "Implementado no OnTabs Play: quando não há notas extraídas (áudio silencioso), a highway não fabrica notas falsas decorativas, exibindo explicitamente o motivo da ausência de extração."
+        }
+      ]
+    }
+  ],
+  "musicDSPFormulations": [
+    {
+      "id": "FORM-DSP-F0-001",
+      "name": "Estimativa Determinística de F0 por Autocorrelação com Interpolação Parabólica Sub-Amostral",
+      "formula": "R(τ) = Σ_{t=0}^{W-1} x(t) x(t+τ); τ* = τ + (α - γ) / [2(α - 2β + γ)]; f0 = f_s / τ*",
+      "domain": "DSP Acústico Monofônico",
+      "variables": { "x(t)": "sinal PCM normalizado", "W": "tamanho da janela (2048 amostras)", "τ": "lag de máxima correlação", "f_s": "taxa de amostragem (Hz)" },
+      "precision": "Erro relativo < 0.20%, desvio < 1 cent em senoides puras",
+      "implementation": "src/engine/audioAnalysis.ts: estimatePitchAutocorrelation",
+      "tests": "src/engine/__tests__/mathAndDijkstra.test.ts, src/engine/__tests__/f0StressAndAcoustics.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-MUS-MIDI-001",
+      "name": "Mapeamento Canônico de Frequência para Altura MIDI Contínua",
+      "formula": "m = 69 + 12 · log_2(f / 440)",
+      "domain": "Acústica Musical / ISO 16 / MIDI 1.0",
+      "variables": { "f": "frequência em Hertz (f > 0)", "m": "número de nota MIDI contínuo" },
+      "precision": "Exatidão analítica exata (0 cents de erro em A4, A2, C4)",
+      "implementation": "src/engine/notes.ts: frequencyToMidi",
+      "tests": "src/engine/__tests__/mathAndDijkstra.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-MUS-CENTS-001",
+      "name": "Fórmula Canônica de Ellis para Desvio Microtonal em Cents",
+      "formula": "c = 1200 · log_2(f / f_{ref})",
+      "domain": "Sistemas de Afinação / Alexander Ellis (1885)",
+      "variables": { "f": "frequência observada", "f_{ref}": "frequência de referência temperada" },
+      "precision": "Erro analítico nulo sob aritmética IEEE 754",
+      "implementation": "src/engine/notes.ts: getCentsOffset",
+      "tests": "src/engine/__tests__/mathAndDijkstra.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-OPT-DIJKSTRA-001",
+      "name": "Otimização Biomecânica de Digitação por Caminho Mínimo de Dijkstra",
+      "formula": "min_P Σ_{t=1}^N C(p_t, p_{t-1}); C(p_1, p_2) = w_f |f_2 - f_1| + w_s |s_2 - s_1| + w_h Δ_{pos}",
+      "domain": "Otimização Combinatória / Grafos Ponderados",
+      "variables": { "p_t": "par (corda, casa) no tempo t", "w_f, w_s, w_h": "pesos biomecânicos de transição de mão" },
+      "precision": "Δ Custo = 0.000 comparado a Busca Exaustiva de Força Bruta (Ground Truth)",
+      "implementation": "src/engine/fretOptimization.ts: optimizeFretSequence",
+      "tests": "src/engine/__tests__/mathAndDijkstra.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-DSP-RMS-001",
+      "name": "Envelope e Energia de Sinal por Raiz Quadrada Média (RMS)",
+      "formula": "RMS = sqrt( (1/N) Σ_{n=0}^{N-1} x[n]^2 )",
+      "domain": "DSP Básico",
+      "variables": { "x[n]": "amostras discretas no frame", "N": "largura do frame" },
+      "precision": "Rejeição de silêncio para RMS < 0.005",
+      "implementation": "src/engine/audioAnalysis.ts: computeRms",
+      "tests": "src/engine/__tests__/audioAndBand.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-DSP-FLUX-001",
+      "name": "Detecção de Transientes por Fluxo Espectral Positivo de Meia Onda",
+      "formula": "Flux(t) = Σ_k max(0, |X_t(k)| - |X_{t-1}(k)|)",
+      "domain": "DSP Tempo-Frequência / Onset Detection",
+      "variables": { "X_t(k)": "magnitude da STFT no frame t e bin k" },
+      "precision": "Detecção de picos de ataque com resolução de 1 frame (~11.6ms a 44.1kHz / hop 512)",
+      "implementation": "src/engine/audioAnalysis.ts: computeEnvelopeAndFlux",
+      "tests": "src/engine/__tests__/audioAndBand.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-DSP-SCHMITT-001",
+      "name": "Detecção de Vibrato e Articulação por Histerese de Schmitt Trigger",
+      "formula": "State_{t+1} = HIGH se c_t >= θ_{high}; LOW se c_t <= θ_{low}; f_v = (ZeroCrossings / 2) / Δt",
+      "domain": "Engenharia de Sinais Não-Lineares",
+      "variables": { "c_t": "desvio em cents em torno da média de afinação", "θ_{high}": "30 cents", "θ_{low}": "15 cents" },
+      "precision": "Estimativa exata de frequência de vibrato em 5.0 Hz (±0.1 Hz) e profundidade 30 cents",
+      "implementation": "src/engine/techniques.ts: detectVibratoSchmittTrigger",
+      "tests": "src/engine/__tests__/techniquesAndEvents.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-HAR-KRUMHANSL-001",
+      "name": "Determinação Tonal por Correlação de Perfis de Krumhansl-Schmuckler",
+      "formula": "r(key) = [Σ (c_i - c_avg)(p_i - p_avg)] / [sqrt(Σ (c_i - c_avg)^2) · sqrt(Σ (p_i - p_avg)^2)]",
+      "domain": "Psicoacústica e Teoria Musical Computacional",
+      "variables": { "c_i": "componente do vetor chroma de 12 dimensões", "p_i": "peso do perfil tonal maior/menor de Krumhansl" },
+      "precision": "Determinação inequívoca de tonalidades maiores e menores em áudios com harmonia tonal",
+      "implementation": "src/engine/keyDetection.ts: detectKey",
+      "tests": "src/engine/__tests__/musicEngine.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-DSP-BIQUAD-001",
+      "name": "Filtros Biquad IIR Paramétricos Diretos (Audio EQ Cookbook de Robert Bristow-Johnson)",
+      "formula": "H(z) = (b0 + b1 z^{-1} + b2 z^{-2}) / (a0 + a1 z^{-1} + a2 z^{-2})",
+      "domain": "DSP / Filtros Digitais",
+      "variables": { "b_i, a_i": "coeficientes analíticos calculados a partir de f0, ganho dB e Q" },
+      "precision": "Erro de ganho < 0.1 dB na frequência central e estabilidade comprovada com clamping",
+      "implementation": "src/engine/equalizer.ts: createBiquadPeaking, createBiquadLowshelf",
+      "tests": "src/engine/__tests__/audioAndBand.test.ts",
+      "status": "VERIFIED"
+    },
+    {
+      "id": "FORM-GOV-ADMISSION-001",
+      "name": "Gating Booleano Determinístico de Admissão de Direitos Autorais",
+      "formula": "Admit(op, asset) = (ScopeAllowed(asset.collection, op)) ∧ (asset.permissions[op] == 'ALLOWED') ∧ (¬asset.isRevoked)",
+      "domain": "Sistemas Críticos de Conformidade Jurídica",
+      "variables": { "op": "uma das 8 operações do sistema", "asset": "registro formal do ativo no catálogo" },
+      "precision": "Rejeição estrita fail-closed sem falsos positivos em uso comercial",
+      "implementation": "src/engine/admissionGate.ts: evaluateAdmission",
+      "tests": "src/engine/__tests__/admissionGate.test.ts",
+      "status": "VERIFIED"
+    }
+  ],
+  "proposedFormulations": [
+    {
+      "id": "FORM-DSP-HARM-SIEVE-001",
+      "name": "Crivo Harmônico Determinístico para Decomposição de Polifonia sem Redes Neurais",
+      "formula": "S(f_0) = Σ_{h=1}^H w_h |X(h · f_0)| / [1 + β · |X(h · f_0) - Predicted(h)|]; F0* = argmax S(f_0)",
+      "domain": "Processamento de Sinais Polifônicos / Harmonic Sieve",
+      "problem": "Estimativa de notas fundamentais concorrentes em acordes simultâneos (2 a 6 vozes) sem depender de modelos de deep learning.",
+      "status": "HYPOTHESIS_FORMALIZED"
+    },
+    {
+      "id": "FORM-BASS-COMPLEX-001",
+      "name": "Modelo Biomecânico de Extensão de Braço para Baixo de 4, 5 e 6 Cordas com Penalidade de Tensão",
+      "formula": "C_{bass}(p_1, p_2) = w_f |f_2 - f_1| · (1 + L_{scale} / 34.0) + w_s |s_2 - s_1| + w_{stretch} max(0, |f_2 - f_1| - MaxReach(f_1))",
+      "domain": "Ergonomia Instrumental Computacional",
+      "problem": "Otimizar digitação para baixos de escala longa (34\" a 35\") onde a distância física entre os trastes graves (casas 1 a 5) exige maior abertura dos dedos que na guitarra.",
+      "status": "HYPOTHESIS_FORMALIZED"
+    },
+    {
+      "id": "FORM-POLY-SEPARATION-001",
+      "name": "Separação Espectral Determinística de Duas Guitarras por Centroide Local e Coerência de Pano",
+      "formula": "Role(G_A, G_B) = argmax [w_{dens} (D_A - D_B) + w_{cent} (C_A - C_B) + w_{reg} (R_A - R_B)]",
+      "domain": "Análise Musical de Conjunto / Double Guitar Intelligence",
+      "problem": "Distinção determinística entre guitarra solo (lead) e guitarra base (rhythm) em gravações estéreo com guitarras panadas para canais opostos.",
+      "status": "HYPOTHESIS_FORMALIZED"
+    }
+  ]
+}

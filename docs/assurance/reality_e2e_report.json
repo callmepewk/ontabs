@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-10-20T02:48:19.424Z",
+  "totalSteps": 8,
+  "passedSteps": 8,
+  "failedSteps": 0,
+  "results": [
+    {
+      "step": "Landing Page Hero & Value Proposition",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 913,
+      "screenshot": "reality_desktop_landing.png",
+      "details": {
+        "heroTitle": "Da gravação à tablatura perfeita, com precisão matemática e inteligência de banda.",
+        "hasCta": true
+      }
+    },
+    {
+      "step": "Spotify Connector Resolution & TOS Compliance UI",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 704,
+      "screenshot": "reality_desktop_spotify_resolution.png",
+      "details": {
+        "resolvedTrack": "Can't You Hear Me Knocking",
+        "artistPresent": true,
+        "metadataOnlyBadgePresent": true
+      }
+    },
+    {
+      "step": "Song Library & Catalog Navigation",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 660,
+      "screenshot": "reality_desktop_library.png",
+      "details": {
+        "songCardsFound": 2
+      }
+    },
+    {
+      "step": "Verified Catalog Tab & Multi-Tier Rights Badges",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 168,
+      "screenshot": "reality_desktop_verified_catalog.png",
+      "details": {
+        "verifiedCardsFound": 9,
+        "hasPublicDomainBadge": true,
+        "hasCCByBadge": true
+      }
+    },
+    {
+      "step": "OnTabs Play Mode & Provenance Badges",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 662,
+      "screenshot": "reality_desktop_play_selector.png",
+      "details": {
+        "playHeading": "OnTabs Play",
+        "hasDemoOption": true
+      }
+    },
+    {
+      "step": "Pricing Plans & Tier Presentation",
+      "viewport": "desktop_1920x1080",
+      "passed": true,
+      "durationMs": 621,
+      "screenshot": "reality_desktop_plans.png",
+      "details": {
+        "planCardsCount": 3
+      }
+    },
+    {
+      "step": "Mobile Responsiveness & Zero Horizontal Overflow",
+      "viewport": "mobile_375x812",
+      "passed": true,
+      "durationMs": 760,
+      "screenshot": "reality_mobile_landing.png",
+      "details": {
+        "hasHorizontalOverflow": false
+      }
+    },
+    {
+      "step": "Mobile Converter Page Layout",
+      "viewport": "mobile_375x812",
+      "passed": true,
+      "durationMs": 612,
+      "screenshot": "reality_mobile_converter.png",
+      "details": {
+        "hasHorizontalOverflow": false
+      }
+    }
+  ],
+  "status": "PASS"
+}

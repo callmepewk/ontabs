@@ -3,9 +3,47 @@
 // (ver src/features/play/types.ts) derivado de uma Tab — este é o modelo
 // "fonte", que a futura conversão de música vai popular.
 
-export type Instrument = 'guitar' | 'acoustic_guitar' | 'bass' | 'ukulele';
+export type Instrument =
+  | 'guitar'
+  | 'rhythm_guitar'
+  | 'lead_guitar'
+  | 'acoustic_guitar'
+  | 'bass'
+  | 'drums'
+  | 'saxophone'
+  | 'alto_sax'
+  | 'tenor_sax'
+  | 'ukulele'
+  | 'piano'
+  | 'vocals';
 
-export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert' | 'beginner' | 'intermediate' | 'advanced';
+
+export type MusicalProvenance = 'OBSERVED' | 'INFERRED' | 'USER_CONFIRMED' | 'REFERENCE_DERIVED' | 'UNKNOWN';
+
+export type PartRelationship =
+  | 'UNISON'
+  | 'OCTAVE_DOUBLING'
+  | 'HARMONIZED'
+  | 'RHYTHMIC_COMPLEMENT'
+  | 'INDEPENDENT_LINES'
+  | 'HARMONIC_SUPPORT'
+  | 'TEXTURAL_LAYER'
+  | 'POSSIBLE_DOUBLING'
+  | 'UNKNOWN_RELATION';
+
+export type FunctionalRole =
+  | 'lead'
+  | 'rhythm'
+  | 'riff'
+  | 'harmonic_support'
+  | 'textural'
+  | 'sustained'
+  | 'arpeggio'
+  | 'vocal_response'
+  | 'groove'
+  | 'percussive'
+  | 'unassigned';
 
 export interface TabSection {
   id: string;
@@ -16,12 +54,16 @@ export interface TabSection {
 
 export interface TabNoteEvent {
   timestamp: number;
-  strings: number[]; // cordas/casas tocadas simultaneamente
+  strings?: number[]; // cordas tocadas simultaneamente
   sustainMs?: number;
+  stringNumber?: number; // corda individual (1-6)
+  fret?: number; // traste/casa
+  duration?: number; // duracao em segundos
 }
 
 export interface Tab {
   id: string;
+  songId?: string;
   title: string;
   artist: string;
   instrument: Instrument;
@@ -45,6 +87,9 @@ export interface Song {
   coverUrl?: string;
   status: 'pending' | 'processing' | 'ready' | 'error';
   tabId?: string;           // referência à Tab gerada, quando existir
+  bpm?: number;
+  key?: string;
+  instrument?: Instrument;
 }
 
 export interface UserSettings {
@@ -57,5 +102,6 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role?: 'user' | 'admin' | 'owner';
   settings: UserSettings;
 }

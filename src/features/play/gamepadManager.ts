@@ -75,10 +75,10 @@ export class GamepadManager {
     return this.connected.size > 0;
   }
 
-  onConnect(cb: (info: GamepadInfo) => void) { this.listeners.connect.add(cb); return () => this.listeners.connect.delete(cb); }
-  onDisconnect(cb: (index: number) => void) { this.listeners.disconnect.add(cb); return () => this.listeners.disconnect.delete(cb); }
-  onButtonDown(cb: (edge: GamepadButtonEdge) => void) { this.listeners.buttonDown.add(cb); return () => this.listeners.buttonDown.delete(cb); }
-  onButtonUp(cb: (edge: GamepadButtonEdge) => void) { this.listeners.buttonUp.add(cb); return () => this.listeners.buttonUp.delete(cb); }
+  onConnect(cb: (info: GamepadInfo) => void) { this.listeners.connect.add(cb); return () => { this.listeners.connect.delete(cb); }; }
+  onDisconnect(cb: (index: number) => void) { this.listeners.disconnect.add(cb); return () => { this.listeners.disconnect.delete(cb); }; }
+  onButtonDown(cb: (edge: GamepadButtonEdge) => void) { this.listeners.buttonDown.add(cb); return () => { this.listeners.buttonDown.delete(cb); }; }
+  onButtonUp(cb: (edge: GamepadButtonEdge) => void) { this.listeners.buttonUp.add(cb); return () => { this.listeners.buttonUp.delete(cb); }; }
 }
 
 export const DEFAULT_KEY_BINDINGS: KeyBindings = {
