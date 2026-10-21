@@ -2,6 +2,8 @@
 // Motor de Análise de Áudio (DSP) - Ontabs Music Engine
 // Envelope RMS, Novelty Flux, Autocorrelação de BPM, Detecção de Compassos e Goertzel Chroma.
 
+import { extractHarmonicSieveVoices } from './harmonicSieve';
+
 export interface AudioEnvelopeResult {
   env: Float32Array;
   flux: Float32Array;
@@ -284,6 +286,208 @@ export function estimatePitchAutocorrelation(
     midi,
     cents,
     clarity: Number(Math.min(1.0, Math.max(0.0, maxCorr)).toFixed(2)),
+  };
+}
+
+export type PitchAnalysisStrategy = 'monophonic' | 'polyphonic_sieve' | 'auto';
+
+export interface FrameNotesExtractionOptions {
+  strategy?: PitchAnalysisStrategy; // Padrão: 'monophonic' (preserva compatibilidade absoluta)
+  sampleRate?: number;
+  clarityThreshold?: number; // Para autocorrelação monofônica (padrão 0.35)
+  maxPolyphonicVoices?: number; // Para Crivo Harmônico (padrão 4)
+  inharmonicityBeta?: number; // Para Crivo Harmônico (padrão 8.0)
+  minRms?: number; // Limiar de silêncio (padrão 0.003)
+  minPeakToNoiseRatio?: number; // Para Crivo Harmônico (padrão 4.0)
+}
+
+export interface ExtractedFrameNote {
+  midi: number;
+  frequency: number;
+  cents: number;
+  confidence: number;
+  strategyUsed: 'monophonic' | 'polyphonic_sieve';
+}
+
+export interface FrameNotesResult {
+  notes: ExtractedFrameNote[];
+  strategySelected: 'monophonic' | 'polyphonic_sieve';
+  decisionReason: string;
+  isAbstention: boolean;
+}
+
+/**
+ * Ponto de entrada unificado para extração determinística de notas em uma janela temporal de áudio.
+ * Permite seleção explícita entre o pipeline monofônico ultrarrápido e o Crivo Harmônico polifônico,
+ * com modo 'auto' determinístico e fallback garantido.
+ */
+export function extractFrameNotes(
+  samples: Float32Array,
+  sampleRate = 44100,
+  options: FrameNotesExtractionOptions = {}
+): FrameNotesResult {
+  const strategy = options.strategy || 'monophonic';
+  const minRms = options.minRms !== undefined ? options.minRms : 0.003;
+  const clarityThreshold = options.clarityThreshold !== undefined ? options.clarityThreshold : 0.35;
+
+  // 1. Verificação de Silêncio e Energia RMS Mínima
+  let sumSq = 0;
+  for (let i = 0; i < samples.length; i++) sumSq += samples[i] * samples[i];
+  const rms = Math.sqrt(sumSq / (samples.length || 1));
+  if (rms < minRms) {
+    return {
+      notes: [],
+      strategySelected: strategy === 'polyphonic_sieve' ? 'polyphonic_sieve' : 'monophonic',
+      decisionReason: `Energia RMS (${rms.toFixed(5)}) abaixo do limiar de silêncio (${minRms}).`,
+      isAbstention: true,
+    };
+  }
+
+  // 2. Execução da Estratégia Monofônica Explícita
+  if (strategy === 'monophonic') {
+    const mono = estimatePitchAutocorrelation(samples, sampleRate, 0, samples.length, 70, 1000, clarityThreshold);
+    if (!mono) {
+      return {
+        notes: [],
+        strategySelected: 'monophonic',
+        decisionReason: 'Autocorrelação monofônica abaixo do limiar de clareza ou sinal aperiódico.',
+        isAbstention: true,
+      };
+    }
+    return {
+      notes: [
+        {
+          midi: mono.midi,
+          frequency: mono.frequency,
+          cents: mono.cents,
+          confidence: mono.clarity,
+          strategyUsed: 'monophonic',
+        },
+      ],
+      strategySelected: 'monophonic',
+      decisionReason: `Fundamental F0 detectada com clareza ${(mono.clarity * 100).toFixed(1)}%.`,
+      isAbstention: false,
+    };
+  }
+
+  // 3. Execução da Estratégia Polifônica por Crivo Harmônico Explícita
+  if (strategy === 'polyphonic_sieve') {
+    const sieveVoices = extractHarmonicSieveVoices(samples, {
+      sampleRate,
+      maxVoices: options.maxPolyphonicVoices || 4,
+      inharmonicityBeta: options.inharmonicityBeta || 8.0,
+      minRms,
+      minPeakToNoiseRatio: options.minPeakToNoiseRatio || 4.0,
+    });
+
+    if (sieveVoices.length === 0) {
+      // Fallback de segurança: se o crivo polifônico não encontrou vozes, aciona o estimador monofônico
+      const monoFallback = estimatePitchAutocorrelation(samples, sampleRate, 0, samples.length, 70, 1000, clarityThreshold);
+      if (monoFallback) {
+        return {
+          notes: [
+            {
+              midi: monoFallback.midi,
+              frequency: monoFallback.frequency,
+              cents: monoFallback.cents,
+              confidence: monoFallback.clarity,
+              strategyUsed: 'monophonic',
+            },
+          ],
+          strategySelected: 'monophonic',
+          decisionReason: 'Crivo polifônico não isolou parciais; acionado fallback monofônico de segurança com sucesso.',
+          isAbstention: false,
+        };
+      }
+
+      return {
+        notes: [],
+        strategySelected: 'polyphonic_sieve',
+        decisionReason: 'Crivo polifônico e fallback monofônico abstiveram-se por ausência de parciais determinísticos audíveis.',
+        isAbstention: true,
+      };
+    }
+
+    return {
+      notes: sieveVoices.map((v) => ({
+        midi: v.midi,
+        frequency: v.frequency,
+        cents: v.cents,
+        confidence: v.saliency,
+        strategyUsed: 'polyphonic_sieve',
+      })),
+      strategySelected: 'polyphonic_sieve',
+      decisionReason: `${sieveVoices.length} voz(es) polifônica(s) resolvida(s) pelo crivo harmônico.`,
+      isAbstention: false,
+    };
+  }
+
+  // 4. Estratégia 'auto': Critério Determinístico Baseado em Complexidade Espectral
+  const sieveVoices = extractHarmonicSieveVoices(samples, {
+    sampleRate,
+    maxVoices: options.maxPolyphonicVoices || 4,
+    inharmonicityBeta: options.inharmonicityBeta || 8.0,
+    minRms,
+    minPeakToNoiseRatio: options.minPeakToNoiseRatio || 4.0,
+  });
+
+  if (sieveVoices.length >= 2) {
+    return {
+      notes: sieveVoices.map((v) => ({
+        midi: v.midi,
+        frequency: v.frequency,
+        cents: v.cents,
+        confidence: v.saliency,
+        strategyUsed: 'polyphonic_sieve',
+      })),
+      strategySelected: 'polyphonic_sieve',
+      decisionReason: `Modo automático: identificadas ${sieveVoices.length} componentes polifônicas concorrentes com suporte harmônico.`,
+      isAbstention: false,
+    };
+  }
+
+  // Se o crivo detectou 0 ou 1 voz, valida com autocorrelação monofônica (mais robusta para solos individuais)
+  const mono = estimatePitchAutocorrelation(samples, sampleRate, 0, samples.length, 70, 1000, clarityThreshold);
+  if (mono) {
+    return {
+      notes: [
+        {
+          midi: mono.midi,
+          frequency: mono.frequency,
+          cents: mono.cents,
+          confidence: mono.clarity,
+          strategyUsed: 'monophonic',
+        },
+      ],
+      strategySelected: 'monophonic',
+      decisionReason: 'Modo automático: linha monofônica dominante confirmada por autocorrelação temporal.',
+      isAbstention: false,
+    };
+  }
+
+  if (sieveVoices.length === 1 && sieveVoices[0].harmonicsFound >= 3) {
+    const v = sieveVoices[0];
+    return {
+      notes: [
+        {
+          midi: v.midi,
+          frequency: v.frequency,
+          cents: v.cents,
+          confidence: v.saliency,
+          strategyUsed: 'polyphonic_sieve',
+        },
+      ],
+      strategySelected: 'polyphonic_sieve',
+      decisionReason: 'Modo automático: nota monofônica resgatada pelo crivo harmônico com múltiplos parciais.',
+      isAbstention: false,
+    };
+  }
+
+  return {
+    notes: [],
+    strategySelected: 'monophonic',
+    decisionReason: 'Modo automático: abstenção por ausência de periodicidade ou energia harmônica consistente.',
+    isAbstention: true,
   };
 }
 

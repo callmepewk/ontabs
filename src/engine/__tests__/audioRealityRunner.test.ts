@@ -2,12 +2,15 @@
 // Testes automatizados do Audio Reality Runner e conformidade de Termos (Gate 0 e Gate 1)
 
 import { describe, it, expect } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { runAudioRealityRunner } from '../../../scripts/audioRealityRunner';
 import { resolveExternalConnectorUrl } from '../connectors';
 
 describe('Ontabs Audio Reality Runner & Regulatory Compliance (Gate 0 & 1)', () => {
-  it('Executa o Audio Reality Runner de ponta a ponta e aprova com status PASS', async () => {
-    const report = await runAudioRealityRunner();
+  it('Executa o Audio Reality Runner de ponta a ponta em modo isolado (writeFiles: false) e aprova com status PASS', async () => {
+    const report = await runAudioRealityRunner({ writeFiles: false });
 
     expect(report.overallStatus).toBe('PASS');
     expect(report.trackA_ExternalReference.status).toBe('PASS');
@@ -44,6 +47,29 @@ describe('Ontabs Audio Reality Runner & Regulatory Compliance (Gate 0 & 1)', () 
     expect(metadata.audioStreamAvailable).toBe(false);
     expect(metadata.requiresLocalAudio).toBe(true);
     expect(metadata.message).toContain('Termos de Serviço');
+  });
+
+  it('Permite direcionar persistência de relatórios para diretório isolado customizado', async () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ontabs-reality-test-'));
+    try {
+      const report = await runAudioRealityRunner({ writeFiles: true, outputDir: tempDir });
+      expect(report.overallStatus).toBe('PASS');
+
+      const jsonPath = path.join(tempDir, 'reality_run_report.json');
+      const mdPath = path.join(tempDir, 'ONTABS_AUDIO_REALITY_REPORT.md');
+
+      expect(fs.existsSync(jsonPath)).toBe(true);
+      expect(fs.existsSync(mdPath)).toBe(true);
+
+      const jsonContent = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+      expect(jsonContent.overallStatus).toBe('PASS');
+      expect(jsonContent.runnerVersion).toBeDefined();
+
+      const mdContent = fs.readFileSync(mdPath, 'utf8');
+      expect(mdContent).toContain('# ONTABS — RELATÓRIO OPERACIONAL');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 });
 

@@ -167,7 +167,13 @@ function generateAuthorizedBandAudioFixture(durationSeconds = 8.0, sampleRate = 
   return buffer;
 }
 
-export async function runAudioRealityRunner(): Promise<RealityRunnerReport> {
+export interface AudioRealityRunnerOptions {
+  writeFiles?: boolean;
+  outputDir?: string;
+}
+
+export async function runAudioRealityRunner(options: AudioRealityRunnerOptions = {}): Promise<RealityRunnerReport> {
+  const { writeFiles = true, outputDir } = options;
   console.log('================================================================');
   console.log('   ONTABS OPERATIONAL AUDIO REALITY RUNNER (GATE 0 & GATE 1)');
   console.log('   Conformidade de Termos, Separação de Stems e Arranjo de Banda');
@@ -432,19 +438,20 @@ export async function runAudioRealityRunner(): Promise<RealityRunnerReport> {
     },
   };
 
-  // Salva o relatório em JSON
-  const assuranceDir = path.join(rootDir, 'docs', 'assurance');
-  if (!fs.existsSync(assuranceDir)) {
-    fs.mkdirSync(assuranceDir, { recursive: true });
-  }
+  if (writeFiles) {
+    // Salva o relatório em JSON
+    const assuranceDir = outputDir || path.join(rootDir, 'docs', 'assurance');
+    if (!fs.existsSync(assuranceDir)) {
+      fs.mkdirSync(assuranceDir, { recursive: true });
+    }
 
-  const jsonReportPath = path.join(assuranceDir, 'reality_run_report.json');
-  fs.writeFileSync(jsonReportPath, JSON.stringify(report, null, 2), 'utf-8');
-  console.log(`\n[✓] Relatório JSON gravado em: ${jsonReportPath}`);
+    const jsonReportPath = path.join(assuranceDir, 'reality_run_report.json');
+    fs.writeFileSync(jsonReportPath, JSON.stringify(report, null, 2), 'utf-8');
+    console.log(`\n[✓] Relatório JSON gravado em: ${jsonReportPath}`);
 
-  // Gera o relatório em Markdown
-  const mdReportPath = path.join(assuranceDir, 'ONTABS_AUDIO_REALITY_REPORT.md');
-  const mdContent = `# ONTABS — RELATÓRIO OPERACIONAL DE REALIDADE ACÚSTICA & ARRANJO DE BANDA
+    // Gera o relatório em Markdown
+    const mdReportPath = path.join(assuranceDir, 'ONTABS_AUDIO_REALITY_REPORT.md');
+    const mdContent = `# ONTABS — RELATÓRIO OPERACIONAL DE REALIDADE ACÚSTICA & ARRANJO DE BANDA
 **Data de Execução:** ${report.executionTimestamp}  
 **Versão do Runner:** ${report.runnerVersion}  
 **Status Consolidado:** **${report.overallStatus}**
@@ -526,8 +533,11 @@ ${report.reconciliationSummary.boundariesRespected.map((b) => `- [x] ${b}`).join
 ${report.reconciliationSummary.pendingIndependentAcceptance.map((p) => `- [ ] ${p}`).join('\n')}
 `;
 
-  fs.writeFileSync(mdReportPath, mdContent, 'utf-8');
-  console.log(`[✓] Relatório Markdown gravado em: ${mdReportPath}`);
+    fs.writeFileSync(mdReportPath, mdContent, 'utf-8');
+    console.log(`[✓] Relatório Markdown gravado em: ${mdReportPath}`);
+  } else {
+    console.log('\n[i] Modo isolado ativo: gravação de relatórios em disco suprimida (writeFiles: false).');
+  }
   console.log(`\n================================================================`);
   console.log(`   EXECUÇÃO CONCLUÍDA: STATUS GERAL ${overallStatus}`);
   console.log(`================================================================\n`);

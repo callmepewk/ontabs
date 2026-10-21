@@ -2,7 +2,6 @@
 // Testes de Regressão e Integridade da Biblioteca OnTabs (Gate V.2B.1.1)
 
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { LibraryPage } from '../LibraryPage';

@@ -21,3 +21,5 @@ export * from './canonicalEvents';
 export * from './electricBass';
 export * from './stemSeparation';
 export * from './admissionGate';
+export * from './scientificRegistry';
+export * from './harmonicSieve';

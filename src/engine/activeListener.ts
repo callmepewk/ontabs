@@ -4,6 +4,7 @@
 
 import { midiToScientific, pitchClassToChromaticIndex, CHROMATIC_SHARPS } from './notes';
 import { CHORD_TEMPLATES } from './chords';
+import { extractFrameNotes, PitchAnalysisStrategy, ExtractedFrameNote } from './audioAnalysis';
 
 export interface TunerResult {
   frequency: number;
@@ -143,3 +144,55 @@ export const ACTIVE_LISTENER_PRIVACY_DISCLOSURE = {
   consentRequired: true,
   description: 'O Active Listener processa o áudio do seu microfone 100% no seu navegador para afinador e feedback em tempo real. Nenhum áudio pessoal é gravado ou transmitido para servidores.',
 };
+
+export interface ActiveListenerAnalysisResult {
+  tuner: TunerResult | null;
+  chordEvaluation: ChordEvaluationResult | null;
+  detectedNotes: ExtractedFrameNote[];
+  strategyUsed: 'monophonic' | 'polyphonic_sieve';
+  decisionReason: string;
+}
+
+/**
+ * Processamento integrado de frames de microfone pelo Active Listener.
+ * Suporta modo afinação monofônica ou reconhecimento polifônico de acordes em tempo real.
+ */
+export function analyzeActiveListenerAudioFrame(
+  samples: Float32Array,
+  sampleRate = 44100,
+  options: {
+    mode?: 'tuner' | 'chord_feedback' | 'auto';
+    expectedChord?: string;
+    referenceA4?: number;
+  } = {}
+): ActiveListenerAnalysisResult {
+  const mode = options.mode || 'auto';
+  let strategy: PitchAnalysisStrategy = 'monophonic';
+
+  if (mode === 'chord_feedback') {
+    strategy = 'polyphonic_sieve';
+  } else if (mode === 'auto') {
+    strategy = options.expectedChord ? 'auto' : 'monophonic';
+  }
+
+  const extraction = extractFrameNotes(samples, sampleRate, { strategy });
+
+  // 1. Afinador cromático (usa a nota dominante)
+  const primaryNote = extraction.notes[0];
+  const tuner = primaryNote ? calculateTunerPitch(primaryNote.frequency, options.referenceA4 || 440) : null;
+
+  // 2. Avaliação de acorde (quando solicitado ou quando polifônico)
+  let chordEvaluation: ChordEvaluationResult | null = null;
+  if (options.expectedChord) {
+    const midis = extraction.notes.map((n) => n.midi);
+    chordEvaluation = evaluateChordPerformance(options.expectedChord, midis);
+  }
+
+  return {
+    tuner,
+    chordEvaluation,
+    detectedNotes: extraction.notes,
+    strategyUsed: extraction.strategySelected,
+    decisionReason: extraction.decisionReason,
+  };
+}

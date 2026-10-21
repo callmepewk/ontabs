@@ -4,7 +4,12 @@
 
 import { Instrument } from '@/types/domain';
 import { authService } from './authService';
-import { computeEnvelopeAndFlux, estimateBpmFromFlux, estimatePitchAutocorrelation } from '../engine';
+import {
+  computeEnvelopeAndFlux,
+  estimateBpmFromFlux,
+  extractFrameNotes,
+  PitchAnalysisStrategy,
+} from '../engine';
 
 export type ConversionStage =
   | 'queued'
@@ -25,11 +30,16 @@ export interface ConversionJob {
   error?: string;
 }
 
+export interface ConversionOptions {
+  strategy?: PitchAnalysisStrategy; // Padrão: 'monophonic'
+}
+
 export interface ConversionService {
   startConversion(
     fileOrTitle: File | string,
     instrument: Instrument,
-    onProgress?: (stage: ConversionStage, progress: number) => void
+    onProgress?: (stage: ConversionStage, progress: number) => void,
+    options?: ConversionOptions
   ): Promise<ConversionJob>;
   getJobStatus(jobId: string): Promise<ConversionJob | null>;
 }
@@ -40,10 +50,12 @@ class SovereignConversionService implements ConversionService {
   async startConversion(
     fileOrTitle: File | string,
     instrument: Instrument = 'guitar',
-    onProgress?: (stage: ConversionStage, progress: number) => void
+    onProgress?: (stage: ConversionStage, progress: number) => void,
+    options?: ConversionOptions
   ): Promise<ConversionJob> {
     const jobId = `job_${Date.now()}`;
     const title = typeof fileOrTitle === 'string' ? fileOrTitle : fileOrTitle.name.replace(/\.[^/.]+$/, '');
+    const strategy = options?.strategy || 'monophonic';
 
     const update = (stage: ConversionStage, progress: number, errorMsg?: string) => {
       const job: ConversionJob = {
@@ -122,17 +134,21 @@ class SovereignConversionService implements ConversionService {
         for (let t = 0; t < Math.min(durationSeconds, 120); t += beatInterval / 2) {
           const sampleIndex = Math.floor(t * sampleRate);
           if (sampleIndex + windowSize <= channelData.length) {
-            const pitch = estimatePitchAutocorrelation(channelData, sampleRate, sampleIndex, windowSize);
-            if (pitch && pitch.clarity >= 0.35 && pitch.midi >= 28 && pitch.midi <= 88) {
-              detectedNotes.push({
-                timestamp: Number(t.toFixed(2)),
-                midi: pitch.midi,
-                frequency: pitch.frequency,
-                cents: pitch.cents,
-                clarity: pitch.clarity,
-                duration: Number((beatInterval * 0.45).toFixed(2)),
-              });
-              pitchClassCounts[pitch.midi % 12]++;
+            const frameSamples = channelData.subarray(sampleIndex, sampleIndex + windowSize);
+            const frameResult = extractFrameNotes(frameSamples, sampleRate, { strategy });
+
+            for (const note of frameResult.notes) {
+              if (note.confidence >= 0.35 && note.midi >= 28 && note.midi <= 88) {
+                detectedNotes.push({
+                  timestamp: Number(t.toFixed(2)),
+                  midi: note.midi,
+                  frequency: note.frequency,
+                  cents: note.cents,
+                  clarity: note.confidence,
+                  duration: Number((beatInterval * 0.45).toFixed(2)),
+                });
+                pitchClassCounts[note.midi % 12]++;
+              }
             }
           }
         }
